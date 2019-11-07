@@ -12,6 +12,8 @@
 class MCTS{
 
     private:
+    public:
+    //INtend this to be private but not now bcoz testing
     struct node{
 
         //Attributes
@@ -31,14 +33,22 @@ class MCTS{
 
     };
 
-    node* root;
-    XOBoard globalGamestate;
 
     //Need to add a constructor to set globalGameState!!
 
-    public:
+
+    node* root;
+
+
+    //NOW true PBLIC starts
+    //Constructor
+    MCTS(XOBoard currentGameState);
+
+
+
+    XOBoard globalGamestate;
+
     //Methods
-    node* createRoot();
     node* createChild(node* parentPTR);
 
     /*This will be the main loop for MCTS which will run until it hits
@@ -48,18 +58,13 @@ class MCTS{
 
 
 
-    //Initialise using XOBoard built in functions
-    node* Initialise();
     node* Selection();
 
-    void ESV();
-    //Maybe put vv in ^^
-    void setpsuedoRoot();
-    node* psuedoRoot;
+    void ESV(node*);
 
-    void Expand();
-    void Simulate();
-    void Update();
+    node* Expand(node*);
+    int Simulate(XOBoard);
+    void Update(int result);
 
 
 

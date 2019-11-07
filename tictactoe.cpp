@@ -16,17 +16,11 @@ using std::vector;
 int main()
 {
 
-    node test1;
-    node test2(node test1);
+    XOBoard start;
 
-    test2.parentGetter();
+    MCTS test(start);
 
-
-
-
-
-
-
+    
 
 
 
