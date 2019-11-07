@@ -64,9 +64,9 @@ class MCTS{
 
     void ESV(node*);
 
-    node* Expand(node*);
+    node* Expand(node*, int);
     int Simulate(XOBoard);
-    void Update(int result);
+    void Update(node*, int result);
 
 
 

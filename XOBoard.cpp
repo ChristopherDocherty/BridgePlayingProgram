@@ -37,16 +37,37 @@ void XOBoard::playGame(){
 }
 
 
+void XOBoard::makeMove(int Move){
+
+    string XorO;
+
+    //Set the marker to whomevers turn it is
+    if(turn%2 == 0){
+        XorO = "X";
+    } else {
+        XorO = "O";
+    }
+
+    board[Move] = XorO;
+
+}
+
+
+
 void XOBoard::computerTurn(){
 
     //Computers turn
+
+    //Here is where MCTS will be called
+
 
     //Generate random number and check if valid
     int rng = rand() % 9;
     while(invalid(rng) ){
         rng = rand() % 9;
     }
-    board[rng] = "O";
+
+    makeMove(rng);
     printBoard();
     
     wonOrNot();
@@ -73,7 +94,8 @@ void XOBoard::playerTurn(){
     }
     
     //Add user's choice and print to screen
-    board[input] = "X";
+
+    makeMove(input);
     printBoard();
 
     wonOrNot();

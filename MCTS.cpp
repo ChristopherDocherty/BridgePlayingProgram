@@ -114,7 +114,7 @@ MCTS::node* MCTS::Selection(node* nodeSelec, vector<int>& parentSimCount){
       all the recursive calls return it all the way to the initial call of
       Selection()*/
 
-    return nodeSelec
+    return nodeSelec;
 
     
 
@@ -128,16 +128,69 @@ MCTS::node* MCTS::Selection(node* nodeSelec, vector<int>& parentSimCount){
 }
 
 
+
 void MCTS::ESV(MCTS::node* psuedoroot){
 
 
+    //Get the game state from parent
+    XOBoard parentGstate = psuedoroot->localGamestate;
+
+    //initialise a counter for checking if endgame is reached
+    int counter = 0;
+
+    //Maybe think about making teh moveset an attribute of MCTS?
+    //Iterate over the moveset
+    for(vector<int>::const_iterator iter = parentGstate.moveset.begin();iter != parentGstate.moveset.end(); ++iter){
+
+        int move = *iter;
+
+        //If move is invalid just increment the counter
+        if(parentGstate.invalid(move)){
+            ++counter;
+        } else{
+
+            //if the move is valid, expand and make a child node
+            //The board is updated in Expand()
+            node* newChild = Expand(psuedoroot, move);
+
+            //Check if the newChild is already in a winning state
+            XOBoard childGstate = newChild->localGamestate;
+            childGstate.wonOrNot(); //MAYBE MOVE THIS INTO EXPAND?
+            if(childGstate.won != 0){
+                /*If the newChild has finished the game
+                  mark it as having done so and
+                  call Update() to update the visit count for all lesser nodes
+                  not sure if I should actually do that though... I think it's
+                  technically a simulation so I should*/
+                newChild->endgame = true;
+                Update(newChild,childGstate.won); //Consider if I should do this or not!
+
+            }
+            
+            /*If the childNode hasn't finished the game simulations must occur until
+            the end*/
+            else {
+
+            //Simulate the rest of the game
+            int result = Simulate(childGstate);
+
+            //Update the results of the simulated game
+            Update(newChild, result);
+            }
+        }
+    }
+    /* At this point all children will have been updated and now either
+    a new node will be selected or the computers time is up and it has 
+    to make it's move*/
 }
 
 
-MCTS::node* MCTS::Expand(MCTS::node* psuedoroot){
+MCTS::node* MCTS::Expand(MCTS::node* psuedoroot, int move){
 
 
 }
+
+
 
 //Need to take in a copy so changes aren't preserved
 int MCTS::Simulate(XOBoard childGamestate){
@@ -145,7 +198,7 @@ int MCTS::Simulate(XOBoard childGamestate){
 
 }
 
-void MCTS::Update(int result){
+void MCTS::Update(node* outerNode, int result){
 
 
 }
@@ -164,6 +217,7 @@ double MCTS::node::getComparisonNum(int parentSimCount){
 }
 
 
+/*
 //I think this is now depreciated but will keep in this commit anyway
 MCTS::node* MCTS::createChild(MCTS::node* parentPTR){
 
@@ -173,7 +227,7 @@ MCTS::node* MCTS::createChild(MCTS::node* parentPTR){
 
     n->IN = parentPTR;
 }
-
+*/
 
 
 
