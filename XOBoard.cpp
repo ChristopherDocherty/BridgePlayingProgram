@@ -48,6 +48,8 @@ void XOBoard::makeMove(int Move){
         XorO = "O";
     }
 
+    ++turn;
+
     board[Move] = XorO;
 
 }

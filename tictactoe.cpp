@@ -16,12 +16,6 @@ using std::vector;
 int main()
 {
 
-    XOBoard start;
-
-    MCTS test(start);
-
-    
-
 
 
 

@@ -151,7 +151,7 @@ void MCTS::ESV(MCTS::node* psuedoroot){
 
             //if the move is valid, expand and make a child node
             //The board is updated in Expand()
-            node* newChild = Expand(psuedoroot, move);
+            node* newChild = Expand(psuedoroot, parentGstate, move);
 
             //Check if the newChild is already in a winning state
             XOBoard childGstate = newChild->localGamestate;
@@ -185,10 +185,29 @@ void MCTS::ESV(MCTS::node* psuedoroot){
 }
 
 
-MCTS::node* MCTS::Expand(MCTS::node* psuedoroot, int move){
+MCTS::node* MCTS::Expand(MCTS::node* psuedoroot, XOBoard prevGstate, int move){
 
+        MCTS::node* childNode = new MCTS::node;
+        
+        //Initialise new node
+        childNode->IN = psuedoroot;
+        
+        //Validity has already been checked in ESV()
+        //Will not affect gamestate of parent ndoe as a copy is passed in
+        prevGstate.makeMove(move);
+        childNode->localGamestate =prevGstate;
 
+        //UPdate parent node's out vector
+        psuedoroot->OUT.push_back(childNode);
+        
+        
+        
 }
+
+        
+
+
+
 
 
 
@@ -217,17 +236,6 @@ double MCTS::node::getComparisonNum(int parentSimCount){
 }
 
 
-/*
-//I think this is now depreciated but will keep in this commit anyway
-MCTS::node* MCTS::createChild(MCTS::node* parentPTR){
-
-    MCTS::node* n = new MCTS::node;
-
-    parentPTR->OUT.push_back(n);
-
-    n->IN = parentPTR;
-}
-*/
 
 
 

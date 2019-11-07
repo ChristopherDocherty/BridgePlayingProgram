@@ -51,7 +51,6 @@ class MCTS{
     XOBoard globalGamestate;
 
     //Methods
-    node* createChild(node* parentPTR);
 
     /*This will be the main loop for MCTS which will run until it hits
     whatever th estop condition is - probably based on time
@@ -64,7 +63,7 @@ class MCTS{
 
     void ESV(node*);
 
-    node* Expand(node*, int);
+    node* Expand(node*, XOBoard, int);
     int Simulate(XOBoard);
     void Update(node*, int result);
 
