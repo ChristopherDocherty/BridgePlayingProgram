@@ -185,44 +185,57 @@ void MCTS::ESV(MCTS::node* psuedoroot){
 }
 
 
-MCTS::node* MCTS::Expand(MCTS::node* psuedoroot, XOBoard prevGstate, int move){
+MCTS::node* MCTS::Expand(MCTS::node* psuedoroot, XOBoard prevGstate, int move){ 
 
-        MCTS::node* childNode = new MCTS::node;
+    MCTS::node* childNode = new MCTS::node;
         
-        //Initialise new node
-        childNode->IN = psuedoroot;
+    //Initialise new node
+    childNode->IN = psuedoroot;
         
-        //Validity has already been checked in ESV()
-        //Will not affect gamestate of parent ndoe as a copy is passed in
-        prevGstate.makeMove(move);
-        childNode->localGamestate =prevGstate;
+    //Validity has already been checked in ESV()
+    //Will not affect gamestate of parent ndoe as a copy is passed in
+    prevGstate.makeMove(move);
+    childNode->localGamestate = prevGstate;
 
-        //UPdate parent node's out vector
-        psuedoroot->OUT.push_back(childNode);
-        
-        
-        
+    //Update parent node's out vector
+    psuedoroot->OUT.push_back(childNode);
+
+    return childNode;        
 }
 
         
-
-
-
 
 
 
 //Need to take in a copy so changes aren't preserved
 int MCTS::Simulate(XOBoard childGamestate){
 
+    //While not won
+    while(childGamestate.wonOrNot == 0){
 
+        int move;
+        bool valid = false;
+        //Continue to generate random move choices until a valid move is found
+        while(valid == false){
+            //Monte Carlo!!!!!!
+
+            valid = childGamestate.invalid(move);
+        }
+        childGamestate.makeMove(move);
+        childGamestate.wonOrNot();
+
+    }
+
+    //Outside the loop means he end of the game has been reached return result
+    return childGamestate.won;
 }
+
+
 
 void MCTS::Update(node* outerNode, int result){
 
 
 }
-
-
 
 
 
