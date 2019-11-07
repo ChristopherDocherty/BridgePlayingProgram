@@ -234,7 +234,18 @@ int MCTS::Simulate(XOBoard childGamestate){
 
 void MCTS::Update(node* outerNode, int result){
 
+    ++outerNode->visitCNT;
 
+    //If result is the integer for comp winning increment win counter
+    if(result ==2){
+    ++outerNode->winCNT;
+    }
+
+    node n = *outerNode;
+
+    if(n.IN != NULL){
+        Update(n.IN,result);
+    }
 }
 
 
