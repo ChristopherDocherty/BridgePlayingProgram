@@ -3,6 +3,7 @@
 
 #include <list>
 #include <math.h>
+#include <vector>
 #include "XOBoard.h"
 
 
@@ -20,6 +21,7 @@ class MCTS{
         int visitCNT =0;
         int winCNT = 0;
         bool endgame = false;
+        double exploreParam = 1.41;
 
         //reference for parent node
         node* IN;
@@ -29,7 +31,7 @@ class MCTS{
         XOBoard localGamestate;
     
         //Methods
-        double getComparisonNum(int parentSimCount, double explor_param);
+        double getComparisonNum(int parentSimCount);
 
     };
 
@@ -58,7 +60,7 @@ class MCTS{
 
 
 
-    node* Selection();
+    node* Selection(node* nodeSelec, vector<int>&  paretnSimCount);
 
     void ESV(node*);
 

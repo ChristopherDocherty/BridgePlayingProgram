@@ -1,7 +1,10 @@
 #include <list>
 #include <math.h>
+#include <vector>
 #include "XOBoard.h"
 #include "MCTS.h"
+
+using std::vector; using std::list;
 
 
 
@@ -23,10 +26,24 @@ MCTS::MCTS(XOBoard currentGameState){
 
 XOBoard MCTS::runMCTS(){
 
+
+    //Probably need to call ESV() on the first node so I don't 
+    //have divide by zero errors
+
+
+
+
     //This is in place of a while loop with some time condition
      for(int counter=0; counter < 1;counter++){
 
-        node* selectedNode = Selection();
+
+        vector<int> parentSimCount;
+        //get count from root and add to vector
+        int rootSimCount = root->visitCNT;
+        parentSimCount.push_back(rootSimCount);
+
+
+        node* selectedNode = Selection(root, parentSimCount);
 
         ESV(selectedNode);
 
@@ -41,7 +58,70 @@ XOBoard MCTS::runMCTS(){
 }
 
 
-MCTS::node* MCTS::Selection(){
+MCTS::node* MCTS::Selection(node* nodeSelec, vector<int>& parentSimCount){
+
+    node n = *nodeSelec;
+
+    //Check if this node is at the farthest reach of the tree
+    if(n.OUT.size() != 0){
+
+        //initialise for comparison with other nodes
+        double maxValue = 0;
+        node* bestChildptr;
+
+        bool EndgameNode = true;
+
+        //Iterate through all the out nodes
+        for(list<node*>::const_iterator iter = n.OUT.begin(); iter != n.OUT.end(); ++iter){
+
+            node* currentCheckNode = *iter;
+
+            //CHECK FOR ENDGAME
+            if(currentCheckNode->endgame == false){
+
+                if(currentCheckNode->getComparisonNum(parentSimCount.back()) > maxValue){
+                    //Mark this node as having a least one child that isn't in endgame
+                    EndgameNode = false;
+                    //Update the max value found 
+                    maxValue = currentCheckNode->getComparisonNum(parentSimCount.back());
+                    bestChildptr = currentCheckNode;
+                }
+            }
+        }
+
+        /*If after iteration all children are found to be endgame nodes
+          so to muse be the current node
+        */
+        if(EndgameNode){
+            nodeSelec->endgame = true;
+            //Remove the current
+            parentSimCount.pop_back;
+            /*recursively call selection on the original parent so another
+              branch can be explored*/
+            Selection((nodeSelec->IN), parentSimCount);
+        } else {
+            /*If this node has a child that isn't at endgame then
+              add this child's visitCNT to parentSimCount and
+              pass into Selection()*/
+
+            parentSimCount.push_back(bestChildptr->visitCNT);
+            Selection(bestChildptr,parentSimCount);
+        }
+    }
+
+    /*When the OUT vector is found to be empty this means the node is
+      at the furthest outreach of the tree, this node (PTR) is then returned s.t.
+      all the recursive calls return it all the way to the initial call of
+      Selection()*/
+
+    return nodeSelec
+
+    
+
+
+
+
+
 
 
 
@@ -76,10 +156,10 @@ void MCTS::Update(int result){
 
 
 
-double MCTS::node::getComparisonNum(int parentSimCount, double explor_param){
+double MCTS::node::getComparisonNum(int parentSimCount){
 
     return winCNT/visitCNT +
-                 explor_param * sqrt(log(parentSimCount)/visitCNT);
+                 exploreParam * sqrt(log(parentSimCount)/visitCNT);
 
 }
 
