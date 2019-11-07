@@ -1,11 +1,16 @@
 #include <list>
 #include <math.h>
 #include <vector>
+#include <string>
+#include <random>
+#include <cstdlib>
 #include "MCTS_XO.h"
 
 using std::vector; using std::list;
 using std::cout; using std::cin;
 using std::endl; using std::string;
+using std::rand; using std::srand;
+using std::time;
 
 
 /* ///////////////////////////////////////////////
@@ -312,7 +317,6 @@ MCTS::node* MCTS::Selection(node* nodeSelec, vector<int>& parentSimCount){
 
 void MCTS::ESV(MCTS::node* psuedoroot){
 
-
     //Get the game state from parent
     XOBoard parentGstate = psuedoroot->localGamestate;
 
@@ -404,10 +408,11 @@ int MCTS::Simulate(MCTS::XOBoard childGamestate){
         int move;
         bool valid = false;
         //Continue to generate random move choices until a valid move is found
-        while(valid == false){
+        srand(time(NULL));
+            while(valid == false){
             //Monte Carlo!!!!!!
-
-            valid = childGamestate.invalid(move);
+            move = rand()%9;
+            valid = !childGamestate.invalid(move);
         }
         childGamestate.makeMove(move);
         childGamestate.wonOrNot();
