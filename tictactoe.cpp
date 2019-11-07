@@ -1,7 +1,9 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <math.h>
 #include "XOBoard.h"
+#include "MCTS.h"
 
 
 using std::cout; using std::cin;
@@ -14,10 +16,16 @@ using std::vector;
 int main()
 {
 
-    XOBoard game1;
+    node test1;
+    node test2(node test1);
 
-    game1.playGame();
-    game1.printBoard();
+    test2.parentGetter();
+
+
+
+
+
+
 
 
 

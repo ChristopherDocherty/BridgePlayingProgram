@@ -7,7 +7,7 @@
 #include <vector>
 
 
-struct XOBoard {
+class XOBoard {
     public:
     void printBoard();
     void playGame();
@@ -20,6 +20,8 @@ struct XOBoard {
     void initialiseBoard();
     bool invalid(int);
     void wonOrNot();
+    void playerTurn();
+    void computerTurn();
 };
 
 

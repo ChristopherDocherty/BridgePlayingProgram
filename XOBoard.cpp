@@ -13,51 +13,15 @@ void XOBoard::playGame(){
     initialiseBoard();
 
 
-    int input;
-
     //Create game loop
     while(true){
-        
-        //Players turn
-        cout << "Enter which square you want to play in :) ";
-        cin >> input;
-
-        while(invalid(input)){
-            cout << "ye canny dae that";
-            cin >> input;
-
-        }
-
-        //Allowing the user to exit on their own accord
-        if(input == -1){
-            cout << "well alllllrighty then";
-            break;
-        }
-
-        //Add user's choice and print to screen
-        board[input] = "X";
-        printBoard();
-
-        wonOrNot();
+        playerTurn();
+        //Check if game is completed     
         if(won != 0) break;
 
-
-        //Computers turn
-
-        //Generate random number and check if valid
-        int rng = rand() % 9;
-        int count = 0;
-        while(invalid(rng) && count < 50){
-            rng = rand() % 9;
-            count += 1;
-        }
-        board[rng] = "O";
-        printBoard();
-
-        wonOrNot();
+        computerTurn();
         if(won != 0) break;
     }
-
 
     //Print the result of the game
     if(won == 2){
@@ -71,6 +35,51 @@ void XOBoard::playGame(){
     cout << "We are done...";
 
 }
+
+
+void XOBoard::computerTurn(){
+
+    //Computers turn
+
+    //Generate random number and check if valid
+    int rng = rand() % 9;
+    while(invalid(rng) ){
+        rng = rand() % 9;
+    }
+    board[rng] = "O";
+    printBoard();
+    
+    wonOrNot();
+}
+
+
+void XOBoard::playerTurn(){
+    //Players turn
+    cout << "Enter which square you want to play in :) ";
+    
+    int input;
+    cin >> input;
+
+    while(invalid(input)){
+        cout << "ye canny dae that";
+        cin >> input;
+    }
+
+    //Allowing the user to exit on their own accord
+    if(input == -1){
+        cout << "well alllllrighty then";
+        won = 3;
+        return;
+    }
+    
+    //Add user's choice and print to screen
+    board[input] = "X";
+    printBoard();
+
+    wonOrNot();
+
+}
+
 
 
 
