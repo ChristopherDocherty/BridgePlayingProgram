@@ -2,8 +2,7 @@
 #include <string>
 #include <vector>
 #include <math.h>
-#include "XOBoard.h"
-#include "MCTS.h"
+#include "MCTS_XO.h"
 
 
 using std::cout; using std::cin;
