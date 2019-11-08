@@ -1,10 +1,13 @@
+#ifndef GUARD_MCTS_h
+#define GUARD_MCTS_h
+
 #include <list>
 #include <math.h>
 #include <vector>
+#include <iostream>
 #include <string>
-#include <random>
 #include <cstdlib>
-#include "MCTS_XO.h"
+#include <ctime>
 
 using std::vector; using std::list;
 using std::cout; using std::cin;
@@ -13,140 +16,81 @@ using std::rand; using std::srand;
 using std::time;
 
 
-/* ///////////////////////////////////////////////
-    Functions for noughts and crosses part of game
-*/ ///////////////////////////////////////////////
+
+/* T must have the methods:
+    T.won holds 0 if not ended or an integer depending on who won
+    T.wonorNot() updates won with correct value
+    T.playerTurn() lets player make a move
+    T.makeMove() updaes a given state with the move passed in
+    T.initialiseBoard() Puts a given gamestate into the starting position
+*/
+
+
+
+template <class T>
+    class MCTS{
+
+        public:
+
+        //Node strcture for building statistics tree
+        struct node{
+
+
+            int visitCNT =0;
+            int winCNT = 0;
+            bool endgame = false;
+            double exploreParam = 1.41;
+            
+            node* IN;
+            std::list<node*> OUT;
+
+            T localGamestate;
+
+            //Methods
+            double getComparisonNum(int parentSimCount);
+        };
+
+
+        node* root;
+        T globalGamestate;
+
+        //Constructor
+        MCTS(); 
+
+        //Methods    
+
+        void Initialise();
+        void playGame();
+
+        T runMCTS();
+
+        node* Selection(node*, std::vector<int>&);
+
+        void ESV(node*);
+
+        node* Expand(node*, T, int);
+        int Simulate(T);
+        void Update(node*, int result); //Might need ot remove recursion from this
+        void cleanMemory();
+    };
 
 
 
 
-void MCTS::XOBoard::makeMove(int Move){
-
-    string XorO;
-
-    //Set the marker to whomevers turn it is
-    if(turn%2 == 0){
-        XorO = "X";
-    } else {
-        XorO = "O";
-    }
-
-    ++turn;
-
-    board[Move] = XorO;
-}
 
 
-
-void MCTS::XOBoard::playerTurn(){
-    //Players turn
-    cout << "Enter which square you want to play in :) ";
-    
-    int input;
-    cin >> input;
-
-    while(invalid(input)){
-        cout << "ye canny dae that";
-        cin >> input;
-    }
-
-    //Allowing the user to exit on their own accord
-    if(input == -1){
-        cout << "well alllllrighty then";
-        won = 3;
-        return;
-    }
-    
-    //Add user's choice and print to screen
-
-    makeMove(input);
-    printBoard();
-
-    wonOrNot();
-}
+using namespace std;
 
 
+template <class T>
+MCTS<T>::MCTS(){}
 
 
-void MCTS::XOBoard::wonOrNot(){
-
-    for(int i = 0; i < win_checks.size(); i ++){
-
-        if(board[win_checks[i][0]] == "X" && board[win_checks[i][1]] == "X" && board[win_checks[i][2]] == "X"){
-            won = 1;
-        } else if (board[win_checks[i][0]] == "O" && board[win_checks[i][1]] == "O" && board[win_checks[i][2]] == "O"){
-            won = 2;
-        }
-    }
-
-    int spaceCNT = 0;
-
-    for(int i = 0; i != board.size(); i ++){
-        if(board[i] == " "){
-            spaceCNT++;
-        }
-    }
-
-    if(spaceCNT == 0 && won == 0){
-        won = 3;
-    }
-}
-
-
-
-bool MCTS::XOBoard::invalid(int index){
-
-    //If the index is OOB or the square has already been played then you can't play
-    if(index == -1 || (index > 8 || board[index] != " ")){
-        return true;
-    }
-    return false;
-}
-
-
-
-void MCTS::XOBoard::initialiseBoard(){
-    //Can probably just put space inside push_back statement...
-    string space = " ";
-
-    for(int i = 0; i != 9; i++){
-        board.push_back(space);
-    }
-}
-
-
-void MCTS::XOBoard::printBoard(){
-
-   /*
-   The board will be displayed as shown below 
-    x | O | O
-    O | x | O
-    O | O | x   
-   */
-
-    for(int i = 0; i != board.size(); i++){
-
-        if(i%3 == 2){
-            cout << board[i] << endl;
-        }else{
-            cout <<  board[i] << "|";
-        }
-
-    }
-}
-
-
-
-/* ///////////////////////////////////////////////
-                Functions for MCTS
-*/ ///////////////////////////////////////////////
-
-MCTS::MCTS(){}
-
-void MCTS::playGame(){
+template <class T>
+void MCTS<T>::playGame(){
 
     //Create a new game state
-    XOBoard newGame;
+    T newGame;
     newGame.initialiseBoard();
     globalGamestate = newGame;
 
@@ -161,7 +105,7 @@ void MCTS::playGame(){
 
         //Computers turn - makes decision through MCTS
         Initialise();
-        XOBoard getUpdatedBoard = runMCTS();
+        T getUpdatedBoard = runMCTS();
         globalGamestate = getUpdatedBoard;
         globalGamestate.printBoard();
         if(globalGamestate.won != 0) break;
@@ -173,7 +117,7 @@ void MCTS::playGame(){
     } else if (globalGamestate.won == 1) {
         cout << "ya won" << endl;
     } else {
-        cout <<"It's a cats game m8";
+        cout <<"It's a cats game";
     }
 
     cout << "We are done...";
@@ -181,8 +125,8 @@ void MCTS::playGame(){
 
 
 
-
-void MCTS::Initialise(){
+template <class T>
+void MCTS<T>::Initialise(){
     
     //Initialise the root node for this gamestate
     node* n = new node;
@@ -195,19 +139,15 @@ void MCTS::Initialise(){
 
 
 
-
-MCTS::XOBoard MCTS::runMCTS(){
+template <class T>
+T MCTS<T>::runMCTS(){
 
     //Perform expansion to create first layer of child nodes
     ESV(root);
 
-
     //This is in place of a while loop with some time condition
-    for(int counter=0; counter < 200;counter++){
+    for(int counter=0; counter < 6000;counter++){
 
-        if(counter == 19){
-            cout<<counter<<endl;
-        }
 
 
         vector<int> parentSimCount;
@@ -217,6 +157,8 @@ MCTS::XOBoard MCTS::runMCTS(){
 
 
         node* selectedNode = Selection(root, parentSimCount);
+
+        if(selectedNode == NULL){break;}
 
         ESV(selectedNode);
 
@@ -228,50 +170,50 @@ MCTS::XOBoard MCTS::runMCTS(){
 
     list<node*> child_list = root->OUT;
 
-    int maxVisitCNT = 0;
+    int maxVisitCNT = -1;
+    int maxWinCNT = -1;
     node* chosenPath;
 
     //find the most promising move
-    for(list<node*>::const_iterator iter = child_list.begin(); iter != child_list.end(); ++iter){
+    for(typename list<node*>::const_iterator iter = child_list.begin(); iter != child_list.end(); ++iter){
         
         node* childNode = *iter;
         
-        if(childNode->visitCNT > maxVisitCNT){
-            maxVisitCNT = childNode->visitCNT;
-            chosenPath = childNode;
+        if(childNode->visitCNT >= maxVisitCNT){
+            if(childNode->winCNT >maxWinCNT){
+                maxVisitCNT = childNode->visitCNT;
+                maxWinCNT = childNode->winCNT;
+                chosenPath = childNode;
+            }
         }
     }
 
-    return chosenPath->localGamestate;
+    T nextMove = chosenPath->localGamestate;
+
+    cleanMemory();
+
+
+    return nextMove;
 }
 
-
-MCTS::node* MCTS::Selection(node* nodeSelec, vector<int>& parentSimCount){
-
-
-    if(nodeSelec == 0x0){
-        cout<< "whyyyyyyy" << endl;
-    }
+template <class T>
+typename MCTS<T>::node* MCTS<T>::Selection(node* nodeSelec, vector<int>& parentSimCount){
 
 
-    node n = *nodeSelec;
+    //Loop until terminal node is reached
+    while(nodeSelec->OUT.size() != 0){
 
-    
-    //Check if this node is at the farthest reach of the tree
-    if(n.OUT.size() != 0){
 
         //initialise for comparison with other nodes
-        double maxValue = 0;
+        double maxValue = -5;
         node* bestChildptr;
 
         bool EndgameNode = true;
 
         //Iterate through all the out nodes
-        for(list<node*>::const_iterator iter = n.OUT.begin(); iter != n.OUT.end(); ++iter){
+        for(typename list<node*>::const_iterator iter = nodeSelec->OUT.begin(); iter != nodeSelec->OUT.end(); ++iter){
 
             node* currentCheckNode = *iter;
-
-            
 
             //CHECK FOR ENDGAME
             if(currentCheckNode->endgame == false){
@@ -293,48 +235,40 @@ MCTS::node* MCTS::Selection(node* nodeSelec, vector<int>& parentSimCount){
             nodeSelec->endgame = true;
             //Remove the current
             parentSimCount.pop_back();
-            /*recursively call selection on the original parent so another
-              branch can be explored*/
-            Selection((nodeSelec->IN), parentSimCount);
+            //As this ndoe was found to be invalid need to assign nodeSelec to its parent
+
+            if(nodeSelec->IN == NULL){
+                return NULL;
+            }
+            nodeSelec = nodeSelec->IN; 
+
         } else {
             /*If this node has a child that isn't at endgame then
               add this child's visitCNT to parentSimCount and
-              pass into Selection()*/
+              reassign nodeSelec*/
            
 
             parentSimCount.push_back(bestChildptr->visitCNT);
-            cout << bestChildptr << endl;
-            cout << "pause" << endl;
-            node* temp;
-            temp = Selection(bestChildptr,parentSimCount);
-            nodeSelec = temp;
+            
+            nodeSelec = bestChildptr;
         }
     }
 
     /*When the OUT vector is found to be empty this means the node is
-      at the furthest outreach of the tree, this node (PTR) is then returned s.t.
-      all the recursive calls return it all the way to the initial call of
-      Selection()*/
+      at the furthest outreach of the tree, this node (PTR) is then returned*/
 
     return nodeSelec;
-
-    
-
-
-
-
-
-
-
-
 }
 
 
 
-void MCTS::ESV(MCTS::node* psuedoroot){
+
+
+template <class T>
+void MCTS<T>::ESV(MCTS::node* psuedoroot){
 
     //Get the game state from parent
-    XOBoard parentGstate = psuedoroot->localGamestate;
+    T parentGstate = psuedoroot->localGamestate;
 
     //initialise a counter for checking if endgame is reached
     int counter = 0;
@@ -355,7 +289,7 @@ void MCTS::ESV(MCTS::node* psuedoroot){
             node* newChild = Expand(psuedoroot, parentGstate, move);
 
             //Check if the newChild is already in a winning state
-            XOBoard childGstate = newChild->localGamestate;
+            T childGstate = newChild->localGamestate;
             childGstate.wonOrNot(); //MAYBE MOVE THIS INTO EXPAND?
             if(childGstate.won != 0){
                 /*If the newChild has finished the game
@@ -392,8 +326,8 @@ void MCTS::ESV(MCTS::node* psuedoroot){
     to make it's move*/
 }
 
-
-MCTS::node* MCTS::Expand(MCTS::node* psuedoroot, MCTS::XOBoard prevGstate, int move){ 
+template <class T>
+typename MCTS<T>::node* MCTS<T>::Expand(MCTS<T>::node* psuedoroot, T prevGstate, int move){ 
 
     MCTS::node* childNode = new MCTS::node;
         
@@ -416,7 +350,8 @@ MCTS::node* MCTS::Expand(MCTS::node* psuedoroot, MCTS::XOBoard prevGstate, int m
 
 
 //Need to take in a copy so changes aren't preserved
-int MCTS::Simulate(MCTS::XOBoard childGamestate){
+template <class T>
+int MCTS<T>::Simulate(T childGamestate){
 
     //While not won
     while(childGamestate.won == 0){
@@ -426,7 +361,6 @@ int MCTS::Simulate(MCTS::XOBoard childGamestate){
         //Continue to generate random move choices until a valid move is found
         srand(time(NULL));
             while(valid == false){
-            //Monte Carlo!!!!!!
             move = rand()%9;
             valid = !childGamestate.invalid(move);
         }
@@ -440,8 +374,8 @@ int MCTS::Simulate(MCTS::XOBoard childGamestate){
 }
 
 
-
-void MCTS::Update(node* outerNode, int result){
+template <class T>
+void MCTS<T>::Update(MCTS<T>::node* outerNode, int result){
 
     ++outerNode->visitCNT;
 
@@ -458,14 +392,31 @@ void MCTS::Update(node* outerNode, int result){
 }
 
 
+template <class T>
+void MCTS<T>::cleanMemory(){
+    //This starts after a search has occurred 
+    //All the nodes need to be deleted in order to start over again
+    //Need efficient way to traverse tree
 
-
-
-double MCTS::node::getComparisonNum(int parentSimCount){
-
-    return winCNT/visitCNT +
-                 exploreParam * sqrt(log(parentSimCount)/visitCNT);
-
+    node* currentnode = root;
+    
+    while (root->OUT.size() != 0){   
+        if (currentnode->OUT.size() !=0)
+        {
+            currentnode = currentnode->OUT.front();
+        }
+        else 
+        {
+            //set current node to parent node when terminus reached
+            currentnode = currentnode->IN;
+            
+            //get the pointer from the start of list
+            //then delete it
+            node* ptrForDelete = currentnode->OUT.front();
+            currentnode->OUT.pop_front();
+            delete ptrForDelete;
+        }
+    }
 }
 
 
@@ -474,3 +425,18 @@ double MCTS::node::getComparisonNum(int parentSimCount){
 
 
 
+
+
+
+
+template <class T>
+double MCTS<T>::node::getComparisonNum(int parentSimCount){
+
+    return winCNT/(double)visitCNT + exploreParam * sqrt(log(parentSimCount)/visitCNT);
+
+}
+
+
+
+
+#endif
