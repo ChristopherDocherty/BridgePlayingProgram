@@ -145,6 +145,11 @@ MCTS::MCTS(){}
 
 void MCTS::playGame(){
 
+    //Create a new game state
+    XOBoard newGame;
+    newGame.initialiseBoard();
+    globalGamestate = newGame;
+
     Initialise();
 
 
@@ -155,8 +160,10 @@ void MCTS::playGame(){
         if(globalGamestate.won != 0) break;
 
         //Computers turn - makes decision through MCTS
+        Initialise();
         XOBoard getUpdatedBoard = runMCTS();
         globalGamestate = getUpdatedBoard;
+        globalGamestate.printBoard();
         if(globalGamestate.won != 0) break;
     }
 
@@ -176,22 +183,13 @@ void MCTS::playGame(){
 
 
 void MCTS::Initialise(){
-    //Create a new game state
-    XOBoard newGame;
-    newGame.initialiseBoard();
-
-
-    //Given the board every time its the computers turn 
-    globalGamestate = newGame;
-
-
+    
     //Initialise the root node for this gamestate
     node* n = new node;
     n->IN = NULL;
     n->localGamestate = globalGamestate;
 
     root = n;
-
 }
 
 
@@ -205,7 +203,11 @@ MCTS::XOBoard MCTS::runMCTS(){
 
 
     //This is in place of a while loop with some time condition
-    for(int counter=0; counter < 1;counter++){
+    for(int counter=0; counter < 200;counter++){
+
+        if(counter == 19){
+            cout<<counter<<endl;
+        }
 
 
         vector<int> parentSimCount;
@@ -246,8 +248,15 @@ MCTS::XOBoard MCTS::runMCTS(){
 
 MCTS::node* MCTS::Selection(node* nodeSelec, vector<int>& parentSimCount){
 
+
+    if(nodeSelec == 0x0){
+        cout<< "whyyyyyyy" << endl;
+    }
+
+
     node n = *nodeSelec;
 
+    
     //Check if this node is at the farthest reach of the tree
     if(n.OUT.size() != 0){
 
@@ -261,6 +270,8 @@ MCTS::node* MCTS::Selection(node* nodeSelec, vector<int>& parentSimCount){
         for(list<node*>::const_iterator iter = n.OUT.begin(); iter != n.OUT.end(); ++iter){
 
             node* currentCheckNode = *iter;
+
+            
 
             //CHECK FOR ENDGAME
             if(currentCheckNode->endgame == false){
@@ -289,9 +300,14 @@ MCTS::node* MCTS::Selection(node* nodeSelec, vector<int>& parentSimCount){
             /*If this node has a child that isn't at endgame then
               add this child's visitCNT to parentSimCount and
               pass into Selection()*/
+           
 
             parentSimCount.push_back(bestChildptr->visitCNT);
-            Selection(bestChildptr,parentSimCount);
+            cout << bestChildptr << endl;
+            cout << "pause" << endl;
+            node* temp;
+            temp = Selection(bestChildptr,parentSimCount);
+            nodeSelec = temp;
         }
     }
 
