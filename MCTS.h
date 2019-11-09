@@ -38,7 +38,6 @@ template <class T>
 
             int visitCNT =0;
             int winCNT = 0;
-            bool endgame = false;
             double exploreParam = 1.41;
             
             node* IN;
@@ -66,7 +65,8 @@ template <class T>
 
         node* Selection(node*, std::vector<int>&);
 
-        void ESV(node*);
+        //Will return NULL unless a created state has won
+        node* ESV(node*);
 
         node* Expand(node*, T, int);
         int Simulate(T);
@@ -89,6 +89,8 @@ MCTS<T>::MCTS(){}
 template <class T>
 void MCTS<T>::playGame(){
 
+    
+
     //Create a new game state
     T newGame;
     newGame.initialiseBoard();
@@ -103,11 +105,13 @@ void MCTS<T>::playGame(){
         //Check if game is completed     
         if(globalGamestate.won != 0) break;
 
+        cout << "Computer's turn!"<<endl;
         //Computers turn - makes decision through MCTS
         Initialise();
         T getUpdatedBoard = runMCTS();
         globalGamestate = getUpdatedBoard;
         globalGamestate.printBoard();
+        globalGamestate.wonOrNot();
         if(globalGamestate.won != 0) break;
     }
 
@@ -117,7 +121,7 @@ void MCTS<T>::playGame(){
     } else if (globalGamestate.won == 1) {
         cout << "ya won" << endl;
     } else {
-        cout <<"It's a cats game";
+        cout <<"It's a cats game" << endl;
     }
 
     cout << "We are done...";
@@ -142,14 +146,20 @@ void MCTS<T>::Initialise(){
 template <class T>
 T MCTS<T>::runMCTS(){
 
+    //pointer for a potential winning move
+    node* potentialWin = NULL;
+
     //Perform expansion to create first layer of child nodes
-    ESV(root);
+    potentialWin = ESV(root);
+
+    if(potentialWin != NULL){
+        return potentialWin->localGamestate;
+    }
 
     //This is in place of a while loop with some time condition
-    for(int counter=0; counter < 6000;counter++){
+    for(int counter=0; counter < 600;counter++){
 
-
-
+        
         vector<int> parentSimCount;
         //get count from root and add to vector
         int rootSimCount = root->visitCNT;
@@ -158,10 +168,10 @@ T MCTS<T>::runMCTS(){
 
         node* selectedNode = Selection(root, parentSimCount);
 
-        if(selectedNode == NULL){break;}
+        //SHOUDL BE OKAY TO REMOVE
+        //if(selectedNode == NULL){break;}
 
-        ESV(selectedNode);
-
+        potentialWin = ESV(selectedNode);
     }
 
      //Look at all children of node and select one with most simulations
@@ -206,56 +216,24 @@ typename MCTS<T>::node* MCTS<T>::Selection(node* nodeSelec, vector<int>& parentS
 
         //initialise for comparison with other nodes
         double maxValue = -5;
-        node* bestChildptr;
+        node* bestChildptr = NULL;
 
-        bool EndgameNode = true;
-
-        //Iterate through all the out nodes
+        //Iterate through all the out nodes to find most suitable
         for(typename list<node*>::const_iterator iter = nodeSelec->OUT.begin(); iter != nodeSelec->OUT.end(); ++iter){
 
             node* currentCheckNode = *iter;
 
-            //CHECK FOR ENDGAME
-            if(currentCheckNode->endgame == false){
-
-                if(currentCheckNode->getComparisonNum(parentSimCount.back()) > maxValue){
-                    //Mark this node as having a least one child that isn't in endgame
-                    EndgameNode = false;
-                    //Update the max value found 
-                    maxValue = currentCheckNode->getComparisonNum(parentSimCount.back());
-                    bestChildptr = currentCheckNode;
-                }
-            }
+            if(currentCheckNode->getComparisonNum(parentSimCount.back()) > maxValue){  
+                //Update the max value found 
+                maxValue = currentCheckNode->getComparisonNum(parentSimCount.back());
+                bestChildptr = currentCheckNode;
+            }  
         }
 
-        /*If after iteration all children are found to be endgame nodes
-          so to muse be the current node
-        */
-        if(EndgameNode){
-            nodeSelec->endgame = true;
-            //Remove the current
-            parentSimCount.pop_back();
-            //As this ndoe was found to be invalid need to assign nodeSelec to its parent
-
-            if(nodeSelec->IN == NULL){
-                return NULL;
-            }
-            nodeSelec = nodeSelec->IN; 
-
-        } else {
-            /*If this node has a child that isn't at endgame then
-              add this child's visitCNT to parentSimCount and
-              reassign nodeSelec*/
-           
-
-            parentSimCount.push_back(bestChildptr->visitCNT);
-            
-            nodeSelec = bestChildptr;
-        }
+        //Should be a one pass through the tree
+        parentSimCount.push_back(bestChildptr->visitCNT);        
+        nodeSelec = bestChildptr;
     }
-
-    /*When the OUT vector is found to be empty this means the node is
-      at the furthest outreach of the tree, this node (PTR) is then returned*/
 
     return nodeSelec;
 }
@@ -265,13 +243,10 @@ typename MCTS<T>::node* MCTS<T>::Selection(node* nodeSelec, vector<int>& parentS
 
 
 template <class T>
-void MCTS<T>::ESV(MCTS::node* psuedoroot){
+typename MCTS<T>::node* MCTS<T>::ESV(MCTS::node* psuedoroot){
 
     //Get the game state from parent
     T parentGstate = psuedoroot->localGamestate;
-
-    //initialise a counter for checking if endgame is reached
-    int counter = 0;
 
     //Maybe think about making teh moveset an attribute of MCTS?
     //Iterate over the moveset
@@ -279,52 +254,36 @@ void MCTS<T>::ESV(MCTS::node* psuedoroot){
 
         int move = *iter;
 
-        //If move is invalid just increment the counter
-        if(parentGstate.invalid(move)){
-            ++counter;
-        } else{
-
-            //if the move is valid, expand and make a child node
+        //if the move is valid, expand and make a child node
+        if(!parentGstate.invalid(move)){
             //The board is updated in Expand()
             node* newChild = Expand(psuedoroot, parentGstate, move);
 
             //Check if the newChild is already in a winning state
             T childGstate = newChild->localGamestate;
-            childGstate.wonOrNot(); //MAYBE MOVE THIS INTO EXPAND?
-            if(childGstate.won != 0){
-                /*If the newChild has finished the game
-                  mark it as having done so and
-                  call Update() to update the visit count for all lesser nodes
-                  not sure if I should actually do that though... I think it's
-                  technically a simulation so I should*/
-                newChild->endgame = true;
-                Update(newChild,childGstate.won); //Consider if I should do this or not!
+            childGstate.wonOrNot(); 
 
+
+            int result;
+            //Only simulate if th result is not already known
+            if(childGstate.won == 0){
+                result = Simulate(childGstate);
+            } else{
+                result = childGstate.won;
             }
             
-            /*If the childNode hasn't finished the game simulations must occur until
-            the end*/
-            else {
-
-            //Simulate the rest of the game
-            int result = Simulate(childGstate);
-
             //Update the results of the simulated game
             Update(newChild, result);
-            }
+    
         }
-
-    //If none of the moves were valid then the endgame is reached.
-    //Might be unecessary but shouldn't hurt to be here
-    if(counter == parentGstate.moveset.size()){
-        psuedoroot->endgame = true;
-    }
-
     }
     /* At this point all children will have been updated and now either
     a new node will be selected or the computers time is up and it has 
     to make it's move*/
+    node* placeholderPTR = NULL;
+    return placeholderPTR;
 }
+
 
 template <class T>
 typename MCTS<T>::node* MCTS<T>::Expand(MCTS<T>::node* psuedoroot, T prevGstate, int move){ 
@@ -359,7 +318,7 @@ int MCTS<T>::Simulate(T childGamestate){
         int move;
         bool valid = false;
         //Continue to generate random move choices until a valid move is found
-        srand(time(NULL));
+        //srand(time(NULL));
             while(valid == false){
             move = rand()%9;
             valid = !childGamestate.invalid(move);
@@ -380,7 +339,8 @@ void MCTS<T>::Update(MCTS<T>::node* outerNode, int result){
     ++outerNode->visitCNT;
 
     //If result is the integer for comp winning increment win counter
-    if(result ==2){
+    //Can change to include draw if wanting either a draw or win
+    if(result ==2 ){
     ++outerNode->winCNT;
     }
 
