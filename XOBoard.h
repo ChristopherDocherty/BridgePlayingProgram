@@ -5,12 +5,7 @@
 #include <iostream>
 #include <string>
 #include <ctime>
- 
-using std::vector; using std::list;
-using std::cout; using std::cin;
-using std::endl; using std::string;
 
- 
  
  class XOBoard{
     public:
@@ -22,7 +17,7 @@ using std::endl; using std::string;
     void makeMove(int);
 
     std::vector<std::string> board;
-    std::vector< std::vector<int>> win_checks = {{0,1,2},{3,4,5},{6,7,8},{0,3,6},{1,4,7},{2,5,8},{0,4,8},{2,4,6}};
+    std::vector<std::vector<int>> win_checks = {{0,1,2},{3,4,5},{6,7,8},{0,3,6},{1,4,7},{2,5,8},{0,4,8},{2,4,6}};
     int turn = 0;
 
     void initialiseBoard();

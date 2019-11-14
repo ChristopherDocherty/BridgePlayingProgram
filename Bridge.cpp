@@ -1,26 +1,97 @@
+#include <iostream>
+#include <string>
+#include <list>
+#include <vector>
 #include "Bridge.h"
 
+using namespace std;
 
+
+
+
+Bridge::Card::Card(int rank, int suit){
+
+
+}
 
 
 
 void Bridge::initialiseBoard(){
 
 
-    //Takes in input from the user to fill current hands
-    //Take in format:
-    //Dealer S{2,5,K} H{4,6,10} ...
+    won, turn, tricksMade_Dec = 0;
+
+
+    cout << "Input the current board state, " << endl;
+
+
+    vector<string> dir = {"N","E","S","W"};
+
+   for(int i=0; i !=4; ++i){ //Iterate over the hands
+
+        cout << "Please enter " << dir[i] << "'s hand: ";
+
+        for(int j=1; j !=4; ++j){ //Iterate over the suits
+
+            //get suit from cin
+
+            //Make list<char> holding all the cards for this suit
+            //If I can make a hash table/dictionary look-a-like
+            //can simplify things a bit
+
+            //End up with list<int>
+
+
+            /*for(list<string>::const_iter rank = list<int>NAME.begin(); rank !=list<int>NAME.end(); ++ rank){
+
+            Card newCard(*rank,suit); 
+
+            hands[j].push_back(Card);
+
+            }*/
+        }
+
+    }
+
+    cout << endl;
+
+    cout << "Please enter the contract with the level and trump suit seperated by a space: ";
+
+    int forCalc;
+    string forSuitDeterm;
+    cin >> forCalc >> forSuitDeterm;
+
+    tricksToWin = 6 + forCalc;
+
+    //Use same method as in for loop (currently line 36) to turn
+    //suit into integer
+
+
+    //TODO
     //Display and give chance to check inbetween each hand population
-    //Clockwise next player...
-    //again...
-    //again...
+    
+    /*
 
-    //Enter the contract
-    //Calculate number of tricks needed to win
+    cout << "Which hand is controlled by the computer? ";
 
-    //Enter which player is the computer
+    cin >> something;
 
-    //All stored in attributes of class instance
+    f(something) gives number 1-4 indicating direction
+
+    assign to attribute
+    */
+
+   /*
+
+    cout << "Which hand belongs ot the declarer? ";
+
+    cin >> something;
+
+    f(something) gives number 1-4 indicating direction
+
+    assign to attribute
+   */
+    
 
 }
 
@@ -28,9 +99,10 @@ void Bridge::initialiseBoard(){
 
 void Bridge::wonOrNot(){
 
-    //check attribute "tricks made" against win condition
-    //return == result
+    //check tricksMade_Dec == tricksToWin
 
+    //If not satisified then check 13- turn//4 < (tricksToWin - tricksMade_Dec)
+        //if this holds then not won
 }
 
 
@@ -39,7 +111,7 @@ void Bridge::wonOrNot(){
 
 void Bridge::makeMove(int move){
 
-    //update gamestate by removing card 
+    //update gamestate by removing card [OBJECT]
     //corresponding to move from hand 
     //Hand is determined by looking at %4 of 
     //turn counter
@@ -100,10 +172,10 @@ int Bridge::trickWinner(){
     //Looks at current play cache and determines winner
     //Store two lists: one of cards played and one of player {N,E,S,W}
     
-    //initialise on first card in vector and compare with next -- need to override > method
-    //if bigger then redefine to the larger card
+    //initialise on first position and compare with next -- need to override > method
+    //if bigger then redefine to the larger card's position
 
-    //
+    //Return 1 or 2 depending on whose trick it is
 
 
 }
