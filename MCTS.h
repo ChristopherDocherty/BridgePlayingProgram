@@ -332,6 +332,11 @@ int MCTS<T>::Simulate(T childGamestate){
     return childGamestate.won;
 }
 
+/*This method needs significant retooling I believe. currently it selects opponents moves
+based on what is best for the computer which is the moves a very bad player would make.
+Not sure if updating the win count of the node should be based on which players turn it is
+but will check when I get internet again*/
+
 
 template <class T>
 void MCTS<T>::Update(MCTS<T>::node* outerNode, int result){
