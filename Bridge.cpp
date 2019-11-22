@@ -223,6 +223,43 @@ void Bridge::printBoard(){
     
     //Need to put the played cards out in the centre
 
+/* 
+                   S  K Q 9 4
+                   H  10 7 2
+                   D  8 7 5
+                   C  Q 9 8
+
+
+    S  6 5             AS       S  J 7 3
+    H  K Q J 5 4    10D  KC     H  9 3
+    D  9               10S      D  K 6 4 3 2
+    C  J 7 6 4                  C  10 2
+
+
+                   S  A 8 2
+                   H  A 8 6
+                   D  A Q J 
+                   C  A 5 3
+
+
+Specifications to get above layout:
+
+2 spaces inbetween suit and first card, one space inbetween each card
+
+2 Carriage returns between N and E & W
+
+5 Spaces inbetween rightmost E's rightmost card and E played card unless
+10 card in which case only 4 spaces
+
+5 Spaces to west as well (same exception for 10)
+
+7 spaces between rightmost E card and N played card (likewise for S played card)
+
+3 spaces inbetween rightmost E card and S,H etc. of N & S (likewise with W on other side)
+
+
+*/
+
 
     //General plan is to make 5 substrings - one for each hand
     //plus one for the centre
