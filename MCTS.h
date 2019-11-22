@@ -77,11 +77,6 @@ template <class T>
 
 
 
-
-
-using namespace std;
-
-
 template <class T>
 MCTS<T>::MCTS(){}
 
@@ -383,11 +378,6 @@ void MCTS<T>::cleanMemory(){
         }
     }
 }
-
-
-
-
-
 
 
 

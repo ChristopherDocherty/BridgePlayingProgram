@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstring>
 #include <string>
 #include <list>
 #include <vector>
@@ -9,10 +10,74 @@ using namespace std;
 
 
 
-Bridge::Card::Card(int rank, int suit){
+Bridge::Card::Card(string rank_str, int suit_int){
+    //method to construct card by changing string card
+    //specifiers to integers
 
+    suit = suit_int;
+
+
+    //First check if non integer rank string
+
+    if(rank_str == "A"){
+        rank = 14;
+    } else if(rank_str == "K"){
+        rank = 13;
+    } else if(rank_str == "Q"){
+        rank = 12;
+    } else if(rank_str == "J"){
+        rank = 11;
+    } else {
+        rank = stoi(rank_str);
+    }
+
+    //Currently no error catching is user enters invalid card
+    //Program will crash
 
 }
+
+
+//Overloading > operator
+bool operator>(const Bridge::Card &c1,const Bridge::Card &c2){
+    return c1.rank  > c2.rank;
+}
+//NB just check suit before comparisons - will do in trick winning method
+
+
+
+
+int Bridge::suittoI(string suit_str){
+
+    if(suit_str == "NT"){
+        return 5;
+    } else if (suit_str == "S"){
+        return 4;
+    }  else if (suit_str == "H"){
+        return 3;
+    }  else if (suit_str == "D"){
+        return 2;
+    }  else if (suit_str == "C"){
+        return 1;
+    }
+
+}
+
+int Bridge::get_dir(string dir){
+
+    if (dir == "N"){
+        return 1;
+    }  else if (dir == "E"){
+        return 2;
+    }  else if (dir == "S"){
+        return 3;
+    }  else if (dir == "W"){
+        return 4;
+    }
+
+}
+
+
+
 
 
 
@@ -29,26 +94,28 @@ void Bridge::initialiseBoard(){
 
    for(int i=0; i !=4; ++i){ //Iterate over the hands
 
-        cout << "Please enter " << dir[i] << "'s hand: ";
+        cout << "Please enter " << dir[i] << "'s hand, in order of decreasing suit rank: " << endl;
 
         for(int j=1; j !=4; ++j){ //Iterate over the suits
 
-            //get suit from cin
-
-            //Make list<char> holding all the cards for this suit
-            //If I can make a hash table/dictionary look-a-like
-            //can simplify things a bit
-
-            //End up with list<int>
+            
+            cout<< "Enter next suit: ";
 
 
-            /*for(list<string>::const_iter rank = list<int>NAME.begin(); rank !=list<int>NAME.end(); ++ rank){
+            string input;
 
-            Card newCard(*rank,suit); 
+            char* cstr = new char [input.length() +1];
+            strcpy(cstr,input.c_str());
 
-            hands[j].push_back(Card);
+            char* p  = strtok(cstr,",");
 
-            }*/
+            //Add all card instances to hand
+            while(p != 0){
+                string rank_str = string(p); //Might complain about p not being const
+                Card newCard(p,5-j); 
+                hands[i].push_back(newCard);
+            }
+
         }
 
     }
@@ -63,35 +130,30 @@ void Bridge::initialiseBoard(){
 
     tricksToWin = 6 + forCalc;
 
-    //Use same method as in for loop (currently line 36) to turn
-    //suit into integer
-
+    int trumpSuit = suittoI(forSuitDeterm);
 
     //TODO
     //Display and give chance to check inbetween each hand population
+    printBoard();
     
-    /*
 
+    //Get computer direction
     cout << "Which hand is controlled by the computer? ";
 
-    cin >> something;
+    string dir_str;
 
-    f(something) gives number 1-4 indicating direction
+    cin >> dir_str;
 
-    assign to attribute
-    */
+    comp_dir = get_dir(dir_str);
+    
 
-   /*
-
+    //Get declarer direction
     cout << "Which hand belongs ot the declarer? ";
 
-    cin >> something;
+    cin >> dir_str;
 
-    f(something) gives number 1-4 indicating direction
+    declarer = get_dir(dir_str);
 
-    assign to attribute
-   */
-    
 
 }
 
@@ -160,6 +222,19 @@ void Bridge::printBoard(){
     //Treat S as did N
     
     //Need to put the played cards out in the centre
+
+
+    //General plan is to make 5 substrings - one for each hand
+    //plus one for the centre
+
+    //concatenate for print string
+
+
+
+
+
+    //Also need to bmake sure partially populated hands can be displayed 
+    //for the the line marked 8 with n bookmarks
 
 }
 
