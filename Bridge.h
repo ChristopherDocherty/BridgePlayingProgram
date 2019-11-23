@@ -44,7 +44,8 @@ class Bridge{
     std::vector<Card> roundRecord_Card; //For determining winning card
     std::vector<Card> roundRecord_Dir; //For matching the winning card with a hand
 
-    int suittoI(std::string);
+    int trumpSuitToInt(std::string);
+    std::string intToRank(int);
     int get_dir(std::string);
 
 

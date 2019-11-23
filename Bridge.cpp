@@ -46,7 +46,7 @@ bool operator>(const Bridge::Card &c1,const Bridge::Card &c2){
 
 
 
-int Bridge::suittoI(string suit_str){
+int Bridge::trumpSuitToInt(string suit_str){
 
     if(suit_str == "NT"){
         return 5;
@@ -61,6 +61,27 @@ int Bridge::suittoI(string suit_str){
     }
 
 }
+
+
+string Bridge::intToRank(int rank){
+
+    string rank_str;
+
+    if(rank == 14){
+        rank_str = "A";
+    } else if(rank == 13){
+        rank_str = "K";
+    } else if(rank == 12){
+        rank_str = "Q";
+    } else if(rank == 11){
+        rank_str = "J";
+    } else {
+        rank_str = to_string(rank);
+    }
+
+}
+
+
 
 int Bridge::get_dir(string dir){
 
@@ -264,7 +285,26 @@ Specifications to get above layout:
     //General plan is to make 5 substrings - one for each hand
     //plus one for the centre
 
-    //concatenate for print string
+    //Need to do middle row string first so that top row lenght is known
+
+
+    for(vector< vector<Card> >::iterator iter = hands.begin(); iter != hands.end(); ++iter){
+
+
+        string S = "S ";
+        string H = "H ";
+        string D = "D ";
+        string C = "C ";
+
+        for(vector<Card>::iterator card = iter->begin(); card != iter->end(); ++card){
+
+            
+
+
+        }
+
+
+    }
 
 
 
