@@ -10,31 +10,19 @@ using namespace std;
 
 
 
-Bridge::Card::Card(string rank_str, int suit_int){
+Bridge::Card::Card(string rank_str="-1", string suit_str="-1"){
     //method to construct card by changing string card
     //specifiers to integers
 
-    suit = suit_int;
+    suit = suitToInt(suit_str);
+    rank = rankToInt(rank_str);
 
-
-    //First check if non integer rank string
-
-    if(rank_str == "A"){
-        rank = 14;
-    } else if(rank_str == "K"){
-        rank = 13;
-    } else if(rank_str == "Q"){
-        rank = 12;
-    } else if(rank_str == "J"){
-        rank = 11;
-    } else {
-        rank = stoi(rank_str);
-    }
+    //FOr default constructor both values will be -1
 
     //Currently no error catching is user enters invalid card
     //Program will crash
-
 }
+
 
 
 //Overloading > operator
@@ -45,44 +33,68 @@ bool operator>(const Bridge::Card &c1,const Bridge::Card &c2){
 
 
 
-
-int Bridge::trumpSuitToInt(string suit_str){
-
-    if(suit_str == "NT"){
-        return 5;
-    } else if (suit_str == "S"){
-        return 4;
-    }  else if (suit_str == "H"){
-        return 3;
-    }  else if (suit_str == "D"){
-        return 2;
-    }  else if (suit_str == "C"){
-        return 1;
-    }
-
-}
-
-
 string Bridge::intToRank(int rank){
 
-    string rank_str;
-
     if(rank == 14){
-        rank_str = "A";
+        return "A";
     } else if(rank == 13){
-        rank_str = "K";
+        return "K";
     } else if(rank == 12){
-        rank_str = "Q";
+        return "Q";
     } else if(rank == 11){
-        rank_str = "J";
+        return"J";
     } else {
-        rank_str = to_string(rank);
+        return to_string(rank);
     }
-
 }
 
+int Bridge::rankToInt(string rank_str){
+    
+    if(rank_str == "A"){
+        return 14;
+    } else if(rank_str == "K"){
+        return 13;
+    } else if(rank_str == "Q"){
+        return 12;
+    } else if(rank_str == "J"){
+        return 11;
+    } else {
+        return stoi(rank_str);
+    }
+}
 
+//Temporary measure until I leanr inheritance
+int Bridge::Card::rankToInt(string rank_str){
+    
+    if(rank_str == "A"){
+        return 14;
+    } else if(rank_str == "K"){
+        return 13;
+    } else if(rank_str == "Q"){
+        return 12;
+    } else if(rank_str == "J"){
+        return 11;
+    } else {
+        return stoi(rank_str);
+    }
+}
 
+int Bridge::Card::suitToInt(string suit_str){
+
+    if(suit_str == "S"){
+        return 0;
+    } else if(suit_str == "H"){
+        return 1;
+    } else if(suit_str == "D"){
+        return 2;
+    } else if(suit_str == "C"){
+        return 3;
+    } else {
+        return -1;
+    }
+}
+
+//May be redundant
 int Bridge::get_dir(string dir){
 
     if (dir == "N"){
@@ -111,7 +123,8 @@ void Bridge::initialiseBoard(){
     cout << "Input the current board state, " << endl;
 
 
-    vector<string> dir = {"N","E","S","W"};
+    
+    
 
    for(int i=0; i !=4; ++i){ //Iterate over the hands
 
@@ -133,7 +146,7 @@ void Bridge::initialiseBoard(){
             //Add all card instances to hand
             while(p != 0){
                 string rank_str = string(p); //Might complain about p not being const
-                Card newCard(p,5-j); 
+                Card newCard(p,suits[j]);  //Should probablt change -- pointless doubel conversion
                 hands[i].push_back(newCard);
             }
 
@@ -151,7 +164,7 @@ void Bridge::initialiseBoard(){
 
     tricksToWin = 6 + forCalc;
 
-    int trumpSuit = suittoI(forSuitDeterm);
+    trumpSuit = forSuitDeterm;
 
     //TODO
     //Display and give chance to check inbetween each hand population
@@ -169,7 +182,7 @@ void Bridge::initialiseBoard(){
     
 
     //Get declarer direction
-    cout << "Which hand belongs ot the declarer? ";
+    cout << "Which hand belongs to the declarer? ";
 
     cin >> dir_str;
 
@@ -265,12 +278,12 @@ void Bridge::printBoard(){
 
 Specifications to get above layout:
 
-2 spaces inbetween suit and first card, one space inbetween each card
+2 spaces inbetween suit and first card, one space inbetween each card --DONE
 
 2 Carriage returns between N and E & W
 
 5 Spaces inbetween rightmost E's rightmost card and E played card unless
-10 card in which case only 4 spaces
+10 card in which case only 4 spaces //can implememt later//
 
 5 Spaces to west as well (same exception for 10)
 
@@ -287,33 +300,127 @@ Specifications to get above layout:
 
     //Need to do middle row string first so that top row lenght is known
 
+    //To hold hands for final print
+    vector<string> hand_strs;
+
+    vector< vector<string> > hand_str_preprocess;
+
+
+    int maxlen_W = 0; //For formatting later
+    int hand_counter = 0; //To check when on East
+
+
 
     for(vector< vector<Card> >::iterator iter = hands.begin(); iter != hands.end(); ++iter){
 
+        vector<string> suit_strs;
 
-        string S = "S ";
-        string H = "H ";
-        string D = "D ";
-        string C = "C ";
+        string C = "C  ";
+        suit_strs.push_back(C);
+        string D = "D  ";
+        suit_strs.push_back(D);
+        string H = "H  ";
+        suit_strs.push_back(H);
+        string S = "S  ";
+        suit_strs.push_back(S);
 
         for(vector<Card>::iterator card = iter->begin(); card != iter->end(); ++card){
-
             
-
+            suit_strs[card->suit] += (intToRank(card->rank) + " ");
 
         }
 
 
+            //Get max length held in vector suit_strs for East
+        for(vector<string>::iterator suit_str = suit_strs.begin(); suit_str != suit_strs.end(); ++suit_str){
+
+            //Add this suits string to the preprocessors bit for that hand
+            hand_str_preprocess[hand_counter].push_back(*suit_str);
+
+            //When on West get max length
+           if(hand_counter == 3){
+                if(suit_str->length() > maxlen_W){
+                    maxlen_W = suit_str->length();
+                }
+            }
+        }
+
+        ++hand_counter;
+    }
+
+    //For EW must be on same line so need ot comnbine differently
+    //Aim to use same method as NS
+
+    //Add cards played to east's preprocessing string
+    //round_record_card
+
+
+
+
+
+
+    //Generate NS hand strings with given max distance
+    for(int i = 0; i != hand_strs.size(); i+=2){
+        hand_strs[i] = print_string_make(hand_str_preprocess[i],maxlen_W); 
     }
 
 
 
 
 
-    //Also need to bmake sure partially populated hands can be displayed 
+
+
+    //Also need to make sure partially populated hands can be displayed 
     //for the the line marked 8 with n bookmarks
 
 }
+
+
+void Bridge::EW_vectorstring_make(vector<string>& W_preprocessed, vector<string> E_preprocessed, int maxlen){
+
+    //pad W strings to be same length
+    for(vector<string>::iterator str = W_preprocessed.begin(); str != W_preprocessed.end(); ++str){
+        string spaces((maxlen - str->length()),' ');
+        *str += spaces;
+    }
+
+    //From specification at start of printBoard function
+    string spaces(7,' ');
+    W_preprocessed[0] += spaces;
+    if(round_record_card[0].suit != -1){
+        W_preprocessed[0] += 
+    }
+
+    W_preprocessed[2] += spaces;
+
+
+
+
+
+    string spaces(4,' ');
+    W_preprocessed[1] += spaces;
+    
+
+
+
+}
+
+
+
+
+
+string Bridge::print_string_make(vector<string> suit_strs, int maxlen){
+
+    string hand_str;
+    string spaces(maxlen,' '); //Make string holding maxlen spaces
+    //CHeck this works when given 0
+
+    for (int i = 0; i != suit_strs.size(); ++i){
+        hand_str +=  (spaces + suit_strs[1] + "\n");
+    }
+}
+
+
 
 
 
