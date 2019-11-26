@@ -1,5 +1,5 @@
 #include <iostream>
-#include <cstring>
+#include <sstream>
 #include <string>
 #include <list>
 #include <vector>
@@ -139,6 +139,13 @@ void Bridge::initialiseBoard(){
         round_record_card.push_back(blank);
     }
 
+    //Initialise hands vector
+
+    for(int i =0; i !=4; ++i){
+        vector<Card> empty;
+        hands.push_back(empty);
+    }
+
 
 
 
@@ -150,7 +157,7 @@ void Bridge::initialiseBoard(){
 
         cout << "Please enter " << dir[i] << "'s hand, in order of decreasing suit rank: " << endl;
 
-        for(int j=1; j !=4; ++j){ //Iterate over the suits
+        for(int j=0; j !=4; ++j){ //Iterate over the suits
 
             
             cout<< "Enter next suit: ";
@@ -158,20 +165,18 @@ void Bridge::initialiseBoard(){
 
             string input;
 
-            char* cstr = new char [input.length() +1];
-            strcpy(cstr,input.c_str());
+            cin >> input;
 
-            char* p  = strtok(cstr,",");
+            stringstream ss(input);
+            string sub_str;
 
-            //Add all card instances to hand
-            while(p != 0){
-                string rank_str = string(p); //Might complain about p not being const
-                Card newCard(p,suits[j]);  //Should probablt change -- pointless doubel conversion
+            while(getline(ss,sub_str,',')){
+                Card newCard(sub_str,suits[j]);  //Should probablt change -- pointless doubel conversion
                 hands[i].push_back(newCard);
             }
-
         }
-
+        cout<<"one hand done" <<endl;
+        printBoard();
     }
 
     cout << endl;
@@ -209,6 +214,7 @@ void Bridge::initialiseBoard(){
 
 
 }
+
 
 
 
@@ -291,65 +297,56 @@ int Bridge::trickWinner(){
 
 void Bridge::printBoard(){
 
-    //Try and print in format similar to bridge hands 
-    //For hand 1, calculate longest hand and add 1 for length
-    //Then vertically list cards in each suit
-
-    //For E W hands, seperate by 6 characters s.t. N S hands have buffer
-    //Treat S as did N
-    
-    //Need to put the played cards out in the centre
-
-/* 
-                   S  K Q 9 4
-                   H  10 7 2
-                   D  8 7 5
-                   C  Q 9 8
+    /* Example layout:
+                       S  K Q 9 4
+                       H  10 7 2
+                       D  8 7 5
+                       C  Q 9 8
 
 
-    S  6 5             AS       S  J 7 3
-    H  K Q J 5 4    10D  KC     H  9 3
-    D  9               10S      D  K 6 4 3 2
-    C  J 7 6 4                  C  10 2
+        S  6 5             AS       S  J 7 3
+        H  K Q J 5 4    10D  KC     H  9 3
+        D  9               10S      D  K 6 4 3 2
+        C  J 7 6 4                  C  10 2
 
 
-                   S  A 8 2
-                   H  A 8 6
-                   D  A Q J 
-                   C  A 5 3
+                       S  A 8 2
+                       H  A 8 6
+                       D  A Q J 
+                       C  A 5 3
 
 
-Specifications to get above layout:
+    Specifications to get above layout:
 
-2 spaces inbetween suit and first card, one space inbetween each card --DONE
+    2 spaces inbetween suit and first card, one space inbetween each card --DONE
 
-2 Carriage returns between N and E & W
+    2 Carriage returns between N and E & W
 
-5 Spaces inbetween rightmost W's rightmost card and W played card unless
-10 card in which case only 4 spaces //can implememt later//
+    5 Spaces inbetween rightmost W's rightmost card and W played card unless
+    10 card in which case only 4 spaces //can implememt later//
 
-5 Spaces to east as well (same exception for 10)
+    5 Spaces to east as well (same exception for 10)
 
-7 spaces between rightmost W card and N played card (likewise for S played card)
+    7 spaces between rightmost W card and N played card (likewise for S played card)
 
-3 spaces inbetween rightmost W card and S,H etc. of N & S (likewise with W on other side)
-
-
-*/
+    3 spaces inbetween rightmost W card and S,H etc. of N & S (likewise with W on other side)
 
 
-    //General plan is to make 5 substrings - one for each hand
-    //plus one for the centre
-
-    //Need to do middle row string first so that top row lenght is known
+    */
 
     //To hold hands for final print
     vector<string> hand_strs;
 
     vector< vector<string> > hand_str_preprocess;
+    //Initialise vector
+    for(int i = 0; i != 4; ++i){
+        vector<string> empty;
+        hand_str_preprocess.push_back(empty);
+    }
 
 
-    int maxlen_W = 0; //For formatting later
+
+    int maxlen_W = 12; //For formatting later
     int hand_counter = 0; //To check when on East
 
 
@@ -378,7 +375,7 @@ Specifications to get above layout:
         for(vector<string>::iterator suit_str = suit_strs.begin(); suit_str != suit_strs.end(); ++suit_str){
 
             //Add this suits string to the preprocessors bit for that hand
-            hand_str_preprocess[hand_counter].push_back(*suit_str);
+            hand_str_preprocess[hand_counter].push_back(*suit_str); //segmentation error
 
             //When on West get max length
            if(hand_counter == 3){
@@ -402,11 +399,10 @@ Specifications to get above layout:
     //Generate hand strings with given max distance
     
     //NS
-    hand_strs[0] = print_string_make(hand_str_preprocess[0],maxlen_W);
-    hand_strs[2] = print_string_make(hand_str_preprocess[0],maxlen_W);
+    hand_strs.push_back(print_string_make(hand_str_preprocess[0],maxlen_W)); //N's hand
+    hand_strs.push_back(print_string_make(hand_str_preprocess[3],0)); //Middle row with EW hands & played cards
+    hand_strs.push_back(print_string_make(hand_str_preprocess[2],maxlen_W)); //S's hand
 
-    //EW
-    hand_strs[1] = print_string_make(hand_str_preprocess[3],0);
     
 
     //Output all the strings
@@ -414,7 +410,7 @@ Specifications to get above layout:
     cout << hand_strs[0] << "\n" << hand_strs[1] <<
                 "\n" << hand_strs[2];
     
-    //Also need to make sure partially populated hands can be displayed 
+    //Also need to make sure partially populated hands can be displayed CAN!
     //for the the line marked 8 with n bookmarks
 
 }
@@ -429,21 +425,21 @@ void Bridge::EW_vectorstring_make(vector<string>& W_preprocessed, vector<string>
     }
 
     //From specification at start of printBoard function
-    string spaces(7,' ');
-    W_preprocessed[0] += spaces;
+    string spaces7(7,' ');
+    W_preprocessed[0] += spaces7;
     if(round_record_card[0].suit != -1){
         W_preprocessed[0] += (intToRank(round_record_card[0].rank) + intToSuit(round_record_card[0].suit));
     }
 
-    W_preprocessed[2] += spaces;
+    W_preprocessed[2] += spaces7;
     if(round_record_card[2].suit != -1){ 
         W_preprocessed[2] += (intToRank(round_record_card[2].rank) + intToSuit(round_record_card[2].suit));
     }
 
 
     //Dealing with row 1
-    string spaces(5,' ');
-    W_preprocessed[1] += spaces;
+    string spaces5(5,' ');
+    W_preprocessed[1] += spaces5;
     if(round_record_card[1].suit != -1){ 
         W_preprocessed[1] += (intToRank(round_record_card[1].rank) + intToSuit(round_record_card[1].suit));
     } else {
@@ -459,7 +455,7 @@ void Bridge::EW_vectorstring_make(vector<string>& W_preprocessed, vector<string>
         W_preprocessed[1] += "  ";
     }
 
-    W_preprocessed[1] += spaces;
+    W_preprocessed[1] += spaces5;
 
     //Get length for padding
 
@@ -468,8 +464,8 @@ void Bridge::EW_vectorstring_make(vector<string>& W_preprocessed, vector<string>
     //SHOULD MAKE FUNCTION FOR READABILITY SAKE
     //pad W strings to be same length
     for(vector<string>::iterator str = W_preprocessed.begin(); str != W_preprocessed.end(); ++str){
-        string spaces((for_pad - str->length()),' ');
-        *str += spaces;
+        string spaces_pad((for_pad - str->length()),' ');
+        *str += spaces_pad;
     }
 
     //Now to finally add wests cards
@@ -492,8 +488,10 @@ string Bridge::print_string_make(vector<string> suit_strs, int maxlen){
     //CHeck this works when given 0
 
     for (int i = 0; i != suit_strs.size(); ++i){
-        hand_str +=  (spaces + suit_strs[1] + "\n");
+        hand_str +=  (spaces + suit_strs[i] + "\n");
     }
+
+    return hand_str;
 }
 
 

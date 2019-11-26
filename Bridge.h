@@ -60,6 +60,7 @@ class Bridge{
 
     //MCTS specific methods
     void initialiseBoard();
+
     bool invalid(int);
     void makeMove(int);
     
