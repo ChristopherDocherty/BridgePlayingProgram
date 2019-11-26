@@ -29,8 +29,9 @@ Bridge::Card::Card(string rank_str="-1", string suit_str="-1"){
 bool operator>(const Bridge::Card &c1,const Bridge::Card &c2){
     return c1.rank  > c2.rank;
 }
-//NB just check suit before comparisons - will do in trick winning method
-
+bool operator==(const Bridge::Card &c1,const Bridge::Card &c2){
+    return(c1.rank == c2.rank && c1.suit == c2.suit);
+}
 
 
 ////////////////////////////////
@@ -266,7 +267,7 @@ bool Bridge::invalid(int move){
 
     //if the first card in a round then trivially valid
     if(round_record_player.size() ==1){
-        return true;
+        return false;
     }
 
     int player = round_record_player.back();
@@ -276,36 +277,70 @@ bool Bridge::invalid(int move){
     bool can_follow = false;
     for(vector<Card>::iterator card = hands[player].begin(); card != hands[player].end(); ++card){
         if(card->suit == suit){
-            can_follow == true;
+            can_follow == false;
         }
     }
 
     //If unable to follow suit then any card is allowed
     if(!can_follow){
-        return true;
+        return false;
     }
 
     if(hands[player][move].suit == suit){
-        return true;
+        return false;
     }
 
     //If all the above tests fail the move is invalid
-    return false; 
+    return true; 
 }
 
 
 
 void Bridge::playerTurn(){
 
+    int player = round_record_player.back();  
+
     //Recieve input on which card to play from user
-    //in format 10D , KH , 2S etc.
-    //Create instance of card object using input
-    //Check if in current hand - ask again if not -- need to override "==" method
-    //From above method return an index to pass to valid move
-    //Check if valid move - ask again if not -- call method
 
-    //Update hand with new information
+    cout << "Pick a card to play: ";
 
+    string suit_str;
+    string rank_str;
+
+    
+    bool failed_first_check = false;
+    
+    while(true){
+
+        
+        if(failed_first_check == true){
+            cout << "Invalid choice, enter again: ";
+        }
+
+        cin >> rank_str >> suit_str;
+        Card player_card(rank_str,suit_str);
+
+        int card_index;
+        bool in_hand = false;
+        //Make sure card is in hand
+        while(in_hand == false){
+            for(int i = 0; i != hands[player].size(); ++i){
+                if(hands[player][i] == player_card){
+                    in_hand = true;
+                    card_index = i;
+                    break;
+                }
+            }    
+        }  
+
+        //Make sure card is valid
+        if(!invalid(card_index)){
+            makeMove(card_index);
+            break; //leave while loop if move can be made
+        }
+
+    failed_first_check = true;
+    }
 }
 
 
