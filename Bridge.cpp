@@ -238,11 +238,26 @@ void Bridge::wonOrNot(){
 
 void Bridge::makeMove(int move){
 
-    //update gamestate by removing card [OBJECT]
-    //corresponding to move from hand 
-    //Hand is determined by looking at %4 of 
-    //turn counter
+    int player = round_record_player.back();    
+    //Update to next player
+    round_record_player.push_back( (player + 1 < 4) ? player + 1 : 0);
 
+
+
+    //corresponding to move from hand 
+    Card played = hands[player][move];
+    round_record_card.push_back(played);
+
+    //update gamestate by removing card from hand
+    hands[player].erase(hands[player].begin() + move);
+
+    ++turn;
+    
+    //Required to flush round_record_card and keep track of tricks made
+    if(turn%4 ==0){
+       trickWinner();
+    }
+  
 }
 
 
@@ -262,6 +277,7 @@ bool Bridge::invalid(int move){
 }
 
 
+
 void Bridge::playerTurn(){
 
     //Recieve input on which card to play from user
@@ -278,19 +294,39 @@ void Bridge::playerTurn(){
 
 
 
-int Bridge::trickWinner(){
-
-    //called every 4 turns
+void Bridge::trickWinner(){
     //Looks at current play cache and determines winner
-    //Store two lists: one of cards played and one of player {N,E,S,W}
     
-    //initialise on first position and compare with next -- need to override > method
-    //if bigger then redefine to the larger card's position
+    Card best_card = round_record_card[0];
+    int best_index = 0;
 
-    //Return 1 or 2 depending on whose trick it is
+    for(int i = 1; i != 4; ++i){
 
-    return 9000; //temporary
+        if(round_record_card[i].suit == best_card.suit || trumpSuit =="NT"){
+            if(round_record_card[i] > best_card){
+            best_card = round_record_card[i];
+            best_index = i;
+            }
+        } else if(intToSuit(round_record_card[i].suit) == trumpSuit){
+            best_card = round_record_card[i];
+            best_index = i;
+        }
+    }    
 
+    //Update based on trick winner
+    if(round_record_player[best_index] == declarer || round_record_player[best_index +2 < 4 ? best_index + 2 : best_index - 2]){
+        ++tricksMade_Dec;
+    }
+
+
+    //Need to flush round_record's
+    for(int i =0; i != 4; ++i){
+        round_record_card.pop_back();
+        round_record_player.pop_back();
+    }
+
+    //Initialise next round
+    round_record_player.push_back(best_index);
 }
 
 

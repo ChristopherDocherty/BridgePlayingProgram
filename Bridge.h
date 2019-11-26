@@ -43,9 +43,9 @@ class Bridge{
     int declarer;
 
 
-    //Need to flush eveyr 4 turns!
+    
     std::vector<Card> round_record_card; //For determining winning card
-
+    std::vector<int>  round_record_player; //For matching card to player and get next turn
 
     std::string intToRank(int);
     int rankToInt(std::string);
@@ -71,7 +71,7 @@ class Bridge{
     void wonOrNot();
     
     //Bridge class specific methods
-    int trickWinner(); 
+    void trickWinner(); 
 
 };
 
