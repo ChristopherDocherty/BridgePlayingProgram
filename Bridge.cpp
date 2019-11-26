@@ -33,6 +33,10 @@ bool operator>(const Bridge::Card &c1,const Bridge::Card &c2){
 
 
 
+////////////////////////////////
+    //Converting functions
+////////////////////////////////
+
 string Bridge::intToRank(int rank){
 
     if(rank == 14){
@@ -112,13 +116,13 @@ int Bridge::Card::suitToInt(string suit_str){
 int Bridge::get_dir(string dir){
 
     if (dir == "N"){
-        return 1;
+        return 0;
     }  else if (dir == "E"){
-        return 2;
+        return 1;
     }  else if (dir == "S"){
-        return 3;
+        return 2;
     }  else if (dir == "W"){
-        return 4;
+        return 3;
     }
 
 }
@@ -131,7 +135,7 @@ int Bridge::get_dir(string dir){
 void Bridge::initialiseBoard(){
 
 
-    won, turn, tricksMade_Dec = 0;
+    won = turn = tricksMade_Dec = 0;
 
     //Initialise round_record_card
     for(int i = 0; i !=4; ++i){
@@ -145,9 +149,6 @@ void Bridge::initialiseBoard(){
         vector<Card> empty;
         hands.push_back(empty);
     }
-
-
-
 
 
     cout << "Input the current board state, " << endl;
@@ -167,12 +168,14 @@ void Bridge::initialiseBoard(){
 
             cin >> input;
 
-            stringstream ss(input);
-            string sub_str;
+            if(input != "n"){
+                stringstream ss(input);
+                string sub_str;
 
-            while(getline(ss,sub_str,',')){
-                Card newCard(sub_str,suits[j]);  //Should probablt change -- pointless doubel conversion
-                hands[i].push_back(newCard);
+                while(getline(ss,sub_str,',')){
+                    Card newCard(sub_str,suits[j]);  //Should probablt change -- pointless doubel conversion
+                    hands[i].push_back(newCard);
+                }
             }
         }
         cout<<"one hand done" <<endl;
@@ -191,27 +194,25 @@ void Bridge::initialiseBoard(){
 
     trumpSuit = forSuitDeterm;
 
-    //Display and give chance to check inbetween each hand population
-    printBoard();
     
-
-    //Get computer direction
-    cout << "Which hand is controlled by the computer? ";
-
+    //Get declarer direction
     string dir_str;
 
-    cin >> dir_str;
-
-    comp_dir = get_dir(dir_str);
-    
-
-    //Get declarer direction
     cout << "Which hand belongs to the declarer? ";
 
     cin >> dir_str;
 
     declarer = get_dir(dir_str);
 
+    //Get computer direction
+    cout << "Which hand is controlled by the computer? ";
+
+    cin >> dir_str;
+
+    int dir_int = get_dir(dir_str);
+    comp_dir.push_back(dir_int);
+    //Also push back opposite direction
+    comp_dir.push_back( dir_int + 2 < 4 ? dir_int + 2 : dir_int -2 );
 
 }
 
@@ -220,10 +221,15 @@ void Bridge::initialiseBoard(){
 
 void Bridge::wonOrNot(){
 
-    //check tricksMade_Dec == tricksToWin
+    //Check if required trick count is made
+    if(tricksMade_Dec == tricksToWin){
+        won = (comp_dir[0] == declarer || comp_dir[1] == declarer ? 2:1);
+    }
 
-    //If not satisified then check 13- turn//4 < (tricksToWin - tricksMade_Dec)
-        //if this holds then not won
+    //If its impossible ot win from this state i.e. too few moves left
+    if(13- turn/4 < (tricksToWin - tricksMade_Dec)){
+        won = (comp_dir[0] == declarer || comp_dir[1] == declarer ? 1:2);
+    }
 }
 
 
@@ -291,7 +297,9 @@ int Bridge::trickWinner(){
 
 
 
-
+//////////////////////////////
+    //All printing functions
+//////////////////////////////
 
 
 
@@ -355,14 +363,14 @@ void Bridge::printBoard(){
 
         vector<string> suit_strs;
 
-        string C = "C  ";
-        suit_strs.push_back(C);
-        string D = "D  ";
-        suit_strs.push_back(D);
-        string H = "H  ";
-        suit_strs.push_back(H);
         string S = "S  ";
         suit_strs.push_back(S);
+        string H = "H  ";
+        suit_strs.push_back(H);
+        string D = "D  ";
+        suit_strs.push_back(D);
+        string C = "C  ";
+        suit_strs.push_back(C);
 
         for(vector<Card>::iterator card = iter->begin(); card != iter->end(); ++card){
             
@@ -476,8 +484,6 @@ void Bridge::EW_vectorstring_make(vector<string>& W_preprocessed, vector<string>
     //West now should be in desired form (without handling the case of 10's...)
 
 }
-
-
 
 
 

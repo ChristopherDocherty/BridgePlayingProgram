@@ -39,14 +39,12 @@ class Bridge{
 
     int tricksMade_Dec;
 
-    int comp_dir;
+    std::vector<int> comp_dir;
     int declarer;
 
 
     //Need to flush eveyr 4 turns!
     std::vector<Card> round_record_card; //For determining winning card
-    //Need to add 4 cards in initialisation and then modify internal contents
-    //s.t. its always up to date
 
 
     std::string intToRank(int);
@@ -60,7 +58,6 @@ class Bridge{
 
     //MCTS specific methods
     void initialiseBoard();
-
     bool invalid(int);
     void makeMove(int);
     
