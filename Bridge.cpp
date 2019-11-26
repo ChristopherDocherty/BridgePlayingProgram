@@ -239,9 +239,10 @@ void Bridge::wonOrNot(){
 void Bridge::makeMove(int move){
 
     int player = round_record_player.back();    
-    //Update to next player
-    round_record_player.push_back( (player + 1 < 4) ? player + 1 : 0);
-
+    //Update to next player unless on last player
+    if(round_record_player.size() !=4){
+        round_record_player.push_back( (player + 1 < 4) ? player + 1 : 0);
+    }
 
 
     //corresponding to move from hand 
@@ -263,17 +264,33 @@ void Bridge::makeMove(int move){
 
 bool Bridge::invalid(int move){
 
-    //Must follow suit
-    //cache of cards played in current round kept
-    //access first card
+    //if the first card in a round then trivially valid
+    if(round_record_player.size() ==1){
+        return true;
+    }
 
-    //Iterate through all cards to see if able to follow suit
-    //Everytime a card of lead suit is found add it to a temporary cache
-//Extract lead suit from card object at the start of the vector
-        //if cache is non empty:
-        //Select random number from 0 to cache size (use vector)
-        //if empty choose random number from 0 to hand size
-    return false; //temporary
+    int player = round_record_player.back();
+    int suit = round_record_card[0].suit;
+
+    //Otherwise check if able to follow suit
+    bool can_follow = false;
+    for(vector<Card>::iterator card = hands[player].begin(); card != hands[player].end(); ++card){
+        if(card->suit == suit){
+            can_follow == true;
+        }
+    }
+
+    //If unable to follow suit then any card is allowed
+    if(!can_follow){
+        return true;
+    }
+
+    if(hands[player][move].suit == suit){
+        return true;
+    }
+
+    //If all the above tests fail the move is invalid
+    return false; 
 }
 
 
