@@ -27,7 +27,6 @@ class Bridge{
 
     };
 
-
     const std::vector<std::string> dir = {"N","E","S","W"};
     const std::vector<std::string> suits = {"S","H","D","C"};
 
@@ -45,12 +44,14 @@ class Bridge{
 
 
     //Need to flush eveyr 4 turns!
-    Card round_record_card[4]; //For determining winning card
-    //Above will be implemented where index corresponds to direction 
-    //Implemented as an array so I can preallocate size
+    std::vector<Card> round_record_card; //For determining winning card
+    //Need to add 4 cards in initialisation and then modify internal contents
+    //s.t. its always up to date
+
 
     std::string intToRank(int);
     int rankToInt(std::string);
+    std::string intToSuit(int);
     int get_dir(std::string);
 
 
@@ -73,14 +74,6 @@ class Bridge{
     
     //Bridge class specific methods
     int trickWinner(); 
-
-
-    
-
-
-
-
-
 
 };
 

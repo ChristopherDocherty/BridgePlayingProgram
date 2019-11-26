@@ -63,6 +63,20 @@ int Bridge::rankToInt(string rank_str){
     }
 }
 
+string Bridge::intToSuit(int suit_int){
+
+    if(suit_int == 0){
+        return "S";
+    } else if(suit_int == 1){
+        return "H";
+    } else if(suit_int == 2){
+        return "D";
+    } else if(suit_int == 3){
+        return "C";
+    } 
+
+}
+
 //Temporary measure until I leanr inheritance
 int Bridge::Card::rankToInt(string rank_str){
     
@@ -119,11 +133,17 @@ void Bridge::initialiseBoard(){
 
     won, turn, tricksMade_Dec = 0;
 
+    //Initialise round_record_card
+    for(int i = 0; i !=4; ++i){
+        Card blank;
+        round_record_card.push_back(blank);
+    }
+
+
+
+
 
     cout << "Input the current board state, " << endl;
-
-
-    
     
 
    for(int i=0; i !=4; ++i){ //Iterate over the hands
@@ -166,7 +186,6 @@ void Bridge::initialiseBoard(){
 
     trumpSuit = forSuitDeterm;
 
-    //TODO
     //Display and give chance to check inbetween each hand population
     printBoard();
     
@@ -227,7 +246,7 @@ bool Bridge::invalid(int move){
         //if cache is non empty:
         //Select random number from 0 to cache size (use vector)
         //if empty choose random number from 0 to hand size
-
+    return false; //temporary
 }
 
 
@@ -243,6 +262,30 @@ void Bridge::playerTurn(){
     //Update hand with new information
 
 }
+
+
+
+
+int Bridge::trickWinner(){
+
+    //called every 4 turns
+    //Looks at current play cache and determines winner
+    //Store two lists: one of cards played and one of player {N,E,S,W}
+    
+    //initialise on first position and compare with next -- need to override > method
+    //if bigger then redefine to the larger card's position
+
+    //Return 1 or 2 depending on whose trick it is
+
+    return 9000; //temporary
+
+}
+
+
+
+
+
+
 
 
 
@@ -282,14 +325,14 @@ Specifications to get above layout:
 
 2 Carriage returns between N and E & W
 
-5 Spaces inbetween rightmost E's rightmost card and E played card unless
+5 Spaces inbetween rightmost W's rightmost card and W played card unless
 10 card in which case only 4 spaces //can implememt later//
 
-5 Spaces to west as well (same exception for 10)
+5 Spaces to east as well (same exception for 10)
 
-7 spaces between rightmost E card and N played card (likewise for S played card)
+7 spaces between rightmost W card and N played card (likewise for S played card)
 
-3 spaces inbetween rightmost E card and S,H etc. of N & S (likewise with W on other side)
+3 spaces inbetween rightmost W card and S,H etc. of N & S (likewise with W on other side)
 
 
 */
@@ -352,24 +395,25 @@ Specifications to get above layout:
     //Aim to use same method as NS
 
     //Add cards played to east's preprocessing string
-    //round_record_card
+    //get EW vector strings -- saved in W as a side effect
+    EW_vectorstring_make(hand_str_preprocess[3], hand_str_preprocess[1], maxlen_W);
 
 
+    //Generate hand strings with given max distance
+    
+    //NS
+    hand_strs[0] = print_string_make(hand_str_preprocess[0],maxlen_W);
+    hand_strs[2] = print_string_make(hand_str_preprocess[0],maxlen_W);
 
+    //EW
+    hand_strs[1] = print_string_make(hand_str_preprocess[3],0);
+    
 
+    //Output all the strings
 
-
-    //Generate NS hand strings with given max distance
-    for(int i = 0; i != hand_strs.size(); i+=2){
-        hand_strs[i] = print_string_make(hand_str_preprocess[i],maxlen_W); 
-    }
-
-
-
-
-
-
-
+    cout << hand_strs[0] << "\n" << hand_strs[1] <<
+                "\n" << hand_strs[2];
+    
     //Also need to make sure partially populated hands can be displayed 
     //for the the line marked 8 with n bookmarks
 
@@ -388,20 +432,52 @@ void Bridge::EW_vectorstring_make(vector<string>& W_preprocessed, vector<string>
     string spaces(7,' ');
     W_preprocessed[0] += spaces;
     if(round_record_card[0].suit != -1){
-        W_preprocessed[0] += 
+        W_preprocessed[0] += (intToRank(round_record_card[0].rank) + intToSuit(round_record_card[0].suit));
     }
 
     W_preprocessed[2] += spaces;
+    if(round_record_card[2].suit != -1){ 
+        W_preprocessed[2] += (intToRank(round_record_card[2].rank) + intToSuit(round_record_card[2].suit));
+    }
 
 
-
-
-
-    string spaces(4,' ');
+    //Dealing with row 1
+    string spaces(5,' ');
     W_preprocessed[1] += spaces;
-    
+    if(round_record_card[1].suit != -1){ 
+        W_preprocessed[1] += (intToRank(round_record_card[1].rank) + intToSuit(round_record_card[1].suit));
+    } else {
+        W_preprocessed[1] += "  ";
+    }
+    //Add space inbetween E & W played cards
+    W_preprocessed[1] += "  ";
 
+    //Add W played card if it exists
+    if(round_record_card[3].suit != -1){ 
+        W_preprocessed[1] += (intToRank(round_record_card[1].rank) + intToSuit(round_record_card[1].suit));
+    } else {
+        W_preprocessed[1] += "  ";
+    }
 
+    W_preprocessed[1] += spaces;
+
+    //Get length for padding
+
+    int for_pad = W_preprocessed[1].size();
+
+    //SHOULD MAKE FUNCTION FOR READABILITY SAKE
+    //pad W strings to be same length
+    for(vector<string>::iterator str = W_preprocessed.begin(); str != W_preprocessed.end(); ++str){
+        string spaces((for_pad - str->length()),' ');
+        *str += spaces;
+    }
+
+    //Now to finally add wests cards
+    for(int i =0; i != 4; ++i){
+        W_preprocessed[i] += E_preprocessed[i];
+    }
+
+    //West now should be in desired form (without handling the case of 10's...)
 
 }
 
@@ -421,22 +497,5 @@ string Bridge::print_string_make(vector<string> suit_strs, int maxlen){
 }
 
 
-
-
-
-
-int Bridge::trickWinner(){
-
-    //called every 4 turns
-    //Looks at current play cache and determines winner
-    //Store two lists: one of cards played and one of player {N,E,S,W}
-    
-    //initialise on first position and compare with next -- need to override > method
-    //if bigger then redefine to the larger card's position
-
-    //Return 1 or 2 depending on whose trick it is
-
-
-}
 
 

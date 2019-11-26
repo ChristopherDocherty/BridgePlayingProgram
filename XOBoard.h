@@ -24,7 +24,7 @@
     void printBoard();
     
     void playerTurn();
-    };
+};
 
 
 #endif
