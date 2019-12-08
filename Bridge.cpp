@@ -113,7 +113,7 @@ int Bridge::Card::suitToInt(string suit_str){
     }
 }
 
-//May be redundant
+
 int Bridge::get_dir(string dir){
 
     if (dir == "N"){
@@ -131,9 +131,76 @@ int Bridge::get_dir(string dir){
 
 
 
-
-
 void Bridge::initialiseBoard(){
+
+    
+    won = turn = tricksMade_Dec = 0;
+
+    //Initialise round_record_card
+    for(int i = 0; i !=4; ++i){
+        Card blank;
+        round_record_card.push_back(blank);
+    }
+
+    //Initialise hands vector
+
+    for(int i =0; i !=4; ++i){
+        vector<Card> empty;
+        hands.push_back(empty);
+    }
+
+    vector<string> N_hand = {"","","",""};
+    vector<string> E_hand = {"","","",""};
+    vector<string> S_hand = {"","","",""};
+    vector<string> W_hand = {"","","",""};
+
+    vector< vector<string> > hand_strs = {N_hand,E_hand,S_hand,W_hand};
+
+   for(int i=0; i !=4; ++i){ //Iterate over the hands
+
+        vector<string> current_hand = hand_strs[i];
+
+        for(int j=0; j !=4; ++j){ //Iterate over the suits
+
+           string current_suit = current_hand[j];           
+
+            if(current_suit != ""){
+                stringstream ss(current_suit);
+                string sub_str;
+
+                while(getline(ss,sub_str,',')){
+                    Card newCard(sub_str,suits[j]);  //Should probablt change -- pointless doubel conversion
+                    hands[i].push_back(newCard);
+                }
+            }
+        }
+        printBoard();
+    }
+
+
+    //Provide contract information
+    int contract_level = 1;
+    trumpSuit = "C";
+
+    tricksToWin = 6 + forCalc;
+
+    
+    //Provide declarer direction
+    string declarer_dir_str = "N";
+    declarer = get_dir(dir_str);
+
+
+    //Provide computer direction
+    string comp_dir_str = "N";
+    int dir_int = get_dir(dir_str);
+    
+    comp_dir.push_back(dir_int);
+    //Also push back opposite direction
+    comp_dir.push_back( dir_int + 2 < 4 ? dir_int + 2 : dir_int -2 );
+
+}
+
+void Bridge::initialiseBoard_UserInput(){
 
 
     won = turn = tricksMade_Dec = 0;
