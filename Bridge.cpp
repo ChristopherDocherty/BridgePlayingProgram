@@ -149,10 +149,10 @@ void Bridge::initialiseBoard(){
         hands.push_back(empty);
     }
 
-    vector<string> N_hand = {"","","",""};
-    vector<string> E_hand = {"","","",""};
-    vector<string> S_hand = {"","","",""};
-    vector<string> W_hand = {"","","",""};
+    vector<string> N_hand = {"A,6,5,4,3,2","K,J","Q,10,9,8,7",""};
+    vector<string> E_hand = {"","A,6,5,4,3,2","K,J","Q,10,9,8,7"};
+    vector<string> S_hand = {"Q,10,9,8,7","","A,6,5,4,3,2","K,J"};
+    vector<string> W_hand = {"K,J","Q,10,9,8,7","","A,6,5,4,3,2"};
 
     vector< vector<string> > hand_strs = {N_hand,E_hand,S_hand,W_hand};
 
@@ -174,7 +174,6 @@ void Bridge::initialiseBoard(){
                 }
             }
         }
-        printBoard();
     }
 
 
@@ -182,22 +181,24 @@ void Bridge::initialiseBoard(){
     int contract_level = 1;
     trumpSuit = "C";
 
-    tricksToWin = 6 + forCalc;
+    tricksToWin = 6 + contract_level;
 
     
     //Provide declarer direction
     string declarer_dir_str = "N";
-    declarer = get_dir(dir_str);
+    declarer = get_dir(declarer_dir_str);
 
 
     //Provide computer direction
     string comp_dir_str = "N";
-    int dir_int = get_dir(dir_str);
+    int dir_int = get_dir(comp_dir_str);
 
     comp_dir.push_back(dir_int);
     //Also push back opposite direction
     comp_dir.push_back( dir_int + 2 < 4 ? dir_int + 2 : dir_int -2 );
 
+    
+    printBoard();
 }
 
 
