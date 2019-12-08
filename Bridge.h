@@ -72,7 +72,6 @@ class Bridge{
     
     //Bridge class specific methods
     void trickWinner(); 
-    void initialiseBoard_UserInput();
 
 };
 
