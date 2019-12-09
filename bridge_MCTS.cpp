@@ -17,9 +17,10 @@ int main(){
 
     test.initialiseBoard();
 
-    for(int i = 0; i != 5; ++i){
-       test.playerTurn();
+    for(int i =0; i !=4; ++i){
+        test.playerTurn();
     }
+    test.wonOrNot();
 
     return 0;
 

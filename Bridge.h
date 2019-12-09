@@ -27,7 +27,6 @@ class Bridge{
 
     };
 
-    const std::vector<std::string> dir = {"N","E","S","W"};
     const std::vector<std::string> suits = {"S","H","D","C"};
 
     std::vector<std::vector<Card>> hands; //Vector contains N,E,S,W in that order

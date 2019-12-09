@@ -137,13 +137,6 @@ void Bridge::initialiseBoard(){
     won = turn = tricksMade_Dec = 0;
 
 
-    /* THINK THIS IS INCORRECT, LETS SEE
-    //Initialise round_record_card
-    for(int i = 0; i !=4; ++i){
-        Card blank;
-        round_record_card.push_back(blank);
-    }
-    */
     //Initialise hands vector
 
     for(int i =0; i !=4; ++i){
@@ -181,7 +174,7 @@ void Bridge::initialiseBoard(){
 
 
     //Provide contract information
-    int contract_level = 1;
+    int contract_level = 7;
     trumpSuit = "C";
 
     tricksToWin = 6 + contract_level;
@@ -202,7 +195,6 @@ void Bridge::initialiseBoard(){
     //Also push back opposite direction
     comp_dir.push_back( dir_int + 2 < 4 ? dir_int + 2 : dir_int -2 );
 
-    
     printBoard();
 }
 
@@ -357,7 +349,7 @@ void Bridge::trickWinner(){
     }    
 
     //Update based on trick winner
-    if(round_record_player[best_index] == declarer || round_record_player[best_index +2 < 4 ? best_index + 2 : best_index - 2]){
+    if(round_record_player[best_index] == declarer || round_record_player[best_index +2 < 4 ? best_index + 2 : best_index - 2] == declarer){
         ++tricksMade_Dec;
     }
 
