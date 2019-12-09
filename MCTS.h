@@ -243,34 +243,36 @@ typename MCTS<T>::node* MCTS<T>::ESV(MCTS::node* psuedoroot){
     //Get the game state from parent
     T parentGstate = psuedoroot->localGamestate;
 
-    //Maybe think about making teh moveset an attribute of MCTS?
+    //Find the valid moves
+
+    vector<int> moveset = parentGstate.getValidMoves();
+
+
     //Iterate over the moveset
-    for(vector<int>::const_iterator iter = parentGstate.moveset.begin();iter != parentGstate.moveset.end(); ++iter){
+    for(vector<int>::const_iterator iter = moveset.begin();iter != moveset.end(); ++iter){
 
         int move = *iter;
 
-        //if the move is valid, expand and make a child node
-        if(!parentGstate.invalid(move)){
-            //The board is updated in Expand()
-            node* newChild = Expand(psuedoroot, parentGstate, move);
+        
+        //The board is updated in Expand()
+        node* newChild = Expand(psuedoroot, parentGstate, move);
 
-            //Check if the newChild is already in a winning state
-            T childGstate = newChild->localGamestate;
-            childGstate.wonOrNot(); 
+        //Check if the newChild is already in a winning state
+        T childGstate = newChild->localGamestate;
+        childGstate.wonOrNot(); 
 
 
-            int result;
-            //Only simulate if th result is not already known
-            if(childGstate.won == 0){
-                result = Simulate(childGstate);
-            } else{
-                result = childGstate.won;
-            }
-            
-            //Update the results of the simulated game
-            Update(newChild, result);
-    
+        int result;
+        //Only simulate if th result is not already known
+        if(childGstate.won == 0){
+            result = Simulate(childGstate);
+        } else{
+            result = childGstate.won;
         }
+        
+        //Update the results of the simulated game
+        Update(newChild, result);
+    
     }
     /* At this point all children will have been updated and now either
     a new node will be selected or the computers time is up and it has 

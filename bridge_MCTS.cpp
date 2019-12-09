@@ -12,16 +12,10 @@ using namespace std;
 
 int main(){
 
+    MCTS<Bridge> test;
 
-    Bridge test;
-
-    test.initialiseBoard();
-
-    for(int i =0; i !=4; ++i){
-        test.playerTurn();
-    }
-    test.wonOrNot();
-
+    test.playGame();
+   
     return 0;
 
 }

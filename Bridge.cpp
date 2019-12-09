@@ -8,7 +8,7 @@
 using namespace std;
 
 
-
+Bridge::Bridge(){}
 
 Bridge::Card::Card(string rank_str="-1", string suit_str="-1"){
     //method to construct card by changing string card
@@ -181,7 +181,7 @@ void Bridge::initialiseBoard(){
 
     
     //Provide declarer direction
-    string declarer_dir_str = "N";
+    string declarer_dir_str = "S";
     declarer = get_dir(declarer_dir_str);
     //Push back declarer into the round record
     round_record_player.push_back(declarer);
@@ -241,6 +241,24 @@ void Bridge::makeMove(int move){
        trickWinner();
     }
   
+}
+
+
+
+vector<int> Bridge::getValidMoves(){
+
+    vector<int> valid_moves;
+
+    //Get current player
+    int player = round_record_player.back();  
+
+    //Iterate over all move s and add if valid play
+    for(int i = 0; i != hands[player].size(); ++i){
+        if(!invalid(i)){
+            valid_moves.push_back(i);
+        }
+    }
+    return valid_moves;
 }
 
 
@@ -503,43 +521,35 @@ void Bridge::EW_vectorstring_make(vector<string>& W_preprocessed, vector<string>
         *str += spaces;
     }
 
+    vector<string> played_print_str = {"  ","  ","  ","  "};
+
+    //Holds the strings for played cards //Minus one because player is addeed before move made
+    for(int i = 0; i != round_record_player.size() -1; ++i){
+        int dir = round_record_player[i];
+        played_print_str[dir] = intToRank(round_record_card[0].rank) + intToSuit(round_record_card[0].suit); 
+    }
+
     //From specification at start of printBoard function
     string spaces7(7,' ');
+
     W_preprocessed[0] += spaces7;
+    W_preprocessed[0] += played_print_str[0];
 
-    try{
-        Card for_excep = round_record_card.at(0);
-        W_preprocessed[0] += (intToRank(round_record_card[0].rank) + intToSuit(round_record_card[0].suit));
-    } catch (const std::out_of_range& oor) {}
-
-    W_preprocessed[2] += spaces7;
-    try{
-        Card for_excep = round_record_card.at(2);        
-        W_preprocessed[2] += (intToRank(round_record_card[2].rank) + intToSuit(round_record_card[2].suit));
-    } catch (const std::out_of_range& oor) {}//MAY NEED TO add spcaces
-
+    W_preprocessed[2] += spaces7;        
+    W_preprocessed[2] += played_print_str[2];
+    
 
     //Dealing with row 1
     string spaces5(5,' ');
     W_preprocessed[1] += spaces5;
-    try{
-        Card for_excep = round_record_card.at(3);
-        W_preprocessed[1] += (intToRank(round_record_card[3].rank) + intToSuit(round_record_card[3].suit));
-    } catch (const std::out_of_range& oor) {
-        W_preprocessed[1] += "  ";
-    }
+    W_preprocessed[1] += played_print_str[3];
+
 
     //Add space inbetween E & W played cards
     W_preprocessed[1] += "  ";
 
     //Add W played card if it exists
-    try{
-        Card for_excep = round_record_card.at(1);
-        W_preprocessed[1] += (intToRank(round_record_card[1].rank) + intToSuit(round_record_card[1].suit));
-    } catch (const std::out_of_range& oor) {
-        W_preprocessed[1] += "  ";
-    }
-
+    W_preprocessed[1] += played_print_str[1];
     W_preprocessed[1] += spaces5;
 
     //Get length for padding

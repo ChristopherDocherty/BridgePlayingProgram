@@ -12,6 +12,8 @@ class Bridge{
 
     public:
 
+    Bridge();
+
     struct Card{
 
         int suit;
@@ -27,7 +29,7 @@ class Bridge{
 
     };
 
-    const std::vector<std::string> suits = {"S","H","D","C"};
+    std::vector<std::string> suits = {"S","H","D","C"};
 
     std::vector<std::vector<Card>> hands; //Vector contains N,E,S,W in that order
 
@@ -57,10 +59,12 @@ class Bridge{
 
     //MCTS specific methods
     void initialiseBoard();
-    bool invalid(int);
     void makeMove(int);
     
+    std::vector<int> getValidMoves();
+    bool invalid(int);
     
+
     void printBoard();
     void EW_vectorstring_make(std::vector<std::string>&, std::vector<std::string>, int);
     std::string print_string_make(std::vector<std::string>, int);
