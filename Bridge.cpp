@@ -174,14 +174,14 @@ void Bridge::initialiseBoard(){
 
 
     //Provide contract information
-    int contract_level = 7;
+    int contract_level = 1;
     trumpSuit = "C";
 
     tricksToWin = 6 + contract_level;
 
     
     //Provide declarer direction
-    string declarer_dir_str = "S";
+    string declarer_dir_str = "E";
     declarer = get_dir(declarer_dir_str);
     //Push back declarer into the round record
     round_record_player.push_back(declarer);
@@ -197,6 +197,17 @@ void Bridge::initialiseBoard(){
 
     printBoard();
 }
+
+
+
+string Bridge::getTurn(){
+    if(round_record_player.back() == comp_dir[0] || round_record_player.back() == comp_dir[1]){
+        return "Computer"; 
+    } else {
+        return "player";
+    }
+}
+
 
 
 
@@ -322,18 +333,15 @@ void Bridge::playerTurn(){
         int card_index;
         bool in_hand = false;
         //Make sure card is in hand
-        while(in_hand == false){
             for(int i = 0; i != hands[player].size(); ++i){
                 if(hands[player][i] == player_card){
                     in_hand = true;
                     card_index = i;
-                    break;
                 }
-            }    
-        }  
+            }   
 
         //Make sure card is valid
-        if(!invalid(card_index)){
+        if(!invalid(card_index) & in_hand){
             makeMove(card_index);
             break; //leave while loop if move can be made
         }
@@ -355,7 +363,7 @@ void Bridge::trickWinner(){
 
     for(int i = 1; i != 4; ++i){
 
-        if(round_record_card[i].suit == best_card.suit || trumpSuit =="NT"){
+        if(round_record_card[i].suit == best_card.suit){
             if(round_record_card[i] > best_card){
             best_card = round_record_card[i];
             best_index = i;
@@ -372,6 +380,8 @@ void Bridge::trickWinner(){
     }
 
 
+    int winning_player = round_record_player[best_index];
+
     //Need to flush round_record's
     for(int i =0; i != 4; ++i){
         round_record_card.pop_back();
@@ -379,7 +389,7 @@ void Bridge::trickWinner(){
     }
 
     //Initialise next round
-    round_record_player.push_back(best_index);
+    round_record_player.push_back(winning_player);
 }
 
 
@@ -507,6 +517,8 @@ void Bridge::printBoard(){
     cout << "\n" << hand_strs[0] << "\n" << hand_strs[1] <<
                 "\n" << hand_strs[2] << "\n";
     
+    cout << "It is " << dirs[round_record_player.back()] << "'s Turn" << endl;
+    
     //Also need to make sure partially populated hands can be displayed CAN!
     //for the the line marked 8 with n bookmarks
 
@@ -526,7 +538,7 @@ void Bridge::EW_vectorstring_make(vector<string>& W_preprocessed, vector<string>
     //Holds the strings for played cards //Minus one because player is addeed before move made
     for(int i = 0; i != round_record_player.size() -1; ++i){
         int dir = round_record_player[i];
-        played_print_str[dir] = intToRank(round_record_card[0].rank) + intToSuit(round_record_card[0].suit); 
+        played_print_str[dir] = intToRank(round_record_card[i].rank) + intToSuit(round_record_card[i].suit); 
     }
 
     //From specification at start of printBoard function

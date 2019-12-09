@@ -15,7 +15,7 @@ int main(){
     MCTS<Bridge> test;
 
     test.playGame();
-   
+
     return 0;
 
 }

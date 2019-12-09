@@ -23,6 +23,8 @@ using std::time;
     T.playerTurn() lets player make a move
     T.makeMove() updaes a given state with the move passed in
     T.initialiseBoard() Puts a given gamestate into the starting position
+    T.getValidMoves() returns vector<int> of available moveset
+    T.getTurn() returns string indiciating player or comp turn
 */
 
 
@@ -96,18 +98,21 @@ void MCTS<T>::playGame(){
 
     //Create game loop
     while(true){
-        globalGamestate.playerTurn();
-        //Check if game is completed     
-        if(globalGamestate.won != 0) break;
 
-        cout << "Computer's turn!"<<endl;
-        //Computers turn - makes decision through MCTS
-        Initialise();
-        T getUpdatedBoard = runMCTS();
-        globalGamestate = getUpdatedBoard;
-        globalGamestate.printBoard();
-        globalGamestate.wonOrNot();
-        if(globalGamestate.won != 0) break;
+        if(globalGamestate.getTurn() == "player"){
+            globalGamestate.playerTurn();
+            //Check if game is completed     
+            if(globalGamestate.won != 0) break;
+        } else {
+            cout << "Computer's turn!"<<endl;
+            //Computers turn - makes decision through MCTS
+            Initialise();
+            T getUpdatedBoard = runMCTS();
+            globalGamestate = getUpdatedBoard;
+            globalGamestate.printBoard();
+            globalGamestate.wonOrNot();
+            if(globalGamestate.won != 0) break;
+        }
     }
 
     //Print the result of the game
@@ -152,7 +157,7 @@ T MCTS<T>::runMCTS(){
     }
 
     //This is in place of a while loop with some time condition
-    for(int counter=0; counter < 600;counter++){
+    for(int counter=0; counter < 2;counter++){
 
         
         vector<int> parentSimCount;
@@ -309,17 +314,15 @@ typename MCTS<T>::node* MCTS<T>::Expand(MCTS<T>::node* psuedoroot, T prevGstate,
 template <class T>
 int MCTS<T>::Simulate(T childGamestate){
 
+
     //While not won
     while(childGamestate.won == 0){
 
-        int move;
-        bool valid = false;
-        //Continue to generate random move choices until a valid move is found
-        //srand(time(NULL));
-            while(valid == false){
-            move = rand()%9;
-            valid = !childGamestate.invalid(move);
-        }
+        //Get avaialable moveset
+        vector<int> moveset = childGamestate.getValidMoves();
+        int move_cnt = moveset.size();
+        int move = moveset[rand()%move_cnt];
+        
         childGamestate.makeMove(move);
         childGamestate.wonOrNot();
 

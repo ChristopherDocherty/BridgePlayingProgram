@@ -29,6 +29,7 @@ class Bridge{
 
     };
 
+    std::vector<std::string> dirs = {"N","E","S","W"};
     std::vector<std::string> suits = {"S","H","D","C"};
 
     std::vector<std::vector<Card>> hands; //Vector contains N,E,S,W in that order
@@ -59,6 +60,7 @@ class Bridge{
 
     //MCTS specific methods
     void initialiseBoard();
+    std::string getTurn();
     void makeMove(int);
     
     std::vector<int> getValidMoves();
