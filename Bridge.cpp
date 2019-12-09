@@ -136,12 +136,14 @@ void Bridge::initialiseBoard(){
     
     won = turn = tricksMade_Dec = 0;
 
+
+    /* THINK THIS IS INCORRECT, LETS SEE
     //Initialise round_record_card
     for(int i = 0; i !=4; ++i){
         Card blank;
         round_record_card.push_back(blank);
     }
-
+    */
     //Initialise hands vector
 
     for(int i =0; i !=4; ++i){
@@ -149,10 +151,11 @@ void Bridge::initialiseBoard(){
         hands.push_back(empty);
     }
 
-    vector<string> N_hand = {"A,6,5,4,3,2","K,J","Q,10,9,8,7",""};
-    vector<string> E_hand = {"","A,6,5,4,3,2","K,J","Q,10,9,8,7"};
-    vector<string> S_hand = {"Q,10,9,8,7","","A,6,5,4,3,2","K,J"};
-    vector<string> W_hand = {"K,J","Q,10,9,8,7","","A,6,5,4,3,2"};
+    //Provide suits in order S,H,D,C -- leave as empty string if no cards
+    vector<string> N_hand = {"A,6,5,4,3,2", "K,J", "Q,10,9,8,7", ""};
+    vector<string> E_hand = {"", "A,6,5,4,3,2", "K,J", "Q,10,9,8,7"};
+    vector<string> S_hand = {"Q,10,9,8,7", "", "A,6,5,4,3,2", "K,J"};
+    vector<string> W_hand = {"K,J", "Q,10,9,8,7", "", "A,6,5,4,3,2"};
 
     vector< vector<string> > hand_strs = {N_hand,E_hand,S_hand,W_hand};
 
@@ -169,7 +172,7 @@ void Bridge::initialiseBoard(){
                 string sub_str;
 
                 while(getline(ss,sub_str,',')){
-                    Card newCard(sub_str,suits[j]);  //Should probablt change -- pointless doubel conversion
+                    Card newCard(sub_str,suits[j]);  //Should probably change -- pointless doubel conversion
                     hands[i].push_back(newCard);
                 }
             }
@@ -187,6 +190,8 @@ void Bridge::initialiseBoard(){
     //Provide declarer direction
     string declarer_dir_str = "N";
     declarer = get_dir(declarer_dir_str);
+    //Push back declarer into the round record
+    round_record_player.push_back(declarer);
 
 
     //Provide computer direction
@@ -325,6 +330,8 @@ void Bridge::playerTurn(){
 
     failed_first_check = true;
     }
+    //Show result of move
+    printBoard();
 }
 
 
@@ -487,8 +494,8 @@ void Bridge::printBoard(){
 
     //Output all the strings
 
-    cout << hand_strs[0] << "\n" << hand_strs[1] <<
-                "\n" << hand_strs[2];
+    cout << "\n" << hand_strs[0] << "\n" << hand_strs[1] <<
+                "\n" << hand_strs[2] << "\n";
     
     //Also need to make sure partially populated hands can be displayed CAN!
     //for the the line marked 8 with n bookmarks
@@ -507,31 +514,37 @@ void Bridge::EW_vectorstring_make(vector<string>& W_preprocessed, vector<string>
     //From specification at start of printBoard function
     string spaces7(7,' ');
     W_preprocessed[0] += spaces7;
-    if(round_record_card[0].suit != -1){
+
+    try{
+        Card for_excep = round_record_card.at(0);
         W_preprocessed[0] += (intToRank(round_record_card[0].rank) + intToSuit(round_record_card[0].suit));
-    }
+    } catch (const std::out_of_range& oor) {}
 
     W_preprocessed[2] += spaces7;
-    if(round_record_card[2].suit != -1){ 
+    try{
+        Card for_excep = round_record_card.at(2);        
         W_preprocessed[2] += (intToRank(round_record_card[2].rank) + intToSuit(round_record_card[2].suit));
-    }
+    } catch (const std::out_of_range& oor) {}//MAY NEED TO add spcaces
 
 
     //Dealing with row 1
     string spaces5(5,' ');
     W_preprocessed[1] += spaces5;
-    if(round_record_card[1].suit != -1){ 
-        W_preprocessed[1] += (intToRank(round_record_card[1].rank) + intToSuit(round_record_card[1].suit));
-    } else {
+    try{
+        Card for_excep = round_record_card.at(3);
+        W_preprocessed[1] += (intToRank(round_record_card[3].rank) + intToSuit(round_record_card[3].suit));
+    } catch (const std::out_of_range& oor) {
         W_preprocessed[1] += "  ";
     }
+
     //Add space inbetween E & W played cards
     W_preprocessed[1] += "  ";
 
     //Add W played card if it exists
-    if(round_record_card[3].suit != -1){ 
+    try{
+        Card for_excep = round_record_card.at(1);
         W_preprocessed[1] += (intToRank(round_record_card[1].rank) + intToSuit(round_record_card[1].suit));
-    } else {
+    } catch (const std::out_of_range& oor) {
         W_preprocessed[1] += "  ";
     }
 

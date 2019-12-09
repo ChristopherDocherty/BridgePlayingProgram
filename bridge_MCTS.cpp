@@ -17,7 +17,10 @@ int main(){
 
     test.initialiseBoard();
 
-    
+    for(int i = 0; i != 5; ++i){
+       test.playerTurn();
+    }
+
     return 0;
 
 }
