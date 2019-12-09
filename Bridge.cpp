@@ -266,7 +266,7 @@ bool Bridge::invalid(int move){
     bool can_follow = false;
     for(vector<Card>::iterator card = hands[player].begin(); card != hands[player].end(); ++card){
         if(card->suit == suit){
-            can_follow == false;
+            can_follow = true;
         }
     }
 
