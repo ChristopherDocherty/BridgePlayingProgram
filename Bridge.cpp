@@ -175,13 +175,13 @@ void Bridge::initialiseBoard(){
 
     //Provide contract information
     int contract_level = 1;
-    trumpSuit = "C";
+    trumpSuit = "S";
 
     tricksToWin = 6 + contract_level;
 
     
     //Provide declarer direction
-    string declarer_dir_str = "E";
+    string declarer_dir_str = "N";
     declarer = get_dir(declarer_dir_str);
     //Push back declarer into the round record
     round_record_player.push_back(declarer);
@@ -269,6 +269,9 @@ vector<int> Bridge::getValidMoves(){
             valid_moves.push_back(i);
         }
     }
+    if(valid_moves.size() == 0){
+        cout << "woops";
+    }
     return valid_moves;
 }
 
@@ -276,7 +279,7 @@ vector<int> Bridge::getValidMoves(){
 bool Bridge::invalid(int move){
 
     //if the first card in a round then trivially valid
-    if(round_record_player.size() ==1){
+    if(round_record_player.size() == 1){
         return false;
     }
 
@@ -328,6 +331,8 @@ void Bridge::playerTurn(){
         }
 
         cin >> rank_str >> suit_str;
+
+        
         Card player_card(rank_str,suit_str);
 
         int card_index;
@@ -518,6 +523,8 @@ void Bridge::printBoard(){
                 "\n" << hand_strs[2] << "\n";
     
     cout << "It is " << dirs[round_record_player.back()] << "'s Turn" << endl;
+
+    cout << tricksMade_Dec << " DEC : " << tricksToWin << "\n";
     
     //Also need to make sure partially populated hands can be displayed CAN!
     //for the the line marked 8 with n bookmarks

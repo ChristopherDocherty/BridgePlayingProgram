@@ -100,8 +100,11 @@ void MCTS<T>::playGame(){
     while(true){
 
         if(globalGamestate.getTurn() == "player"){
+            
             globalGamestate.playerTurn();
-            //Check if game is completed     
+
+            //Check if game is completed
+            globalGamestate.wonOrNot();
             if(globalGamestate.won != 0) break;
         } else {
             cout << "Computer's turn!"<<endl;
@@ -157,7 +160,7 @@ T MCTS<T>::runMCTS(){
     }
 
     //This is in place of a while loop with some time condition
-    for(int counter=0; counter < 2;counter++){
+    for(int counter=0; counter < 60;counter++){
 
         
         vector<int> parentSimCount;
