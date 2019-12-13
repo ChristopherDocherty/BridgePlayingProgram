@@ -145,11 +145,17 @@ void Bridge::initialiseBoard(){
     }
 
     //Provide suits in order S,H,D,C -- leave as empty string if no cards
-    vector<string> N_hand = {"A,6,5,4,3,2", "K,J", "Q,10,9,8,7", ""};
-    vector<string> E_hand = {"", "A,6,5,4,3,2", "K,J", "Q,10,9,8,7"};
-    vector<string> S_hand = {"Q,10,9,8,7", "", "A,6,5,4,3,2", "K,J"};
-    vector<string> W_hand = {"K,J", "Q,10,9,8,7", "", "A,6,5,4,3,2"};
+    vector<string> N_hand = {"6,4", "Q,3", "", "8"};
+    vector<string> E_hand = {"2", "J,9,7", "3", ""};
+    vector<string> S_hand = {"9", "A,5", "9,8", ""};
+    vector<string> W_hand = {"K", "10,8", "J,10", ""};
 
+/*
+    vector<string> N_hand = {"J,8,6,4", "Q,4,3", "6,4", "Q,10,8,3"};
+    vector<string> E_hand = {"A,Q,2", "J,9,7,2", "A,5,3", "A,K,7"};
+    vector<string> S_hand = {"9,7,3", "A,6,5", "Q,9,8,2", "J,9,4"};
+    vector<string> W_hand = {"K,10,5", "K,10,8", "K,J,10,7", "6,5,2"};
+*/
     vector< vector<string> > hand_strs = {N_hand,E_hand,S_hand,W_hand};
 
    for(int i=0; i !=4; ++i){ //Iterate over the hands
@@ -174,21 +180,22 @@ void Bridge::initialiseBoard(){
 
 
     //Provide contract information
-    int contract_level = 1;
-    trumpSuit = "S";
+    int contract_level = -2;
+    trumpSuit = "H";
+    turn = 36;
 
     tricksToWin = 6 + contract_level;
 
     
     //Provide declarer direction
-    string declarer_dir_str = "N";
+    string declarer_dir_str = "E";
     declarer = get_dir(declarer_dir_str);
     //Push back declarer into the round record
     round_record_player.push_back(declarer);
 
 
     //Provide computer direction
-    string comp_dir_str = "N";
+    string comp_dir_str = "E";
     int dir_int = get_dir(comp_dir_str);
 
     comp_dir.push_back(dir_int);
@@ -202,7 +209,7 @@ void Bridge::initialiseBoard(){
 
 string Bridge::getTurn(){
     if(round_record_player.back() == comp_dir[0] || round_record_player.back() == comp_dir[1]){
-        return "Computer"; 
+        return "computer"; 
     } else {
         return "player";
     }
@@ -523,11 +530,8 @@ void Bridge::printBoard(){
                 "\n" << hand_strs[2] << "\n";
     
     cout << "It is " << dirs[round_record_player.back()] << "'s Turn" << endl;
-
-    cout << tricksMade_Dec << " DEC : " << tricksToWin << "\n";
     
-    //Also need to make sure partially populated hands can be displayed CAN!
-    //for the the line marked 8 with n bookmarks
+    cout << "declarer has made " << tricksMade_Dec << " of " << tricksToWin << " needed tricks \n";
 
 }
 

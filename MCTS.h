@@ -8,12 +8,12 @@
 #include <string>
 #include <cstdlib>
 #include <ctime>
+#include <chrono>
 
 using std::vector; using std::list;
 using std::cout; using std::cin;
 using std::endl; using std::string;
 using std::rand; using std::srand;
-using std::time;
 
 
 
@@ -51,6 +51,8 @@ template <class T>
             double getComparisonNum(int parentSimCount);
         };
 
+        
+        int computeTime = 20;
 
         node* root;
         T globalGamestate;
@@ -159,10 +161,12 @@ T MCTS<T>::runMCTS(){
         return potentialWin->localGamestate;
     }
 
-    //This is in place of a while loop with some time condition
-    for(int counter=0; counter < 60;counter++){
+    
+    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
-        
+    //This is in place of a while loop with some time condition
+    while(std::chrono::system_clock::now() - start < std::chrono::seconds(computeTime)){
+
         vector<int> parentSimCount;
         //get count from root and add to vector
         int rootSimCount = root->visitCNT;
@@ -317,6 +321,7 @@ typename MCTS<T>::node* MCTS<T>::Expand(MCTS<T>::node* psuedoroot, T prevGstate,
 template <class T>
 int MCTS<T>::Simulate(T childGamestate){
 
+    string turn = childGamestate.getTurn();
 
     //While not won
     while(childGamestate.won == 0){
@@ -331,8 +336,15 @@ int MCTS<T>::Simulate(T childGamestate){
 
     }
 
-    //Outside the loop means he end of the game has been reached return result
-    return childGamestate.won;
+    //Simulates best move from oppponent as well
+    if(turn == "player" && childGamestate.won == 1 || turn == "computer" && childGamestate.won == 2){
+        return 2;
+    } else {
+        return 1;
+    }
+
+
+
 }
 
 /*This method needs significant retooling I believe. currently it selects opponents moves
