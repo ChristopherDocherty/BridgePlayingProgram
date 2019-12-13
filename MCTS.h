@@ -52,7 +52,7 @@ template <class T>
         };
 
         
-        int computeTime = 20;
+        int computeTime = 30;
 
         node* root;
         T globalGamestate;
@@ -97,7 +97,7 @@ void MCTS<T>::playGame(){
 
     Initialise();
 
-
+    int count = 0;
     //Create game loop
     while(true){
 
@@ -112,12 +112,19 @@ void MCTS<T>::playGame(){
             cout << "Computer's turn!"<<endl;
             //Computers turn - makes decision through MCTS
             Initialise();
+            if(globalGamestate.turn%4 == 0){
+                computeTime = 300;
+            } else {
+                computeTime = 30;
+            }
             T getUpdatedBoard = runMCTS();
             globalGamestate = getUpdatedBoard;
             globalGamestate.printBoard();
             globalGamestate.wonOrNot();
             if(globalGamestate.won != 0) break;
+        ++count;
         }
+        cout << "";
     }
 
     //Print the result of the game
@@ -283,12 +290,7 @@ typename MCTS<T>::node* MCTS<T>::ESV(MCTS::node* psuedoroot){
             if(childGstate.won == 0){
                 result = Simulate(childGstate);
             } else{
-                string turn = childGstate.getTurn();
-                if(turn == "player" && childGstate.won == 1 || turn == "computer" && childGstate.won == 2){
-                    result = 2;
-                } else {
-                    result = 1;
-                }
+                result = childGstate.won;
             }
 
             //Update the results of the simulated game
@@ -296,12 +298,7 @@ typename MCTS<T>::node* MCTS<T>::ESV(MCTS::node* psuedoroot){
 
         }
     } else{
-        string turn = parentGstate.getTurn();
-        if(turn == "player" && parentGstate.won == 1 || turn == "computer" && parentGstate.won == 2){
-        Update(psuedoroot,2);
-        } else {
-        Update(psuedoroot,1);
-        }
+        Update(psuedoroot,parentGstate.won);
     }
 
 
@@ -354,22 +351,8 @@ int MCTS<T>::Simulate(T childGamestate){
         childGamestate.wonOrNot();
 
     }
-
-    //Simulates best move from oppponent as well
-    if(turn == "player" && childGamestate.won == 1 || turn == "computer" && childGamestate.won == 2){
-        return 2;
-    } else {
-        return 1;
-    }
-
-
-
+    return childGamestate.won;
 }
-
-/*This method needs significant retooling I believe. currently it selects opponents moves
-based on what is best for the computer which is the moves a very bad player would make.
-Not sure if updating the win count of the node should be based on which players turn it is
-but will check when I get internet again*/
 
 
 template <class T>
@@ -377,16 +360,15 @@ void MCTS<T>::Update(MCTS<T>::node* outerNode, int result){
 
     ++outerNode->visitCNT;
 
-    //If result is the integer for comp winning increment win counter
-    //Can change to include draw if wanting either a draw or win
-    if(result ==2 ){
+    T gamestate = outerNode->localGamestate;
+
+    if(result == 1 && gamestate.getTurn() == "computer" || result == 2 && gamestate.getTurn() == "player" ){
     ++outerNode->winCNT;
     }
 
-    node n = *outerNode;
 
-    if(n.IN != NULL){
-        Update(n.IN,result);
+    if(outerNode->IN != NULL){
+        Update(outerNode->IN,result);
     }
 }
 
