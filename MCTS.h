@@ -255,40 +255,59 @@ typename MCTS<T>::node* MCTS<T>::ESV(MCTS::node* psuedoroot){
     //Get the game state from parent
     T parentGstate = psuedoroot->localGamestate;
 
-    //Find the valid moves
+    parentGstate.wonOrNot();
 
-    vector<int> moveset = parentGstate.getValidMoves();
+    //Can't keep trying to expand when teh given gamestate has already won
+    if(parentGstate.won == 0){
+        //Find the valid moves
 
-
-    //Iterate over the moveset
-    for(vector<int>::const_iterator iter = moveset.begin();iter != moveset.end(); ++iter){
-
-        int move = *iter;
-
-        
-        //The board is updated in Expand()
-        node* newChild = Expand(psuedoroot, parentGstate, move);
-
-        //Check if the newChild is already in a winning state
-        T childGstate = newChild->localGamestate;
-        childGstate.wonOrNot(); 
+        vector<int> moveset = parentGstate.getValidMoves();
 
 
-        int result;
-        //Only simulate if th result is not already known
-        if(childGstate.won == 0){
-            result = Simulate(childGstate);
-        } else{
-            result = childGstate.won;
+        //Iterate over the moveset
+        for(vector<int>::const_iterator iter = moveset.begin();iter != moveset.end(); ++iter){
+
+            int move = *iter;
+
+
+            //The board is updated in Expand()
+            node* newChild = Expand(psuedoroot, parentGstate, move);
+
+            //Check if the newChild is already in a winning state
+            T childGstate = newChild->localGamestate;
+            childGstate.wonOrNot(); 
+
+
+            int result;
+            //Only simulate if th result is not already known
+            if(childGstate.won == 0){
+                result = Simulate(childGstate);
+            } else{
+                string turn = childGstate.getTurn();
+                if(turn == "player" && childGstate.won == 1 || turn == "computer" && childGstate.won == 2){
+                    result = 2;
+                } else {
+                    result = 1;
+                }
+            }
+
+            //Update the results of the simulated game
+            Update(newChild, result);
+
         }
-        
-        //Update the results of the simulated game
-        Update(newChild, result);
-    
+    } else{
+        string turn = parentGstate.getTurn();
+        if(turn == "player" && parentGstate.won == 1 || turn == "computer" && parentGstate.won == 2){
+        Update(psuedoroot,2);
+        } else {
+        Update(psuedoroot,1);
+        }
     }
-    /* At this point all children will have been updated and now either
-    a new node will be selected or the computers time is up and it has 
-    to make it's move*/
+
+
+        /* At this point all children will have been updated and now either
+        a new node will be selected or the computers time is up and it has 
+        to make it's move*/
     node* placeholderPTR = NULL;
     return placeholderPTR;
 }

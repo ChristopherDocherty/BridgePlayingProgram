@@ -145,17 +145,12 @@ void Bridge::initialiseBoard(){
     }
 
     //Provide suits in order S,H,D,C -- leave as empty string if no cards
-    vector<string> N_hand = {"6,4", "Q,3", "", "8"};
-    vector<string> E_hand = {"2", "J,9,7", "3", ""};
-    vector<string> S_hand = {"9", "A,5", "9,8", ""};
-    vector<string> W_hand = {"K", "10,8", "J,10", ""};
 
-/*
     vector<string> N_hand = {"J,8,6,4", "Q,4,3", "6,4", "Q,10,8,3"};
     vector<string> E_hand = {"A,Q,2", "J,9,7,2", "A,5,3", "A,K,7"};
     vector<string> S_hand = {"9,7,3", "A,6,5", "Q,9,8,2", "J,9,4"};
     vector<string> W_hand = {"K,10,5", "K,10,8", "K,J,10,7", "6,5,2"};
-*/
+
     vector< vector<string> > hand_strs = {N_hand,E_hand,S_hand,W_hand};
 
    for(int i=0; i !=4; ++i){ //Iterate over the hands
@@ -180,18 +175,17 @@ void Bridge::initialiseBoard(){
 
 
     //Provide contract information
-    int contract_level = -2;
+    int contract_level = 4;
     trumpSuit = "H";
-    turn = 36;
 
     tricksToWin = 6 + contract_level;
 
     
     //Provide declarer direction
-    string declarer_dir_str = "E";
+    string declarer_dir_str = "W"; 
     declarer = get_dir(declarer_dir_str);
-    //Push back declarer into the round record
-    round_record_player.push_back(declarer);
+    //Push back declarer + 1 into the round record for player on lead
+    round_record_player.push_back(declarer != 3 ? declarer +1 : 0);
 
 
     //Provide computer direction
@@ -277,7 +271,7 @@ vector<int> Bridge::getValidMoves(){
         }
     }
     if(valid_moves.size() == 0){
-        cout << "woops";
+        cout << "woops"; //FOR DEBUGGING
     }
     return valid_moves;
 }
