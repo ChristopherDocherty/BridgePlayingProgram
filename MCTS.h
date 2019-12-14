@@ -128,8 +128,8 @@ void MCTS<T>::playGame(){
         cout <<"It's a cats game" << endl;
     }
 
-    cout << " \n End of program press any key to terminate";
-    cin.get();
+    cout << "\nEnd of program" << endl;
+    system("pause"); 
 }
 
 
@@ -171,7 +171,7 @@ T MCTS<T>::runMCTS(){
     if(moveset.size() == 1){
         computeTime = 1; //simlulating for one choice is redundant 
     } else {
-        computeTime = computeTimeInterval * moveset.size();
+        computeTime = 1;//computeTimeInterval * moveset.size();
     }
     
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();

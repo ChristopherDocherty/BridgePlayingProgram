@@ -17,10 +17,6 @@ Bridge::Card::Card(string rank_str="-1", string suit_str="-1"){
     suit = suitToInt(suit_str);
     rank = rankToInt(rank_str);
 
-    //FOr default constructor both values will be -1
-
-    //Currently no error catching is user enters invalid card
-    //Program will crash
 }
 
 
@@ -53,20 +49,6 @@ string Bridge::intToRank(int rank){
     }
 }
 
-int Bridge::rankToInt(string rank_str){
-    
-    if(rank_str == "A"){
-        return 14;
-    } else if(rank_str == "K"){
-        return 13;
-    } else if(rank_str == "Q"){
-        return 12;
-    } else if(rank_str == "J"){
-        return 11;
-    } else {
-        return stoi(rank_str);
-    }
-}
 
 string Bridge::intToSuit(int suit_int){
 
@@ -82,7 +64,7 @@ string Bridge::intToSuit(int suit_int){
 
 }
 
-//Temporary measure until I leanr inheritance
+
 int Bridge::Card::rankToInt(string rank_str){
     
     if(rank_str == "A"){
@@ -94,7 +76,11 @@ int Bridge::Card::rankToInt(string rank_str){
     } else if(rank_str == "J"){
         return 11;
     } else {
-        return stoi(rank_str);
+        try{
+            return stoi(rank_str);
+        } catch(exception& e){
+            return -1;
+        }
     }
 }
 
@@ -175,7 +161,7 @@ void Bridge::initialiseBoard(){
 
 
     //Provide contract information
-    int contract_level = 4;
+    int contract_level = -5;
     trumpSuit = "H";
 
     tricksToWin = 6 + contract_level;
@@ -525,7 +511,7 @@ void Bridge::printBoard(){
     
     cout << "It is " << dirs[round_record_player.back()] << "'s Turn" << endl;
     
-    cout << "declarer has made " << tricksMade_Dec << " of " << tricksToWin << " needed tricks \n";
+    cout << "Declarer has made " << tricksMade_Dec << " of " << tricksToWin << " needed tricks \n";
 
 }
 
