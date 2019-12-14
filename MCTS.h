@@ -52,7 +52,7 @@ template <class T>
         };
 
         
-        int computeTime = 30;
+        int computeTimeInterval = 10;
 
         node* root;
         T globalGamestate;
@@ -97,7 +97,6 @@ void MCTS<T>::playGame(){
 
     Initialise();
 
-    int count = 0;
     //Create game loop
     while(true){
 
@@ -112,31 +111,25 @@ void MCTS<T>::playGame(){
             cout << "Computer's turn!"<<endl;
             //Computers turn - makes decision through MCTS
             Initialise();
-            if(globalGamestate.turn%4 == 0){
-                computeTime = 300;
-            } else {
-                computeTime = 30;
-            }
             T getUpdatedBoard = runMCTS();
             globalGamestate = getUpdatedBoard;
             globalGamestate.printBoard();
             globalGamestate.wonOrNot();
             if(globalGamestate.won != 0) break;
-        ++count;
         }
-        cout << "";
     }
 
     //Print the result of the game
     if(globalGamestate.won == 2){
-        cout << "ya lost" << endl;
+        cout << "Copmuter wins!" << endl;
     } else if (globalGamestate.won == 1) {
-        cout << "ya won" << endl;
+        cout << "You win!" << endl;
     } else {
         cout <<"It's a cats game" << endl;
     }
 
-    cout << "We are done...";
+    cout << " \n End of program press any key to terminate";
+    cin.get();
 }
 
 
@@ -168,6 +161,18 @@ T MCTS<T>::runMCTS(){
         return potentialWin->localGamestate;
     }
 
+    //Change simulation time depending on number of cards available to play
+    //The more cards there are to play th more difficult the choice and hence
+    //the more time that should be spent thinkning
+    //currently just have copmutation time scale linearly with card count
+
+    vector<int> moveset = globalGamestate.getValidMoves();
+    int computeTime;
+    if(moveset.size() == 1){
+        computeTime = 1; //simlulating for one choice is redundant 
+    } else {
+        computeTime = computeTimeInterval * moveset.size();
+    }
     
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
@@ -345,6 +350,8 @@ int MCTS<T>::Simulate(T childGamestate){
         //Get avaialable moveset
         vector<int> moveset = childGamestate.getValidMoves();
         int move_cnt = moveset.size();
+        //seed RNG
+        srand(time(NULL));
         int move = moveset[rand()%move_cnt];
         
         childGamestate.makeMove(move);
@@ -362,6 +369,7 @@ void MCTS<T>::Update(MCTS<T>::node* outerNode, int result){
 
     T gamestate = outerNode->localGamestate;
 
+    //Updates node according to player who last played
     if(result == 1 && gamestate.getTurn() == "computer" || result == 2 && gamestate.getTurn() == "player" ){
     ++outerNode->winCNT;
     }
