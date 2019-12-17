@@ -2,8 +2,8 @@
 #include <sstream>
 #include <string>
 #include <list>
-#include <cmath>
 #include <vector>
+#include <cmath>
 #include "Bridge.h"
 
 using namespace std;
@@ -30,12 +30,8 @@ bool operator==(const Bridge::Card &c1,const Bridge::Card &c2){
     return(c1.rank == c2.rank && c1.suit == c2.suit);
 }
 
-bool operator-(const Bridge::Card &c1,const Bridge::Card &c2){
-    if(c1.suit == c2.suit){
-        return abs(c1.rank - c2.rank);
-    } else {
-        return(-1);
-    }
+bool Bridge::Card::TouchingCards(const Card other){
+    return suit == other.suit && abs(rank - other.rank) ==1;
 }
 
 
@@ -140,7 +136,8 @@ void Bridge::initialiseBoard(){
     }
 
 
-    ///*Kelsey page 57
+   
+    /*Kelsey page 57
     //Provide suits in order S,H,D,C -- leave as empty string if no cards
     vector<string> N_hand = {"K,9,4,3", "7,3", "Q,8,7,2", "Q,8,2"};
     vector<string> E_hand = {"J,10,8", "J,6", "A,K,9,6,3", "J,9,4"};
@@ -156,7 +153,7 @@ void Bridge::initialiseBoard(){
 
     //Provide computer direction
     string comp_dir_str = "S";
-    //*/
+    */
     
 
    /*Kelsey page 88
@@ -177,12 +174,12 @@ void Bridge::initialiseBoard(){
     string comp_dir_str = "S";
     */
 
-   /* //Goren pg602
+    //Goren pg602
     //Provide suits in order S,H,D,C -- leave as empty string if no cards
-    vector<string> N_hand = {"J", "A,J", "", ""};
-    vector<string> E_hand = {"6", "10,6", "", ""};
-    vector<string> S_hand = {"", "7,5", "A", ""};
-    vector<string> W_hand = {"Q", "K,Q", "", ""};
+    vector<string> N_hand = {"A,J", "A,J,4", "10,9,6,4", "J,6,4,2"};
+    vector<string> E_hand = {"9,8,6,5,3", "10,8,6", "7", "9,8,7,5"};
+    vector<string> S_hand = {"2", "7,5", "A,K,Q,J,8,2", "A,K,Q,3"};
+    vector<string> W_hand = {"K,Q,10,7,4", "K,Q,9,3,2", "5,3", "10"};
 
     //Provide contract information
     int contract_level = 7;
@@ -193,7 +190,7 @@ void Bridge::initialiseBoard(){
 
     //Provide computer direction
     string comp_dir_str = "S";
-    */
+    
 
     vector< vector<string> > hand_strs = {N_hand,E_hand,S_hand,W_hand};
 
@@ -295,6 +292,7 @@ void Bridge::makeMove(int move){
 vector<int> Bridge::getValidMoves(){
 
     vector<int> valid_moves;
+    vector<int> valid_non_duplic_moves;
 
     //Get current player
     int player = round_record_player.back();  
@@ -302,7 +300,17 @@ vector<int> Bridge::getValidMoves(){
     //Iterate over all move s and add if valid play
     for(int i = 0; i != hands[player].size(); ++i){
         if(!invalid(i)){
-            valid_moves.push_back(i);
+            valid_non_duplic_moves.push_back(i);
+            bool touching = false;
+            for(vector<int>::iterator j = valid_non_duplic_moves.begin(); j != valid_non_duplic_moves.end(); ++j){
+                if(hands[player][*j].TouchingCards(hands[player][i])){
+                    touching = true;
+                }
+            }
+
+            if(touching == false){
+                valid_moves.push_back(i);
+            }
         }
     }
     if(valid_moves.size() == 0){
