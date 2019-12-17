@@ -25,6 +25,7 @@ class Bridge{
         
         friend bool operator> (const Card &c1,const Card &c2);
         friend bool operator== (const Card &c1,const Card &c2);
+        friend bool operator- (const Card &c1,const Card &c2);
         
 
     };

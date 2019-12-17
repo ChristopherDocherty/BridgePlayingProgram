@@ -52,7 +52,7 @@ template <class T>
         };
 
         
-        int computeTimeInterval = 10;
+        int computeTimeInterval = 20;
 
         node* root;
         T globalGamestate;
@@ -170,8 +170,10 @@ T MCTS<T>::runMCTS(){
     int computeTime;
     if(moveset.size() == 1){
         computeTime = 1; //simlulating for one choice is redundant 
+    } else if(moveset.size() < 8) {
+        computeTime = computeTimeInterval/4 * moveset.size();
     } else {
-        computeTime = 1;//computeTimeInterval * moveset.size();
+        computeTime = computeTimeInterval * moveset.size();
     }
     
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();

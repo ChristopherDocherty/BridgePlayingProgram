@@ -2,6 +2,7 @@
 #include <sstream>
 #include <string>
 #include <list>
+#include <cmath>
 #include <vector>
 #include "Bridge.h"
 
@@ -27,6 +28,14 @@ bool operator>(const Bridge::Card &c1,const Bridge::Card &c2){
 }
 bool operator==(const Bridge::Card &c1,const Bridge::Card &c2){
     return(c1.rank == c2.rank && c1.suit == c2.suit);
+}
+
+bool operator-(const Bridge::Card &c1,const Bridge::Card &c2){
+    if(c1.suit == c2.suit){
+        return abs(c1.rank - c2.rank);
+    } else {
+        return(-1);
+    }
 }
 
 
@@ -130,16 +139,65 @@ void Bridge::initialiseBoard(){
         hands.push_back(empty);
     }
 
-    //Provide suits in order S,H,D,C -- leave as empty string if no cards
 
-    vector<string> N_hand = {"J,8,6,4", "Q,4,3", "6,4", "Q,10,8,3"};
-    vector<string> E_hand = {"A,Q,2", "J,9,7,2", "A,5,3", "A,K,7"};
-    vector<string> S_hand = {"9,7,3", "A,6,5", "Q,9,8,2", "J,9,4"};
-    vector<string> W_hand = {"K,10,5", "K,10,8", "K,J,10,7", "6,5,2"};
+    ///*Kelsey page 57
+    //Provide suits in order S,H,D,C -- leave as empty string if no cards
+    vector<string> N_hand = {"K,9,4,3", "7,3", "Q,8,7,2", "Q,8,2"};
+    vector<string> E_hand = {"J,10,8", "J,6", "A,K,9,6,3", "J,9,4"};
+    vector<string> S_hand = {"A,Q,7,6,5,2", "A,K,9", "4", "K,6,5"};
+    vector<string> W_hand = {"", "Q,10,8,5,4,2", "J,10,5", "A,10,7,3"};
+
+    //Provide contract information
+    int contract_level = 4;
+    trumpSuit = "S";
+
+    //Provide declarer direction
+    string declarer_dir_str = "S"; 
+
+    //Provide computer direction
+    string comp_dir_str = "S";
+    //*/
+    
+
+   /*Kelsey page 88
+   //Provide suits in order S,H,D,C -- leave as empty string if no cards
+    vector<string> N_hand = {"A,7", "J,6,3", "10,5,4", "A,J,10,6,2"};
+    vector<string> E_hand = {"Q,10,9,2", "10,5,2", "Q,6", "K,9,8,5"};
+    vector<string> S_hand = {"K,6,4,3", "A,K,Q", "A,9,7,2", "4,3"};
+    vector<string> W_hand = {"J,8,5", "9,8,7,4", "K,J,8,3", "Q,7"};
+
+    //Provide contract information
+    int contract_level = 3;
+    trumpSuit = "NT";
+
+    //Provide declarer direction
+    string declarer_dir_str = "S"; 
+
+    //Provide computer direction
+    string comp_dir_str = "S";
+    */
+
+   /* //Goren pg602
+    //Provide suits in order S,H,D,C -- leave as empty string if no cards
+    vector<string> N_hand = {"J", "A,J", "", ""};
+    vector<string> E_hand = {"6", "10,6", "", ""};
+    vector<string> S_hand = {"", "7,5", "A", ""};
+    vector<string> W_hand = {"Q", "K,Q", "", ""};
+
+    //Provide contract information
+    int contract_level = 7;
+    trumpSuit = "D";
+
+    //Provide declarer direction
+    string declarer_dir_str = "S"; 
+
+    //Provide computer direction
+    string comp_dir_str = "S";
+    */
 
     vector< vector<string> > hand_strs = {N_hand,E_hand,S_hand,W_hand};
 
-   for(int i=0; i !=4; ++i){ //Iterate over the hands
+    for(int i=0; i !=4; ++i){ //Iterate over the hands
 
         vector<string> current_hand = hand_strs[i];
 
@@ -160,24 +218,15 @@ void Bridge::initialiseBoard(){
     }
 
 
-    //Provide contract information
-    int contract_level = -5;
-    trumpSuit = "H";
+   
 
     tricksToWin = 6 + contract_level;
 
-    
-    //Provide declarer direction
-    string declarer_dir_str = "W"; 
     declarer = get_dir(declarer_dir_str);
     //Push back declarer + 1 into the round record for player on lead
     round_record_player.push_back(declarer != 3 ? declarer +1 : 0);
 
-
-    //Provide computer direction
-    string comp_dir_str = "E";
     int dir_int = get_dir(comp_dir_str);
-
     comp_dir.push_back(dir_int);
     //Also push back opposite direction
     comp_dir.push_back( dir_int + 2 < 4 ? dir_int + 2 : dir_int -2 );
@@ -257,7 +306,7 @@ vector<int> Bridge::getValidMoves(){
         }
     }
     if(valid_moves.size() == 0){
-        cout << "woops"; //FOR DEBUGGING
+        cout << "Exception has occured please restart"; //FOR DEBUGGING
     }
     return valid_moves;
 }
