@@ -52,7 +52,7 @@ template <class T>
         };
 
         
-        int computeTimeInterval = 20;
+        int computeTimeInterval = 35;
 
         node* root;
         T globalGamestate;
