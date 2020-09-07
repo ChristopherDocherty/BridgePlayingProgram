@@ -1,8 +1,4 @@
-# DeepGreen
+# Bridge Playing Program
 
 
-For project B of CUHK's PHYS4061 class.
-
-An implementation of monte carlo tree search for the card game bridge.
-
-The report can be found in this repository.
+This is an "AI" for the card game bridge built in C++ using the Monte Carlo Tree Search (MCTS) algorithm. Some details on how the program performed can be found in the report in this repository.
