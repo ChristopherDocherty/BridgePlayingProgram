@@ -6,3 +6,6 @@ pg88_record
 /hide
 /Notes
 .vscode
+/build
+/new_temp
+*.swp
