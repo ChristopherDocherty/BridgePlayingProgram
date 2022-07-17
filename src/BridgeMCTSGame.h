@@ -1,9 +1,5 @@
-#ifndef GUARD_Bridge_h
-#define GUARD_Bridge_h
 
-#include <vector>
-#include <string>
-#include <exception>
+
 
 
 
@@ -67,14 +63,18 @@ class Bridge{
     std::vector<int> getValidMoves();
     bool invalid(int);
     
+    void playerTurn();
+    void wonOrNot();
+
+
+
+
 
     void printBoard();
     void EW_vectorstring_make(std::vector<std::string>&, std::vector<std::string>, int);
     std::string print_string_make(std::vector<std::string>, int);
 
 
-    void playerTurn();
-    void wonOrNot();
     
     //Bridge class specific methods
     void trickWinner(); 
@@ -82,7 +82,3 @@ class Bridge{
 };
 
 
-
-
-
-#endif
