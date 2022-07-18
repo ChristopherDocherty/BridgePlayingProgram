@@ -20,10 +20,5 @@ class BridgeGameState {
 
 
 
-
-class BridgeCard {
-};
-
-
 }
 #endif
