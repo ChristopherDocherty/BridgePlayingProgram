@@ -1,20 +1,18 @@
 #ifndef BridgeGamestate_h
 #define BridgeGamestate_h
 
-#include <map>
 #include <string>
 
 
 namespace Bridge {
 
 
+const int convertSuitStringToInt(const std::string& suit);
+const std::string convertSuitIntToString(const int suitInt); 
  
-const std::map<std::string, int> suitStringToIntMap(); 
-const std::map<int, std::string> suitIntToStringMap(); 
 
-const std::map<std::string, int> rankStringToIntMap(); 
-const std::map<int, std::string> rankIntToStringMap(); 
-
+const int convertRankStringToInt(const std::string& rank); 
+const std::string convertRankIntToString(const int rankInt); 
 
 
 }

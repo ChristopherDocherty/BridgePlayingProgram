@@ -10,8 +10,7 @@ class BridgeCard {
 
     public: 
 
-        BridgeCard(std::string suit, std::string rank) :
-            mSuit(validateSuitString(suit)), mRank(validateRankString(rank)) {}; 
+        BridgeCard(std::string suit, std::string rank); 
 
         const bool operator > (const BridgeCard& other);
         const bool operator < (const BridgeCard& other);
@@ -22,8 +21,6 @@ class BridgeCard {
         const int mSuit;
         const int mRank;
 
-        const int validateSuitString(const std::string& suit);
-        const int validateRankString(const std::string& rank);
 
 };
 

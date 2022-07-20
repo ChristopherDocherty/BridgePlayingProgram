@@ -1,33 +1,12 @@
 #include "bridgeCard.h"
 #include "utils/bridgeUtils.h"
 
+#include <string>
+
 namespace Bridge{
 
-
-const int BridgeCard::validateSuitString(const std::string& suit) {
-    
-    auto suitMap = suitStringToIntMap();
-
-    if (suitMap.find(suit) == suitMap.end()) {
-        throw std::invalid_argument("Invalid suit string entered");
-    }; 
-
-    return suitMap[suit];
-
-}
-
-
-const int BridgeCard::validateRankString(const std::string& rank) {
-
-    auto rankMap = rankStringToIntMap();
-
-    if (rankMap.find(rank) == rankMap.end()) {
-        throw std::invalid_argument("Invalid rank string entered");
-    }; 
-
-    return rankMap[rank];
-
-}
+    BridgeCard::BridgeCard(std::string suit, std::string rank) :
+    mSuit(convertSuitStringToInt(suit)), mRank(convertRankStringToInt(rank)) {}; 
 
 
 const bool BridgeCard::operator > (const BridgeCard& other) {
@@ -38,7 +17,7 @@ const bool BridgeCard::operator > (const BridgeCard& other) {
         return false;
     }
 
-}
+};
 
 
 const bool BridgeCard::operator < (const BridgeCard& other) {
@@ -49,7 +28,7 @@ const bool BridgeCard::operator < (const BridgeCard& other) {
         return false;
     }
 
-}
+};
 
 
 }

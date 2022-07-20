@@ -5,36 +5,46 @@
 
 namespace Bridge {
 
-const std::map<std::string, int> suitStringToIntMap() {
-
-   const static std::map<std::string, int>  suitStringToInt = {
+const int convertSuitStringToInt(const std::string& suit) {
+    
+   const static std::map<std::string, int>  suitMap = {
        {"C", 1},
        {"D", 2},
        {"H", 3},
        {"S", 4}
     };
 
-   return suitStringToInt;
-};
+    if (suitMap.find(suit) == suitMap.end()) {
+        throw std::invalid_argument("Invalid suit string entered");
+    }; 
 
+    return suitMap.at(suit);
 
+}
 
-const std::map<int, std::string> suitIntToStringMap() {
+const std::string convertSuitIntToString(const int suitInt) {
     
-    const static std::map<int, std::string> suitIntToString = {
+    const static std::map<int, std::string> suitMap = {
         {1, "C"},
         {2, "D"},
         {3, "H"},
         {4, "S"}
     }; 
 
-    return suitIntToString;
+    if (suitMap.find(suitInt) == suitMap.end()) {
+        throw std::invalid_argument("Invalid suit string entered");
+    }; 
+
+    return suitMap.at(suitInt);
 };            
 
 
-const std::map<std::string, int> rankStringToIntMap() {
 
-    const static std::map<std::string, int> rankStringToInt = {
+
+
+const int convertRankStringToInt(const std::string& rank) {
+
+    const static std::map<std::string, int> rankMap = {
         {"1", 1},
         {"2", 2},
         {"3", 3},
@@ -51,14 +61,18 @@ const std::map<std::string, int> rankStringToIntMap() {
         {"A", 14}
     }; 
 
-    return rankStringToInt;
-};
+    if (rankMap.find(rank) == rankMap.end()) {
+        throw std::invalid_argument("Invalid rank string entered");
+    }; 
+
+    return rankMap.at(rank);
+
+}
 
 
-
-const std::map<int, std::string> rankIntToStringMap() {
+const std::string convertRankIntToString(const int rankInt) {
     
-    const static std::map<int, std::string> rankIntToString = {
+    const static std::map<int, std::string> rankMap = {
         {1, "1"},
         {2, "2"},
         {3, "3"},
@@ -75,7 +89,11 @@ const std::map<int, std::string> rankIntToStringMap() {
         {14, "A"}
     }; 
 
-    return rankIntToString;
+    if (rankMap.find(rankInt) == rankMap.end()) {
+        throw std::invalid_argument("Invalid rank string entered");
+    }; 
+
+    return rankMap.at(rankInt);
 };           
 
 
