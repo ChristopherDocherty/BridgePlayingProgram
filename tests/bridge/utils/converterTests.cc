@@ -43,6 +43,7 @@ TEST(ConverterTests, DirConverterTests) {
 TEST(ConverterTests, ContractConverterTests) {
 
     EXPECT_EQ(std::make_tuple(4,12), Bridge::convertContractString("6S"));
+    EXPECT_EQ(std::make_tuple(0,9), Bridge::convertContractString("3NT"));
 
     EXPECT_THROW(Bridge::convertContractString("TS"), std::invalid_argument);
     EXPECT_THROW(Bridge::convertContractString("5Y"), std::invalid_argument);
