@@ -1,4 +1,7 @@
+#include "bridgeUtils.h"
+
 #include <string>
+#include <sstream>
 #include <map>
 
 
@@ -8,6 +11,7 @@ namespace Bridge {
 const int convertSuitStringToInt(const std::string& suit) {
     
    const static std::map<std::string, int>  suitMap = {
+       {"NT", 0},
        {"C", 1},
        {"D", 2},
        {"H", 3},
@@ -25,6 +29,7 @@ const int convertSuitStringToInt(const std::string& suit) {
 const std::string convertSuitIntToString(const int suitInt) {
     
     const static std::map<int, std::string> suitMap = {
+        {0, "NT"},
         {1, "C"},
         {2, "D"},
         {3, "H"},
@@ -97,6 +102,69 @@ const std::string convertRankIntToString(const int rankInt) {
 };           
 
 
+
+const int convertDirStringToInt(const std::string& dir) {
+
+   const static std::map<std::string, int>  dirMap = {
+       {"N", 1},
+       {"E", 2},
+       {"S", 3},
+       {"W", 4}
+    };
+
+    if (dirMap.find(dir) == dirMap.end()) {
+        throw std::invalid_argument("Invalid direction string entered");
+    }; 
+
+    return dirMap.at(dir);
+
+
+}
+
+
+
+
+
+const std::string convertDirIntToString(const int dirInt) {
+
+    const static std::map<int, std::string> dirMap = {
+        {1, "N"},
+        {2, "E"},
+        {3, "S"},
+        {4, "W"}
+    }; 
+
+    if (dirMap.find(dirInt) == dirMap.end()) {
+        throw std::invalid_argument("Invalid direction string entered");
+    }; 
+
+    return dirMap.at(dirInt);
+
+}
+
+
+const std::tuple<int, int> convertContractString(const std::string& contractString) {
+
+    std::stringstream contractStream(contractString);
+
+    int contractNumber; 
+    std::string contractSuit; 
+
+    contractStream >> contractNumber >> contractSuit;
+
+    if (contractStream.fail()) {
+        throw std::invalid_argument("Invalid contract string entered: first char must be an valid integer.");
+    }
+
+    int tricksRequired = contractNumber + 6;
+
+    int trumpSuitInt = convertSuitStringToInt(contractSuit); 
+
+
+    return std::make_tuple(trumpSuitInt, tricksRequired);
+
+
+}
 
 
 }

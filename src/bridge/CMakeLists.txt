@@ -10,6 +10,12 @@ add_library(bridgeCard
 
 add_subdirectory(utils)
 
+target_link_libraries(bridgeCard
+    PRIVATE
+        utils
+    )
+
+
 target_link_libraries(bridgeGamestate 
     PRIVATE
         bridgeCard

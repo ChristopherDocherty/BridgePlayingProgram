@@ -5,7 +5,7 @@
 
 namespace Bridge{
 
-    BridgeCard::BridgeCard(std::string suit, std::string rank) :
+BridgeCard::BridgeCard(std::string suit, std::string rank) :
     mSuit(convertSuitStringToInt(suit)), mRank(convertRankStringToInt(rank)) {}; 
 
 
