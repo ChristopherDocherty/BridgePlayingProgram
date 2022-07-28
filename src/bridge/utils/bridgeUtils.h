@@ -2,6 +2,7 @@
 #define BridgeUtils
 
 #include <string>
+#include <tuple>
 
 
 namespace Bridge {

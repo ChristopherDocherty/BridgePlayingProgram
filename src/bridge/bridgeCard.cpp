@@ -2,11 +2,13 @@
 #include "utils/bridgeUtils.h"
 
 #include <string>
+#include <exception>
+
 
 namespace Bridge{
 
-BridgeCard::BridgeCard(std::string suit, std::string rank) :
-    mSuit(convertSuitStringToInt(suit)), mRank(convertRankStringToInt(rank)) {}; 
+BridgeCard::BridgeCard(const std::string suit, const std::string rank) :
+    mSuit(convertToValidCardSuit(suit)), mRank(convertRankStringToInt(rank)) {}; 
 
 
 const bool BridgeCard::operator > (const BridgeCard& other) {
@@ -29,6 +31,17 @@ const bool BridgeCard::operator < (const BridgeCard& other) {
     }
 
 };
+
+
+const int BridgeCard::convertToValidCardSuit(const std::string suit) {
+
+    if (suit == "NT") {
+        throw std::invalid_argument("No Trump is not a valid suit for a Card");
+    } else {
+        return convertSuitStringToInt(suit);
+    }
+
+}
 
 
 }
