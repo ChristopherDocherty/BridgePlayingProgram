@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "bridge/bridgeCard.h"
+#include "models/bridge/bridgeCard.h"
 
 
 

@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "bridge/utils/bridgeUtils.h"
+#include "models/bridge/utils/bridgeUtils.h"
 
 
 

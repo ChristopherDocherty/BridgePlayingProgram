@@ -1,6 +1,6 @@
 add_executable(MCTSBridge main.cpp)
 
-add_subdirectory(bridge)
+add_subdirectory(models)
 
 
 target_link_libraries(MCTSBridge 
