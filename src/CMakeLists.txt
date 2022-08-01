@@ -1,5 +1,6 @@
 add_executable(MCTSBridge main.cpp)
 
+add_subdirectory(interfaces)
 add_subdirectory(models)
 
 

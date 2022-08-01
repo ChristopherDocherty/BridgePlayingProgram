@@ -1,5 +1,5 @@
-#include "bridgeCard.h"
-#include "utils/bridgeUtils.h"
+#include "bridgeCard.hpp"
+#include "utils/bridgeUtils.hpp"
 
 #include <string>
 #include <exception>

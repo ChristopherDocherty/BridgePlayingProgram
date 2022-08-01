@@ -1,6 +1,6 @@
-#include "bridgeGamestate.h"
-#include "bridgeCard.h"
-#include "utils/bridgeUtils.h"
+#include "bridgeGamestate.hpp"
+#include "bridgeCard.hpp"
+#include "utils/bridgeUtils.hpp"
 
 #include <string>
 #include <vector>

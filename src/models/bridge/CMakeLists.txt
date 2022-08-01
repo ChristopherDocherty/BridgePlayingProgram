@@ -1,11 +1,11 @@
 add_library(bridgeGamestate
     bridgeGamestate.cpp
-    bridgeGamestate.h
+    bridgeGamestate.hpp
 )
 
 add_library(bridgeCard
     bridgeCard.cpp 
-    bridgeCard.h
+    bridgeCard.hpp
 )
 
 add_subdirectory(utils)

@@ -1,7 +1,7 @@
 #ifndef BridgeGamestate_h
 #define BridgeGamestate_h
 
-#include "bridgeCard.h"
+#include "bridgeCard.hpp"
 
 #include <string>
 #include <vector>
