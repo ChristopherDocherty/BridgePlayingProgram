@@ -12,6 +12,10 @@ set(Boost_USE_RELEASE_LIBS       ON)
 find_package(Boost REQUIRED COMPONENTS json) 
 
 
+#Saving the dir of config files for later substition
+set(CONFIG_BINARY_DIR "${CMAKE_BINARY_DIR}/config")
+add_subdirectory(config)
+
 if(Boost_FOUND)
 
     add_subdirectory(src)
