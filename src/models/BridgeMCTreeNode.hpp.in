@@ -10,8 +10,10 @@ class BridgeMCTreeNode : public MCTreeNode {
 
     public:
 
-        //will be json for final thing
-        std::string getGamestateJson();
+        //will probably end up private
+        std::string getGamestateJsonString();
+        
+        void loadGamestateJsonFromFile(std::string filepath="@CONFIG_BINARY_DIR@/bridge/bridgeGamestate.json")
 
         virtual void notify() override;
 
