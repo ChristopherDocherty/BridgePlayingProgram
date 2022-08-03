@@ -7,8 +7,24 @@ project(MCTSBridge  VERSION 1.0
                     LANGUAGES CXX)
 
 
-add_subdirectory(src)
+set(Boost_USE_DEBUG_LIBS        OFF)
+set(Boost_USE_RELEASE_LIBS       ON)
+find_package(Boost REQUIRED COMPONENTS json) 
 
-enable_testing()
 
-add_subdirectory(tests)
+if(Boost_FOUND)
+
+    add_subdirectory(src)
+
+    enable_testing()
+    
+    add_subdirectory(tests)
+    
+endif()
+
+
+
+
+
+
+
