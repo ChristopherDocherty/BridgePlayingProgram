@@ -6,39 +6,18 @@
 #include <string>
 #include <vector>
 
+#include <boost/json.hpp>
+
 
 
 namespace Bridge {
-
-
-//for quick dev use 
-struct BoardConf {
-
-    //card string should be of the form "[suit] [cards]" e.g. "S 10,J,K"
-    std::vector<std::string> northHand;
-    std::vector<std::string> eastHand;
-    std::vector<std::string> southHand;
-    std::vector<std::string> westHand;
-
-    //should be in the form "[number] [suit]" e.g. "4 S"
-    std::string contractString;
-    std::string declarerDirection;
-
-    std::string delimiter = ","; 
-
-};
-
-
 
 class BridgeGamestate {
     
 
     public:
 
-        //TODO: Need to add version of this constructor that takes no arguments 
-        //so that user input can be used instead
-        BridgeGamestate(const BoardConf& conf);
-        
+        BridgeGamestate(boost::json::object& conf);
 
         std::string getWinner(); 
 
@@ -47,16 +26,14 @@ class BridgeGamestate {
         
         std::vector<int> getCurrentValidMoves();
 
-        void printBoard();
-        void printContractInfo();
+        std::string serialiseBoardToJson();
 
 
     private:
 
         static const int totalTurns = 13;
 
-        //HAve to come back here and decouple BridgeCard - perhaps using pimpl
-        std::vector<std::vector<BridgeCard>> hands;
+        std::vector<std::vector<BridgeCard>> board;
 
         const int declarerHand;
         const int currentLeadHand;
@@ -70,13 +47,12 @@ class BridgeGamestate {
 
         std::vector<BridgeCard> currentTrickRecord;
 
+        const bool moveIsValid(int move);
         std::vector<int> currentValidMoves;
 
+        int getTricksRequired(int contractLevel) {return contractLevel + 6;};
+        std::vector<std::vector<BridgeCard>> readBoardFromJson(boost::json::object& conf);
 
-        const bool moveIsValid(int move);
-
-        std::vector<std::vector<BridgeCard>> getBoard(const std::vector<std::vector<std::string>>& handStrings, const std::string& delimiter);
-        //abstract the reading of a hand away into some private function
     
 };
 

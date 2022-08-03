@@ -9,16 +9,15 @@
 
 namespace Bridge {
 
-   
-BridgeGamestate::BridgeGamestate(const BoardConf& conf) :
-    declarerHand( convertDirStringToInt(conf.declarerDirection) ), 
-    currentLeadHand( convertDirStringToInt(conf.declarerDirection) ), 
-    currentHand( convertDirStringToInt(conf.declarerDirection) ), 
-    trumpSuit( std::get<0>(convertContractString(conf.contractString)) ),
-    declarerTricksRequired( std::get<1>(convertContractString(conf.contractString)) )
+
+BridgeGamestate::BridgeGamestate(boost::json::object& conf) :
+    declarerHand( convertDirStringToInt(boost::json::value_to<std::string>(conf["declarer_dir"])) ), 
+    currentLeadHand( convertDirStringToInt(boost::json::value_to<std::string>(conf["declarer_dir"])) ), 
+    currentHand( convertDirStringToInt(boost::json::value_to<std::string>(conf["declarer_dir"])) ), 
+    trumpSuit( convertSuitStringToInt(boost::json::value_to<std::string>(conf["trump_suit"])) ),
+    declarerTricksRequired( getTricksRequired(boost::json::value_to<int>(conf["contract_level"])) )
 {
-    auto handVector = {conf.northHand, conf.eastHand, conf.southHand, conf.westHand};
-    hands = getBoard(handVector, conf.delimiter); 
+    board = readBoardFromJson(conf);
 }
 
 
@@ -35,46 +34,37 @@ std::string BridgeGamestate::getWinner() {
     //possibly simulate till the end
 } 
 
-//got to change this name as I will be putting getters and setters on this
-std::vector<std::vector<BridgeCard>> BridgeGamestate::getBoard(const std::vector<std::vector<std::string>>& handVectors, const std::string& delimiter) {
 
-    std::vector<std::vector<BridgeCard>> board;
+std::vector<std::vector<BridgeCard>> BridgeGamestate::readBoardFromJson(boost::json::object& conf) {
+    
+    auto boardJson = conf["board"].as_object(); 
 
-    for (auto handVector: handVectors) {
+    std::vector<std::vector<BridgeCard>> boardVector;
 
-        std::vector<BridgeCard> currHandCards;
+    std::vector<std::string> handJsonStrings = {"N_hand", "E_hand", "S_hand", "W_hand"};
 
-        for (auto handString : handVector) {
+    for (auto handJsonString : handJsonStrings) {
 
-            std::string suitString = handString.substr(0,1);
+        std::vector<BridgeCard> handVector;
 
-            std::string rankString;
-            size_t start = 1;
-            auto end = handString.find(delimiter);
-            while (end != std::string::npos) {
+        for (auto cardJson : boardJson[handJsonString].as_array()) {
 
-                rankString = handString.substr(start, end - start);
-                currHandCards.push_back( BridgeCard(suitString, rankString) );
+            auto cardSuitJson = cardJson.as_array()[0];
+            auto cardRankJson = cardJson.as_array()[1];
 
-                start = end + delimiter.length();
-                end = handString.find(delimiter, start);
+            std::string cardSuit = boost::json::value_to<std::string>(cardSuitJson);
+            std::string cardRank = boost::json::value_to<std::string>(cardRankJson);
 
-            }
-
-            
-            rankString = handString.substr(start, end - start);
-            currHandCards.push_back( BridgeCard(suitString, rankString) );
-
+            handVector.push_back(BridgeCard(cardSuit, cardRank));
         }
 
-        board.push_back(currHandCards);
+        boardVector.push_back(handVector);
+    }     
 
-    }
-
-    return board;
+    return boardVector;
 
 }
-
+  
 
 
 }
