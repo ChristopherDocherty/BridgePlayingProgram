@@ -8,15 +8,15 @@
 namespace Bridge {
 
 
-const int convertSuitStringToInt(const std::string& suit);
+int convertSuitStringToInt(const std::string& suit);
 const std::string convertSuitIntToString(const int suitInt); 
  
 
-const int convertRankStringToInt(const std::string& rank); 
+int convertRankStringToInt(const std::string& rank); 
 const std::string convertRankIntToString(const int rankInt); 
 
 
-const int convertDirStringToInt(const std::string& dir);
+int convertDirStringToInt(const std::string& dir);
 const std::string convertDirIntToString(const int dirInt);
 
 

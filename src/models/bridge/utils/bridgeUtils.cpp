@@ -10,7 +10,7 @@
 
 namespace Bridge {
 
-const int convertSuitStringToInt(const std::string& suit) {
+int convertSuitStringToInt(const std::string& suit) {
     
    const static std::map<std::string, int>  suitMap = {
        {"NT", 0},
@@ -43,13 +43,13 @@ const std::string convertSuitIntToString(const int suitInt) {
     }; 
 
     return suitMap.at(suitInt);
-};            
+}            
 
 
 
 
 
-const int convertRankStringToInt(const std::string& rank) {
+int convertRankStringToInt(const std::string& rank) {
 
     const static std::map<std::string, int> rankMap = {
         {"1", 1},
@@ -101,11 +101,11 @@ const std::string convertRankIntToString(const int rankInt) {
     }; 
 
     return rankMap.at(rankInt);
-};           
+}           
 
 
 
-const int convertDirStringToInt(const std::string& dir) {
+int convertDirStringToInt(const std::string& dir) {
 
    const static std::map<std::string, int>  dirMap = {
        {"N", 1},

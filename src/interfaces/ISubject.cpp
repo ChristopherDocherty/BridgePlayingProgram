@@ -9,6 +9,6 @@ void ISubject::attach(std::shared_ptr<IObserver> observer) {
 
 }
 
-void ISubject::detach(std::shared_ptr<IObserver> observer) {
-
-}
+//void ISubject::detach(std::shared_ptr<IObserver> observer) {
+//
+//}

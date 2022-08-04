@@ -47,7 +47,7 @@ class BridgeGamestate {
 
         std::vector<BridgeCard> currentTrickRecord;
 
-        const bool moveIsValid(int move);
+        bool moveIsValid(int move);
         std::vector<int> currentValidMoves;
 
         int getTricksRequired(int contractLevel) {return contractLevel + 6;};

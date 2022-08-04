@@ -22,19 +22,6 @@ BridgeGamestate::BridgeGamestate(boost::json::object& conf) :
 }
 
 
-std::string BridgeGamestate::getWinner() {
-
-
-    if (declarerTricksMade >= declarerTricksRequired) {
-        return "Declarer"; 
-    } else if ( (totalTurns  - currentTrick) < (declarerTricksRequired - declarerTricksMade)) {
-        return "Defence";
-    } else {
-        return "";
-    }
-    //possibly simulate till the end
-} 
-
 
 std::vector<std::vector<BridgeCard>> BridgeGamestate::readBoardFromJson(boost::json::object& conf) {
     
@@ -105,6 +92,22 @@ boost::json::object BridgeGamestate::getGamestateJson() {
 }
 
 
+std::string BridgeGamestate::getWinner() {
+
+
+    if (declarerTricksMade >= declarerTricksRequired) {
+        return "Declarer"; 
+    } else if ( (totalTurns  - currentTrick) < (declarerTricksRequired - declarerTricksMade)) {
+        return "Defence";
+    } else {
+        return "";
+    }
+    //possibly simulate till the end
+} 
+
+
+
+
+
+
 }
-
-

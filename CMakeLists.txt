@@ -6,6 +6,14 @@ project(MCTSBridge  VERSION 1.0
                     DESCRIPTION "Bridge MCTS files"
                     LANGUAGES CXX)
 
+if(MSVC)
+  add_compile_options( /W4 /WX)
+else()
+  add_compile_options(-Wall -Wextra -Wpedantic -Werror)
+endif()
+
+
+
 
 set(Boost_USE_DEBUG_LIBS        OFF)
 set(Boost_USE_RELEASE_LIBS       ON)
