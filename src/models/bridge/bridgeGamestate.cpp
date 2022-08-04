@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <stack>
+#include <algorithm>
 
 
 
@@ -19,6 +20,8 @@ BridgeGamestate::BridgeGamestate(boost::json::object& conf) :
     declarerTricksRequired( getTricksRequired(boost::json::value_to<int>(conf["contract_level"])) )
 {
     board = readBoardFromJson(conf);
+    
+//    updateCurrentValidMoves();
 }
 
 
@@ -54,7 +57,7 @@ std::vector<std::vector<BridgeCard>> BridgeGamestate::readBoardFromJson(boost::j
 }
   
 
-boost::json::object BridgeGamestate::getGamestateJson() {
+boost::json::object BridgeGamestate::getGamestateJson() const{
 
 
     boost::json::object gamestateJson;
@@ -104,6 +107,64 @@ std::string BridgeGamestate::getWinner() {
     }
     //possibly simulate till the end
 } 
+
+//void BridgeGamestate::makeMoveMCTS(int validMoveNumber) {
+//    BridgeCard cardPlayed = currentValidMoves[validMoveNumber];
+//    makeMove(cardPlayed.getSuit(), cardPlayed.getRank());
+//} 
+
+//void BridgeGamestate::makeMove(const std::string suit, const std::string rank){}
+//
+//void BridgeGamestate::updateCurrentValidMoves(){}
+
+bool BridgeGamestate::moveIsValid(const BridgeCard& proposedMove) const {
+
+    if ( currentHandDoesNotHaveCard(proposedMove) || moveShouldFollowSuitButDoesnt(proposedMove)) {
+        return false;
+    }
+
+    return true;
+}
+
+bool BridgeGamestate::currentHandDoesNotHaveCard(const BridgeCard& proposedMove) const {
+
+    auto currentCards = board[currentHand];
+
+    if ( find( currentCards.begin(), currentCards.end(), proposedMove) == currentCards.end() ) {
+        return true;    
+    } else {
+        return false;
+    }
+}
+
+
+bool BridgeGamestate::moveShouldFollowSuitButDoesnt(const BridgeCard& proposedMove) const {
+    
+    //First card of a trick can be any suit
+    if (currentTrickRecord.size() == 0) {
+        return false;
+    }
+
+
+    auto currentCards = board[currentHand];
+
+    const std::string leadSuit = currentTrickRecord[0].getSuit();
+
+    if (proposedMove.getSuit() == leadSuit) {
+        return false;
+    }
+
+
+    for (auto card : currentCards) {
+
+        if (card.getSuit() == convertSuitIntToString(trumpSuit)) {
+            return true;
+        }
+    }
+
+
+    return false;
+}
 
 
 

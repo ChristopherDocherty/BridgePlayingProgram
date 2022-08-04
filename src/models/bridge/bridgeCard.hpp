@@ -12,11 +12,12 @@ class BridgeCard {
 
         BridgeCard(const std::string suit, const std::string rank); 
 
+        bool operator == (const BridgeCard& other);
         bool operator > (const BridgeCard& other);
         bool operator < (const BridgeCard& other);
 
-        const std::string getSuit();
-        const std::string getRank();
+        const std::string getSuit() const;
+        const std::string getRank() const;
 
 
     private:

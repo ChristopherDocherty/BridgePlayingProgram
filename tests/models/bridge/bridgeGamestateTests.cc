@@ -7,12 +7,12 @@
 #include <fstream>
 #include <sstream>
 
-class JsonTest : public ::testing::Test {
+class BridgeGamestateTest : public ::testing::Test {
 
 
     protected:
 
-        JsonTest() {
+        BridgeGamestateTest() {
             
             std::ifstream testJsonFile("testBoards.json");
             std::stringstream buffer;
@@ -30,7 +30,7 @@ class JsonTest : public ::testing::Test {
 };
 
 
-TEST_F(JsonTest, ConstructorTests) {
+TEST_F(BridgeGamestateTest, ConstructorTests) {
 
     boost::json::object defaultJson = testJson["default_board_config"].as_object(); 
 
@@ -40,10 +40,3 @@ TEST_F(JsonTest, ConstructorTests) {
     EXPECT_EQ(boost::json::serialize(defaultBG.getGamestateJson()), boost::json::serialize(defaultJson));
 
 }
-
-
-
-
-
-
-

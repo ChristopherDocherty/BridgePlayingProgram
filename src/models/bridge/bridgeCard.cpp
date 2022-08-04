@@ -11,6 +11,16 @@ BridgeCard::BridgeCard(const std::string suit, const std::string rank) :
     mSuit(convertToValidCardSuit(suit)), mRank(convertRankStringToInt(rank)) {} 
 
 
+bool BridgeCard::operator == (const BridgeCard& other) {
+
+    if ( (mSuit == other.mSuit) && (mRank == other.mRank) )  {
+        return true;
+    } else {
+        return false;
+    }
+
+}
+
 bool BridgeCard::operator > (const BridgeCard& other) {
 
     if ( (mSuit > other.mSuit) || ( (mSuit == other.mSuit) && (mRank > other.mRank)) ) {
@@ -44,11 +54,11 @@ int BridgeCard::convertToValidCardSuit(const std::string suit) {
 }
 
 
-const std::string BridgeCard::getSuit() {
+const std::string BridgeCard::getSuit() const {
     return convertSuitIntToString(mSuit);
 }
 
-const std::string BridgeCard::getRank() {
+const std::string BridgeCard::getRank() const {
     return convertRankIntToString(mRank);
 }
 
