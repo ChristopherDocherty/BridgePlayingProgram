@@ -44,4 +44,13 @@ const int BridgeCard::convertToValidCardSuit(const std::string suit) {
 }
 
 
+const std::string BridgeCard::getSuit() {
+    return convertSuitIntToString(mSuit);
+}
+
+const std::string BridgeCard::getRank() {
+    return convertRankIntToString(mRank);
+}
+
+
 }

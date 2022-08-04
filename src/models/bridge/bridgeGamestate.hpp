@@ -26,7 +26,7 @@ class BridgeGamestate {
         
         std::vector<int> getCurrentValidMoves();
 
-        std::string serialiseBoardToJson();
+        boost::json::object getGamestateJson();
 
 
     private:

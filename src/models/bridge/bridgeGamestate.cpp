@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+#include <stack>
 
 
 
@@ -65,6 +66,43 @@ std::vector<std::vector<BridgeCard>> BridgeGamestate::readBoardFromJson(boost::j
 
 }
   
+
+boost::json::object BridgeGamestate::getGamestateJson() {
+
+
+    boost::json::object gamestateJson;
+
+    gamestateJson["contract_level"] = declarerTricksRequired - 6; 
+    gamestateJson["trump_suit"] = convertSuitIntToString(trumpSuit);
+    gamestateJson["declarer_dir"] = convertDirIntToString(declarerHand);
+    
+    boost::json::object boardJson;
+
+    std::stack<std::string> handJsonNames({"W_hand", "S_hand", "E_hand", "N_hand"});
+
+    for (auto handVector : board) {
+
+        boost::json::array handJsonArr;
+
+        for (auto card : handVector) {
+            boost::json::array cardJsonArr = {card.getSuit(), card.getRank()};
+            handJsonArr.emplace_back(cardJsonArr);
+        }
+
+
+        std::string handJsonName = handJsonNames.top();
+        handJsonNames.pop();
+
+        boardJson[handJsonName] = handJsonArr;
+        
+    }
+
+    gamestateJson["board"] = boardJson;
+
+
+    return gamestateJson;
+    
+}
 
 
 }

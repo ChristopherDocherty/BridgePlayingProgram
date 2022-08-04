@@ -15,6 +15,9 @@ class BridgeCard {
         const bool operator > (const BridgeCard& other);
         const bool operator < (const BridgeCard& other);
 
+        const std::string getSuit();
+        const std::string getRank();
+
 
     private:
 

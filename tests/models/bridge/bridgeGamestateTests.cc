@@ -32,12 +32,12 @@ class JsonTest : public ::testing::Test {
 
 TEST_F(JsonTest, ConstructorTests) {
 
-
     boost::json::object defaultJson = testJson["default_board_config"].as_object(); 
 
     ASSERT_NO_THROW(Bridge::BridgeGamestate defaultBG(defaultJson));
 
-    
+    Bridge::BridgeGamestate defaultBG(defaultJson);
+    EXPECT_EQ(boost::json::serialize(defaultBG.getGamestateJson()), boost::json::serialize(defaultJson));
 
 }
 
