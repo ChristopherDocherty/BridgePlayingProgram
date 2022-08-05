@@ -29,6 +29,9 @@ TEST(BridgeCardTests, ComparisonTests) {
     EXPECT_TRUE(queenDiamond < fourSpade);
 
 
+    Bridge::BridgeCard fourSpade2("S", "4"); 
+    
+    EXPECT_TRUE(fourSpade == fourSpade2);
 }
 
 

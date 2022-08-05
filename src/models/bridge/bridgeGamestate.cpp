@@ -14,14 +14,16 @@ namespace Bridge {
 
 BridgeGamestate::BridgeGamestate(boost::json::object& conf) :
     declarerHand( convertDirStringToInt(boost::json::value_to<std::string>(conf["declarer_dir"])) ), 
-    currentLeadHand( convertDirStringToInt(boost::json::value_to<std::string>(conf["declarer_dir"])) ), 
-    currentHand( convertDirStringToInt(boost::json::value_to<std::string>(conf["declarer_dir"])) ), 
+    currentLeadHand( convertDirStringToInt(boost::json::value_to<std::string>(conf["current_lead_hand"])) ), 
+    currentHand( convertDirStringToInt(boost::json::value_to<std::string>(conf["current_lead_hand"])) ), 
     trumpSuit( convertSuitStringToInt(boost::json::value_to<std::string>(conf["trump_suit"])) ),
-    declarerTricksRequired( getTricksRequired(boost::json::value_to<int>(conf["contract_level"])) )
+    declarerTricksRequired( getTricksRequired(boost::json::value_to<int>(conf["contract_level"])) ),
+    currentTrick( boost::json::value_to<int>(conf["current_trick"]) ),
+    declarerTricksMade( boost::json::value_to<int>(conf["declarer_tricks_made"]) )
 {
     board = readBoardFromJson(conf);
     
-//    updateCurrentValidMoves();
+    updateCurrentValidMoves();
 }
 
 
@@ -65,6 +67,10 @@ boost::json::object BridgeGamestate::getGamestateJson() const{
     gamestateJson["contract_level"] = declarerTricksRequired - 6; 
     gamestateJson["trump_suit"] = convertSuitIntToString(trumpSuit);
     gamestateJson["declarer_dir"] = convertDirIntToString(declarerHand);
+    gamestateJson["current_lead_hand"] = convertDirIntToString(currentLeadHand);
+    gamestateJson["current_trick"] = currentTrick;
+    gamestateJson["declarer_tricks_made"] = declarerTricksMade;
+    
     
     boost::json::object boardJson;
 
@@ -97,25 +103,112 @@ boost::json::object BridgeGamestate::getGamestateJson() const{
 
 std::string BridgeGamestate::getWinner() {
 
-
     if (declarerTricksMade >= declarerTricksRequired) {
         return "Declarer"; 
-    } else if ( (totalTurns  - currentTrick) < (declarerTricksRequired - declarerTricksMade)) {
+    } else if ( (totalTurns + 1 - currentTrick) < (declarerTricksRequired - declarerTricksMade)) {
         return "Defence";
     } else {
         return "";
     }
     //possibly simulate till the end
+    //just do simple check of if there is only one valid card to play - no reason to go through the last obvious move
 } 
 
-//void BridgeGamestate::makeMoveMCTS(int validMoveNumber) {
-//    BridgeCard cardPlayed = currentValidMoves[validMoveNumber];
-//    makeMove(cardPlayed.getSuit(), cardPlayed.getRank());
-//} 
 
-//void BridgeGamestate::makeMove(const std::string suit, const std::string rank){}
-//
-//void BridgeGamestate::updateCurrentValidMoves(){}
+std::string BridgeGamestate::makeMoveMCTS(int validMoveNumber) {
+    BridgeCard cardPlayed = currentValidMoves[validMoveNumber];
+    return makeMove(cardPlayed.getSuit(), cardPlayed.getRank());
+} 
+
+
+std::string BridgeGamestate::makeMove(const std::string suit, const std::string rank) {
+    
+    if (getWinner() != "") {
+        //probably cahnge this to return something else
+        //basically jsut want a catch so you can't keep changing the gamestate once the gme is done
+        //but this logic may end up in the controller
+        return getWinner(); 
+    }
+    
+    BridgeCard move(suit, rank);
+
+    if ( !moveIsValid(move)) {
+        throw std::invalid_argument(boost::json::serialize(getGamestateJson())); //"This is an invalid move");
+    } 
+
+
+    auto iterToErase = std::find(board[currentHand].begin(), board[currentHand].end(), move);
+    board[currentHand].erase(iterToErase);
+
+    currentTrickRecord.push_back(move);
+
+    if (currentTrickRecord.size() == 4) {
+
+        ++currentTrick;
+
+        const int trickWinnerDir = getTrickWinner();
+
+        currentHand = trickWinnerDir;
+        currentLeadHand = trickWinnerDir;
+
+
+        //Declarer wins trick if they or the dummy wins, hence %2
+        if ( trickWinnerDir % 2 == declarerHand % 2) {
+            ++declarerTricksMade;
+        }
+
+    } else {
+        currentHand = (currentHand + 1) % 4;
+    }
+
+    updateCurrentValidMoves();
+
+    return getWinner(); 
+
+}
+
+
+int BridgeGamestate::getTrickWinner() const {
+
+    BridgeCard bestCard = currentTrickRecord[0];
+    int bestCardDir = currentLeadHand;
+
+    for (size_t i = 1; i != currentTrickRecord.size(); ++i) {
+        
+        auto currentCard = currentTrickRecord[i];
+
+        if (currentCard.getSuit() == bestCard.getSuit() && currentCard> bestCard) {
+            bestCard = currentCard;
+            bestCardDir = (currentLeadHand + i) % 4;
+        } else if (currentCard.getSuit() != bestCard.getSuit() && currentCard.getSuit() == convertSuitIntToString(trumpSuit)) {
+            bestCard = currentCard;
+            bestCardDir = (currentLeadHand + i) % 4;
+        }
+    }
+
+    return bestCardDir;
+}
+
+
+
+
+void BridgeGamestate::updateCurrentValidMoves() {
+
+    currentValidMoves.clear();
+
+    auto currentCards = board[currentHand];
+
+
+    for (auto card : currentCards) {
+        if (moveIsValid(card)) {
+            currentValidMoves.push_back(card);
+        }
+    }
+
+}
+
+
+
 
 bool BridgeGamestate::moveIsValid(const BridgeCard& proposedMove) const {
 
@@ -125,6 +218,7 @@ bool BridgeGamestate::moveIsValid(const BridgeCard& proposedMove) const {
 
     return true;
 }
+
 
 bool BridgeGamestate::currentHandDoesNotHaveCard(const BridgeCard& proposedMove) const {
 
@@ -157,7 +251,7 @@ bool BridgeGamestate::moveShouldFollowSuitButDoesnt(const BridgeCard& proposedMo
 
     for (auto card : currentCards) {
 
-        if (card.getSuit() == convertSuitIntToString(trumpSuit)) {
+        if (card.getSuit() == leadSuit) {
             return true;
         }
     }

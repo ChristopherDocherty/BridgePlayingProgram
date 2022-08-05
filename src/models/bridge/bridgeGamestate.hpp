@@ -44,8 +44,8 @@ class BridgeGamestate {
         int trumpSuit;
         int declarerTricksRequired;
 
-        int currentTrick = 1;
-        int declarerTricksMade = 0;
+        int currentTrick;
+        int declarerTricksMade;
 
         std::vector<BridgeCard> currentTrickRecord;
 

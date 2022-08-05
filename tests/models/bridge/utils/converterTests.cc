@@ -29,8 +29,8 @@ TEST(ConverterTests, RankConverterTests) {
 
 TEST(ConverterTests, DirConverterTests) {
 
-  EXPECT_EQ(2, Bridge::convertDirStringToInt("E"));
-  EXPECT_EQ("S", Bridge::convertDirIntToString(3));
+  EXPECT_EQ(2, Bridge::convertDirStringToInt("S"));
+  EXPECT_EQ("E", Bridge::convertDirIntToString(1));
 
 
   EXPECT_THROW(Bridge::convertDirStringToInt("J"), std::invalid_argument);

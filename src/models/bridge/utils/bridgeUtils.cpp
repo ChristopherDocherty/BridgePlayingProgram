@@ -108,10 +108,10 @@ const std::string convertRankIntToString(const int rankInt) {
 int convertDirStringToInt(const std::string& dir) {
 
    const static std::map<std::string, int>  dirMap = {
-       {"N", 1},
-       {"E", 2},
-       {"S", 3},
-       {"W", 4}
+       {"N", 0},
+       {"E", 1},
+       {"S", 2},
+       {"W", 3}
     };
 
     if (dirMap.find(dir) == dirMap.end()) {
@@ -130,10 +130,10 @@ int convertDirStringToInt(const std::string& dir) {
 const std::string convertDirIntToString(const int dirInt) {
 
     const static std::map<int, std::string> dirMap = {
-        {1, "N"},
-        {2, "E"},
-        {3, "S"},
-        {4, "W"}
+        {0, "N"},
+        {1, "E"},
+        {2, "S"},
+        {3, "W"}
     }; 
 
     if (dirMap.find(dirInt) == dirMap.end()) {

@@ -5,6 +5,9 @@
 
     "declarer_dir": "S",
     
+    "current_lead_hand": "S",
+    "current_trick": 1,
+    "declarer_tricks_made": 0,
     
     "board" : {
         "N_hand" : [
