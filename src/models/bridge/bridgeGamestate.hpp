@@ -22,9 +22,9 @@ class BridgeGamestate {
         std::string getWinner(); 
 
         //Required for controller (MCTS) functions
-        void makeMoveMCTS(int validMoveNumber); 
+        std::string makeMoveMCTS(int validMoveNumber); 
         //Requried for view functions
-        void makeMove(const std::string suit, const std::string rank);
+        std::string makeMove(const std::string suit, const std::string rank);
         
         int getValidMoveCount() const {return currentValidMoves.size();};
 
@@ -37,12 +37,12 @@ class BridgeGamestate {
 
         std::vector<std::vector<BridgeCard>> board;
 
-        const int declarerHand;
-        const int currentLeadHand;
-        const int currentHand;
+        int declarerHand;
+        int currentLeadHand;
+        int currentHand;
 
-        const int trumpSuit;
-        const int declarerTricksRequired;
+        int trumpSuit;
+        int declarerTricksRequired;
 
         int currentTrick = 1;
         int declarerTricksMade = 0;
@@ -59,6 +59,10 @@ class BridgeGamestate {
 
         int getTricksRequired(int contractLevel) const {return contractLevel + 6;};
         std::vector<std::vector<BridgeCard>> readBoardFromJson(boost::json::object& conf);
+
+
+        int getTrickWinner() const;
+
 
 };
 

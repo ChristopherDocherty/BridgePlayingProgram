@@ -22,8 +22,8 @@ class BridgeCard {
 
     private:
 
-        const int mSuit;
-        const int mRank;
+        int mSuit;
+        int mRank;
 
         int convertToValidCardSuit(const std::string suit);
 
