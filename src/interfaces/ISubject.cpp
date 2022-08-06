@@ -2,13 +2,15 @@
 #include "IObserver.hpp"
 
 #include <memory>        
+#include <algorithm>        
 
-void ISubject::attach(std::shared_ptr<IObserver> observer) {
 
-    observerList.push_back(observer);
+void ISubject::detach(std::shared_ptr<IObserver> pObserver) {
+
+    auto observerIterToErase = std::find(observerList.begin(), observerList.end(), pObserver);
+
+    if (observerIterToErase != observerList.end()) {
+        observerList.erase(observerIterToErase);
+    }
 
 }
-
-//void ISubject::detach(std::shared_ptr<IObserver> observer) {
-//
-//}

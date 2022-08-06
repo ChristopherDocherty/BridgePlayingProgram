@@ -12,7 +12,7 @@ class ISubject {
         
         virtual ~ISubject();
 
-        void attach(std::shared_ptr<IObserver> observer);
+        void attach(std::shared_ptr<IObserver> observer) {observerList.push_back(observer);};
         void detach(std::shared_ptr<IObserver> observer);
         virtual void notify() = 0;
 
