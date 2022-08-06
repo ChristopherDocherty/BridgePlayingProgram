@@ -11,6 +11,8 @@ class MCTreeNode : public ISubject {
 
         MCTreeNode(MCTreeNode* parent) : mParent(parent) {};
 
+        virtual ~MCTreeNode();
+
         void recordSimulationResult(bool wonSim) { 
             ++visitCnt;
             if (wonSim) {++winCnt;};
