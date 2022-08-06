@@ -4,23 +4,32 @@
 #include "ISubject.hpp"
 
 
+
 class MCTreeNode : public ISubject {
 
     public:
 
-        const float getComparisonNum(int parentSimCount);
+        MCTreeNode(MCTreeNode* parent) : mParent(parent) {};
+
+        void recordSimulationResult(bool wonSim) { 
+            ++visitCnt;
+            if (wonSim) {++winCnt;};
+        };
+
+        float getComparisonNum(float parentSimCount);
 
     private:
 
-        const static float exploreParam = 1.41;
+        constexpr static float exploreParam = 1.41;
 
-        int visitCNT = 0;
-        int winCNT = 0;
+        int visitCnt = 0;
+        int winCnt = 0;
         
-        const std::shared_ptr<MCTreeNode> parent;
-        std::list<std::shared_ptr<MCTreeNode>> children;
+        MCTreeNode* mParent;
+        std::list<std::unique_ptr<MCTreeNode>> children;
 
 };
+
 
 
 #endif

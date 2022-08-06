@@ -4,19 +4,17 @@ add_library(MCTreeNode
 )
 
 
-#target_link_libraries(
-#
-#    MCTreeNode
-#    PRIVATE
-#    ${CMAKE_SOURCE_DIR}/src/interfaces
-#
-#)
+target_link_libraries(
+    MCTreeNode
+    PRIVATE
+    observerInterface
+)
 
-#target_include_directories(
-#    MCTreeNode
-#    PRIVATE
-#    ${CMAKE_SOURCE_DIR}/src/interfaces
-#)
+target_include_directories(
+    MCTreeNode
+    PRIVATE
+    ${CMAKE_SOURCE_DIR}/src/interfaces
+)
 
 
 
