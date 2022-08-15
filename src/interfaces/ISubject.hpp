@@ -10,13 +10,13 @@ class ISubject {
 
     public:
         
-        virtual ~ISubject();
+        virtual ~ISubject() {};
 
         void attach(std::shared_ptr<IObserver> observer) {observerList.push_back(observer);};
         void detach(std::shared_ptr<IObserver> observer);
         virtual void notify() = 0;
 
-    private:
+    protected:
 
         std::list<std::shared_ptr<IObserver>> observerList;
 
