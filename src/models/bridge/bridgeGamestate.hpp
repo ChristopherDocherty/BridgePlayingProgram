@@ -26,7 +26,7 @@ class BridgeGamestate {
         //Requried for view functions
         std::string makeMove(const std::string suit, const std::string rank);
         
-        int getValidMoveCount() const {return currentValidMoves.size();};
+        int getValidMoveCnt() const {return currentValidMoves.size();};
 
         boost::json::object getGamestateJson() const;
 

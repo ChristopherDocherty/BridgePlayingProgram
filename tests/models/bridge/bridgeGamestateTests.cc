@@ -49,7 +49,7 @@ TEST_F(BridgeGamestateTest, MCTSInterfaceTests) {
 
     Bridge::BridgeGamestate defaultBG(defaultJson);
 
-    EXPECT_EQ(defaultBG.getValidMoveCount(), 13);
+    EXPECT_EQ(defaultBG.getValidMoveCnt(), 13);
 
     EXPECT_NO_THROW(defaultBG.makeMoveMCTS(3));
 

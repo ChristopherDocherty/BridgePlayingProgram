@@ -26,7 +26,7 @@ class BridgeMCTreeNode : public MCTreeNode {
 
         std::string makeMove(const std::string suit, const std::string rank) {return pGamestate->makeMove(suit, rank);};
         
-        int getValidMoveCount() const {return pGamestate->getValidMoveCount();};
+        int getValidMoveCnt() const {return pGamestate->getValidMoveCnt();};
 
 
     private:

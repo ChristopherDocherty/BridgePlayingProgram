@@ -15,14 +15,14 @@ class MCTreeNode : public ISubject {
 
         virtual ~MCTreeNode() {};
 
-        void pushbackChildNode(std::unique_ptr<MCTreeNode> childNode) {childList.push_back(std::move(childNode));};
+        void pushbackChildNode(std::unique_ptr<MCTreeNode> childNode) {children.push_back(std::move(childNode));};
 
         void recordSimulationResult(bool wonSim) { 
             ++visitCnt;
             if (wonSim) {++winCnt;};
         };
 
-        float getComparisonNum(float parentSimCount);
+        float getComparisonNum(float parentSimCnt);
 
     private:
 
@@ -32,7 +32,7 @@ class MCTreeNode : public ISubject {
         int winCnt = 0;
         
         MCTreeNode* mpParent;
-        std::list<std::unique_ptr<MCTreeNode>> childList;
+        std::list<std::unique_ptr<MCTreeNode>> children;
 
 };
 
