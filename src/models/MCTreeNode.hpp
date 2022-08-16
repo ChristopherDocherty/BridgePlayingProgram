@@ -1,7 +1,7 @@
 #ifndef MCTreeNode_h
 #define MCTreeNode_h
 
-#include "ISubject.hpp"
+#include "interfaces/ISubject.hpp"
 
 
 
@@ -9,9 +9,13 @@ class MCTreeNode : public ISubject {
 
     public:
 
-        MCTreeNode(MCTreeNode* parent) : mParent(parent) {};
+        MCTreeNode() = delete;
 
-        virtual ~MCTreeNode();
+        MCTreeNode(MCTreeNode* pParent) : mpParent(pParent) {};
+
+        virtual ~MCTreeNode() {};
+
+        void pushbackChildNode(std::unique_ptr<MCTreeNode> childNode) {childList.push_back(std::move(childNode));};
 
         void recordSimulationResult(bool wonSim) { 
             ++visitCnt;
@@ -27,8 +31,8 @@ class MCTreeNode : public ISubject {
         int visitCnt = 0;
         int winCnt = 0;
         
-        MCTreeNode* mParent;
-        std::list<std::unique_ptr<MCTreeNode>> children;
+        MCTreeNode* mpParent;
+        std::list<std::unique_ptr<MCTreeNode>> childList;
 
 };
 

@@ -1,0 +1,44 @@
+#ifndef BridgeMCTreeNode_h
+#define BridgeMCTreeNode_h
+
+#include "MCTreeNode.hpp"
+#include "bridge/bridgeGamestate.hpp"
+
+#include <boost/json.hpp>
+
+#include <memory>
+
+namespace Bridge {
+
+class BridgeMCTreeNode : public MCTreeNode {
+
+
+    public:
+
+        BridgeMCTreeNode(const std::string& initialGamestateJsonFilepath= "@CONFIG_BINARY_DIR@/bridge/bridgeGamestate.json");
+        BridgeMCTreeNode(BridgeMCTreeNode* parent);
+
+        void notify() override;
+
+
+        std::string makeMoveMCTS(int validMoveNumber) {return pGamestate->makeMoveMCTS(validMoveNumber);}; 
+        //TODO: aadd makeRandomMoveMethod for simulation
+
+        std::string makeMove(const std::string suit, const std::string rank) {return pGamestate->makeMove(suit, rank);};
+        
+        int getValidMoveCount() const {return pGamestate->getValidMoveCount();};
+
+
+    private:
+
+        std::unique_ptr<BridgeGamestate> pGamestate;
+
+        boost::json::object loadGamestateJsonFromFile(const std::string& filepath="@CONFIG_BINARY_DIR@/bridge/bridgeGamestate.json");
+
+        std::string getGamestateJsonString() {return boost::json::serialize(pGamestate->getGamestateJson());};
+};
+
+
+
+}
+#endif

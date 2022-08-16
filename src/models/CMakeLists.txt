@@ -6,16 +6,15 @@ add_library(MCTreeNode
 
 target_link_libraries(
     MCTreeNode
-    PRIVATE
+    PUBLIC
     observerInterface
 )
 
 target_include_directories(
     MCTreeNode
-    PRIVATE
-    ${CMAKE_SOURCE_DIR}/src/interfaces
+    PUBLIC 
+    ${CMAKE_SOURCE_DIR}/src
 )
-
 
 
 
@@ -23,18 +22,27 @@ target_include_directories(
 add_subdirectory(bridge)
 
 #Used to insert default config filepaths
-configure_file(BridgeMCTreeNode.hpp.in BridgeMCTreeNode.hpp)
+configure_file(bridgeMCTreeNode.hpp.in bridgeMCTreeNode.hpp)
 
-add_library(BridgeMCTreeNode 
-    ${CMAKE_CURRENT_BINARY_DIR}/BridgeMCTreeNode.hpp
+add_library(
+    bridgeMCTreeNode 
+    ${CMAKE_CURRENT_BINARY_DIR}/bridgeMCTreeNode.hpp
+    bridgeMCTreeNode.cpp
 )
 
-target_include_directories(BridgeMCTreeNode PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(
+    bridgeMCTreeNode 
+    PUBLIC 
+    ${CMAKE_CURRENT_BINARY_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${Boost_INCLUDE_DIRS}
+)
 
-target_link_libraries(BridgeMCTreeNode
+target_link_libraries(bridgeMCTreeNode
     PUBLIC
     MCTreeNode
-    BridgeGamestate
+    bridgeGamestate
+    Boost::json
 )
 
 
