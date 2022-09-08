@@ -3,8 +3,8 @@
 
 #include "IObserver.hpp"
 
-#include <memory>        
 #include <list>
+#include <memory>        
 
 class ISubject {
 

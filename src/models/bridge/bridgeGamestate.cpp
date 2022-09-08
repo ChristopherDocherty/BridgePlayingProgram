@@ -1,12 +1,11 @@
-#include "bridgeGamestate.hpp"
 #include "bridgeCard.hpp"
+#include "bridgeGamestate.hpp"
 #include "utils/bridgeUtils.hpp"
 
+#include <algorithm>
+#include <stack>
 #include <string>
 #include <vector>
-#include <stack>
-#include <algorithm>
-
 
 
 namespace Bridge {

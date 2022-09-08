@@ -1,8 +1,8 @@
 #include "bridgeCard.hpp"
 #include "utils/bridgeUtils.hpp"
 
-#include <string>
 #include <exception>
+#include <string>
 
 
 namespace Bridge{

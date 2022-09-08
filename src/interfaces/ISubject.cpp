@@ -1,8 +1,8 @@
 #include "ISubject.hpp"
 #include "IObserver.hpp"
 
-#include <memory>        
 #include <algorithm>        
+#include <memory>        
 
 
 void ISubject::detach(std::shared_ptr<IObserver> pObserver) {
