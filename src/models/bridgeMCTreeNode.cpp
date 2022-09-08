@@ -11,17 +11,18 @@ namespace Bridge {
 //ctor for root node
 BridgeMCTreeNode::BridgeMCTreeNode(const std::string& initialGamestateJsonFilepath) : MCTreeNode(nullptr) {
 
-    boost::json::object initialGamestateJson = loadGamestateJsonFromFile(initialGamestateJsonFilepath);
+    std::string initialGamestateJson = loadGamestateJsonFromFile(initialGamestateJsonFilepath);
 
-    pGamestate = std::make_unique<BridgeGamestate>(initialGamestateJson);
+    setGamestate(initialGamestateJson);
 
 }
 
 
+BridgeMCTreeNode::BridgeMCTreeNode(MCTreeNode* parent) : MCTreeNode(parent) {
 
-BridgeMCTreeNode::BridgeMCTreeNode(BridgeMCTreeNode* parent) : MCTreeNode(parent) {
+    std::string inheritedGamestate = parent->getGamestate();
 
-    pGamestate = std::make_unique<BridgeGamestate>(*(parent->pGamestate)); 
+    setGamestate(inheritedGamestate);
 
 }
 
@@ -38,26 +39,25 @@ void BridgeMCTreeNode::notify() {
 }
 
 
-
-
-
-boost::json::object BridgeMCTreeNode::loadGamestateJsonFromFile(const std::string& filepath) {
+std::string BridgeMCTreeNode::loadGamestateJsonFromFile(const std::string& filepath) {
 
     std::ifstream jsonFile(filepath);
     std::stringstream buffer;
     buffer << jsonFile.rdbuf();
 
-    auto json = boost::json::parse(buffer.str());
+    return buffer.str();
 
-    return json.as_object();
 }
 
 
 
+void BridgeMCTreeNode::setGamestate(std::string gamestate) {
 
+    auto gamestateJson = boost::json::parse(gamestate);
 
+    pGamestate = std::make_unique<BridgeGamestate>(gamestateJson.as_object());
 
-
+}
 
 
 

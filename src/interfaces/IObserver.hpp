@@ -9,7 +9,6 @@ class IObserver {
 
         virtual ~IObserver() {};
 
-        //some JSON type as the argument here
         virtual void update(std::string) = 0;
 
 };
