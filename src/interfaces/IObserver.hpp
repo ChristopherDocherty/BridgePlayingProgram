@@ -9,7 +9,7 @@ class IObserver {
 
         virtual ~IObserver() {};
 
-        virtual void update(std::string) = 0;
+        virtual void update(const std::string& gamestate) const = 0;
 
 };
 
