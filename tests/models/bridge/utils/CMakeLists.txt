@@ -5,7 +5,7 @@ add_executable(
 
 target_link_libraries(
     converterTests 
-    GTest::gtest_main
+    Catch2::Catch2WithMain
     utils 
 )
 
@@ -15,6 +15,6 @@ target_include_directories(
     ${CMAKE_SOURCE_DIR}/src
 ) 
 
-
-include(GoogleTest)
-gtest_discover_tests(converterTests)
+include(CTest)
+include(Catch)
+catch_discover_tests(converterTests)

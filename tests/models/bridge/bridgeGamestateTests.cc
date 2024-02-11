@@ -1,196 +1,124 @@
-#include <gtest/gtest.h>
-
 #include "models/bridge/bridgeGamestate.hpp"
-
-#include <boost/json.hpp>
+#include "models/bridge/bridgeGamestateLoader.hpp"
 
 #include <fstream>
 #include <sstream>
 
-class BridgeGamestateTest : public ::testing::Test {
+#include <catch2/catch_test_macros.hpp>
 
+namespace Bridge {
 
-    protected:
+const std::string TEST_BOARD_CONFIG_FILE = "testBoards.json";
 
-        BridgeGamestateTest() {
-            
-            std::ifstream testJsonFile("testBoards.json");
-            std::stringstream buffer;
-            buffer << testJsonFile.rdbuf();
+TEST_CASE("BridgeGamestateTest -- MCTSInterfaceTests") {
 
-            std::string testJsonStr = buffer.str();
+  BridgeGamestate defaultBG =
+      loadGamestate(TEST_BOARD_CONFIG_FILE, "default_board_config");
 
-            testJson = boost::json::parse(testJsonStr).as_object(); 
-        }
+  REQUIRE(defaultBG.getValidMoveCnt() == 13);
 
-
-        boost::json::object testJson;
-
-
-};
-
-
-TEST_F(BridgeGamestateTest, ConstructorTests) {
-
-    boost::json::object defaultJson = testJson["default_board_config"].as_object(); 
-
-    ASSERT_NO_THROW(Bridge::BridgeGamestate defaultBG(defaultJson));
-
-    Bridge::BridgeGamestate defaultBG(defaultJson);
-    EXPECT_EQ(boost::json::serialize(defaultBG.getGamestateJson()), boost::json::serialize(defaultJson));
-
+  REQUIRE_NOTHROW(defaultBG.makeMoveMCTS(3));
 }
 
+TEST_CASE("BridgeGamestateTest -- MakeMoveTests") {
 
+  BridgeGamestate defaultBG =
+      loadGamestate(TEST_BOARD_CONFIG_FILE, "default_board_config");
 
-TEST_F(BridgeGamestateTest, MCTSInterfaceTests) {
+  REQUIRE_THROWS_AS(defaultBG.makeMove("D", "2"), std::invalid_argument);
+  REQUIRE_THROWS_AS(defaultBG.makeMove("C", "2"), std::invalid_argument);
 
-    boost::json::object defaultJson = testJson["default_board_config"].as_object(); 
+  REQUIRE_NOTHROW(defaultBG.makeMove("S", "A"));
 
-    Bridge::BridgeGamestate defaultBG(defaultJson);
+  BridgeGamestate defaultAfterMove =
+      loadGamestate(TEST_BOARD_CONFIG_FILE, "default_board_config_after_move");
 
-    EXPECT_EQ(defaultBG.getValidMoveCnt(), 13);
-
-    EXPECT_NO_THROW(defaultBG.makeMoveMCTS(3));
-
+  //TODO: make way to compare gamestates
 }
 
+TEST_CASE("BridgeGamestateTest -- FollowSuitTests") {
 
+  BridgeGamestate defaultBG =
+      loadGamestate(TEST_BOARD_CONFIG_FILE, "default_board_config");
 
-TEST_F(BridgeGamestateTest, MakeMoveTests) {
-
-    boost::json::object defaultJson = testJson["default_board_config"].as_object(); 
-
-    Bridge::BridgeGamestate defaultBG(defaultJson);
-
-    EXPECT_THROW(defaultBG.makeMove("D","2"), std::invalid_argument);
-    EXPECT_THROW(defaultBG.makeMove("C","2"), std::invalid_argument);
-
-
-    EXPECT_NO_THROW(defaultBG.makeMove("S","A"));
-
-    boost::json::object defaultJsonAfterMove = testJson["default_board_config_after_move"].as_object(); 
-
-    EXPECT_EQ(boost::json::serialize(defaultJsonAfterMove), boost::json::serialize(defaultBG.getGamestateJson())); 
-
+  REQUIRE_NOTHROW(defaultBG.makeMove("C", "K"));
+  REQUIRE_THROWS_AS(defaultBG.makeMove("D", "5"), std::invalid_argument);
+  REQUIRE_NOTHROW(defaultBG.makeMove("C", "A"));
+  REQUIRE_NOTHROW(defaultBG.makeMove("C", "Q"));
 }
 
+TEST_CASE("BridgeGamestateTest -- DeclarerLosesTrick") {
 
+  BridgeGamestate defaultBG =
+      loadGamestate(TEST_BOARD_CONFIG_FILE, "default_board_config");
 
-TEST_F(BridgeGamestateTest, FollowSuitTests) {
+  REQUIRE_NOTHROW(defaultBG.makeMove("C", "K"));
+  REQUIRE_NOTHROW(defaultBG.makeMove("C", "A"));
+  REQUIRE_NOTHROW(defaultBG.makeMove("C", "Q"));
+  REQUIRE_NOTHROW(defaultBG.makeMove("C", "J"));
 
-    boost::json::object defaultJson = testJson["default_board_config"].as_object(); 
+  BridgeGamestate defaultAfterLostTrick = loadGamestate(
+      TEST_BOARD_CONFIG_FILE, "default_board_config_after_lost_trick");
 
-    Bridge::BridgeGamestate defaultBG(defaultJson);
-
-
-    ASSERT_NO_THROW(defaultBG.makeMove("C","K"));
-    ASSERT_THROW(defaultBG.makeMove("D","5"), std::invalid_argument);
-    ASSERT_NO_THROW(defaultBG.makeMove("C","A"));
-    ASSERT_NO_THROW(defaultBG.makeMove("C","Q"));
-
+  //TODO: make way to compare gamestates
 }
 
+TEST_CASE("BridgeGamestateTest -- DeclarerWinsTrick") {
 
+  BridgeGamestate defaultBG =
+      loadGamestate(TEST_BOARD_CONFIG_FILE, "default_board_config");
 
-TEST_F(BridgeGamestateTest, DeclarerLosesTrick) {
+  REQUIRE_NOTHROW(defaultBG.makeMove("S", "A"));
+  REQUIRE_NOTHROW(defaultBG.makeMove("C", "A"));
+  REQUIRE_NOTHROW(defaultBG.makeMove("S", "3"));
+  REQUIRE_NOTHROW(defaultBG.makeMove("S", "J"));
 
-    boost::json::object defaultJson = testJson["default_board_config"].as_object(); 
+  BridgeGamestate defaultAfterWonTrick = loadGamestate(
+      TEST_BOARD_CONFIG_FILE, "default_board_config_after_won_trick");
 
-    Bridge::BridgeGamestate defaultBG(defaultJson);
-
-
-    ASSERT_NO_THROW(defaultBG.makeMove("C","K"));
-    ASSERT_NO_THROW(defaultBG.makeMove("C","A"));
-    ASSERT_NO_THROW(defaultBG.makeMove("C","Q"));
-    ASSERT_NO_THROW(defaultBG.makeMove("C","J"));
-
-
-    boost::json::object defaultJsonAfterLostTrick = testJson["default_board_config_after_lost_trick"].as_object(); 
-
-
-    EXPECT_EQ(boost::json::serialize(defaultJsonAfterLostTrick), boost::json::serialize(defaultBG.getGamestateJson())); 
-
+  //TODO: make way to compare gamestates
 }
 
+TEST_CASE("BridgeGamestateTest -- TrickWonByRuffing") {
 
-TEST_F(BridgeGamestateTest, DeclarerWinsTrick) {
+  BridgeGamestate testBG =
+      loadGamestate(TEST_BOARD_CONFIG_FILE, "test_board_config");
 
-    boost::json::object defaultJson = testJson["default_board_config"].as_object(); 
+  REQUIRE_NOTHROW(testBG.makeMove("S", "A"));
+  REQUIRE_NOTHROW(testBG.makeMove("D", "5"));
+  REQUIRE_NOTHROW(testBG.makeMove("S", "3"));
+  REQUIRE_NOTHROW(testBG.makeMove("S", "J"));
 
-    Bridge::BridgeGamestate defaultBG(defaultJson);
+  BridgeGamestate defaultJsonAfterRuff =
+      loadGamestate(TEST_BOARD_CONFIG_FILE, "test_board_config_after_ruff");
 
-
-    ASSERT_NO_THROW(defaultBG.makeMove("S","A"));
-    ASSERT_NO_THROW(defaultBG.makeMove("C","A"));
-    ASSERT_NO_THROW(defaultBG.makeMove("S","3"));
-    ASSERT_NO_THROW(defaultBG.makeMove("S","J"));
-
-
-    boost::json::object defaultJsonAfterWonTrick = testJson["default_board_config_after_won_trick"].as_object(); 
-
-
-    EXPECT_EQ(boost::json::serialize(defaultJsonAfterWonTrick), boost::json::serialize(defaultBG.getGamestateJson())); 
-
+  //TODO: make way to compare gamestates
 }
 
+TEST_CASE("BridgeGamestateTest -- DeclarerLostGameTest") {
 
+  BridgeGamestate testBG =
+      loadGamestate(TEST_BOARD_CONFIG_FILE, "test_board_config");
 
-TEST_F(BridgeGamestateTest, TrickWonByRuffing) {
+  REQUIRE_NOTHROW(testBG.makeMove("S", "A"));
+  REQUIRE_NOTHROW(testBG.makeMove("D", "5"));
+  REQUIRE_NOTHROW(testBG.makeMove("S", "3"));
+  REQUIRE_NOTHROW(testBG.makeMove("S", "J"));
 
-    boost::json::object defaultJson = testJson["test_board_config"].as_object(); 
-
-    Bridge::BridgeGamestate testBG(defaultJson);
-
-
-    ASSERT_NO_THROW(testBG.makeMove("S","A"));
-    ASSERT_NO_THROW(testBG.makeMove("D","5"));
-    ASSERT_NO_THROW(testBG.makeMove("S","3"));
-    ASSERT_NO_THROW(testBG.makeMove("S","J"));
-
-
-    boost::json::object defaultJsonAfterRuff = testJson["test_board_config_after_ruff"].as_object(); 
-
-
-    EXPECT_EQ(boost::json::serialize(defaultJsonAfterRuff), boost::json::serialize(testBG.getGamestateJson())); 
-
+  REQUIRE(testBG.makeMove("S", "4") == "Defence");
 }
 
+TEST_CASE("BridgeGamestateTest -- DeclarerWonGameTest") {
 
+  BridgeGamestate wonTestBG =
+      loadGamestate(TEST_BOARD_CONFIG_FILE, "won_test_config");
 
-TEST_F(BridgeGamestateTest, DeclarerLostGameTest) {
+  REQUIRE_NOTHROW(wonTestBG.makeMove("S", "A"));
+  REQUIRE_NOTHROW(wonTestBG.makeMove("D", "J"));
+  REQUIRE_NOTHROW(wonTestBG.makeMove("H", "3"));
+  REQUIRE_NOTHROW(wonTestBG.makeMove("C", "J"));
 
-    boost::json::object defaultJson = testJson["test_board_config"].as_object(); 
-
-    Bridge::BridgeGamestate testBG(defaultJson);
-
-
-    ASSERT_NO_THROW(testBG.makeMove("S","A"));
-    ASSERT_NO_THROW(testBG.makeMove("D","5"));
-    ASSERT_NO_THROW(testBG.makeMove("S","3"));
-    ASSERT_NO_THROW(testBG.makeMove("S","J"));
-
-    EXPECT_EQ( testBG.makeMove("S","4"), "Defence");
-
+  REQUIRE(wonTestBG.makeMove("S", "4") == "Declarer");
 }
 
-
-
-TEST_F(BridgeGamestateTest, DeclarerWonGameTest) {
-
-    boost::json::object defaultJson = testJson["won_test_config"].as_object(); 
-
-    Bridge::BridgeGamestate wonTestBG(defaultJson);
-
-
-    ASSERT_NO_THROW(wonTestBG.makeMove("S","A"));
-    ASSERT_NO_THROW(wonTestBG.makeMove("D","J"));
-    ASSERT_NO_THROW(wonTestBG.makeMove("H","3"));
-    ASSERT_NO_THROW(wonTestBG.makeMove("C","J"));
-
-    EXPECT_EQ( wonTestBG.makeMove("S","4"), "Declarer");
-
-}
-
-
-
+}  // namespace Bridge

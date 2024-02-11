@@ -1,16 +1,15 @@
-add_executable(MCTSBridge main.cpp)
-
-add_subdirectory(interfaces)
-add_subdirectory(views)
 add_subdirectory(models)
+add_subdirectory(includes)
+#add_subdirectory(interfaces)
+#add_subdirectory(views)
 #add_subdirectory(controllers)
 
+add_executable(main main.cpp)
 
-target_include_directories(MCTSBridge PRIVATE ${Boost_INCLUDE_DIRS})
+target_include_directories(main PRIVATE)
 
-target_link_libraries(MCTSBridge 
+target_link_libraries(main
     PRIVATE
         bridgeGamestate
-        Boost::json
     )
 

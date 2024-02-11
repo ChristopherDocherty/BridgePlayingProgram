@@ -1,46 +1,44 @@
 add_subdirectory(utils)
 
-add_executable(
-    bridgeCardTests 
-    bridgeCardTests.cc
-)
-
-target_link_libraries(
-    bridgeCardTests 
-    GTest::gtest_main
-    bridgeCard
-)
-
-target_include_directories(
-    bridgeCardTests
-    PRIVATE 
-    ${CMAKE_SOURCE_DIR}/src
-) 
-
-
-
 configure_file(testBoards.json .)
 
 add_executable(
-    bridgeGamestateTests
-    bridgeGamestateTests.cc
+    bridgeTests 
+    bridgeCardTests.cc
+    bridgeGamestateLoaderTests.cc
 )
-    
+
 target_link_libraries(
-    bridgeGamestateTests
-    GTest::gtest_main
+    bridgeTests 
+    Catch2::Catch2WithMain
+    bridgeCard
     bridgeGamestate
-    Boost::json
 )
 
 target_include_directories(
-    bridgeGamestateTests 
+    bridgeTests
     PRIVATE 
     ${CMAKE_SOURCE_DIR}/src
-    ${Boost_INCLUDE_DIRS}
 ) 
+include(CTest)
+include(Catch)
+catch_discover_tests(bridgeTests)
 
 
-include(GoogleTest)
-gtest_discover_tests(bridgeCardTests)
-gtest_discover_tests(bridgeGamestateTests)
+#
+#add_executable(
+#    bridgeGamestateTests
+#    bridgeGamestateTests.cc
+#)
+#    
+#target_link_libraries(
+#    bridgeGamestateTests
+#    Catch2::Catch2WithMain
+#    bridgeGamestate
+#)
+#
+#target_include_directories(
+#    bridgeGamestateTests 
+#    PRIVATE 
+#    ${CMAKE_SOURCE_DIR}/src
+#) 

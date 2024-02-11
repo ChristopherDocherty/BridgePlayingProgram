@@ -1,52 +1,92 @@
-#include <gtest/gtest.h>
-#include "models/bridge/utils/bridgeUtils.hpp"
+#include <models/bridge/utils/bridgeUtils.hpp>
 
+#include <catch2/catch_test_macros.hpp>
 
+SCENARIO("Converters work as expected") {
 
-TEST(ConverterTests, SuitConverterTests) {
+  GIVEN("A valid suit strings") {
 
-  EXPECT_EQ(4, Bridge::convertSuitStringToInt("S"));
-  EXPECT_EQ("D", Bridge::convertSuitIntToString(2));
+    WHEN("Converted to int") {
 
-  EXPECT_EQ(0, Bridge::convertSuitStringToInt("NT"));
+      THEN("The correct int is found") {
+        REQUIRE(Bridge::convertSuitStringToInt("C") == 1);
+        REQUIRE(Bridge::convertSuitStringToInt("D") == 2);
+        REQUIRE(Bridge::convertSuitStringToInt("H") == 3);
+        REQUIRE(Bridge::convertSuitStringToInt("S") == 4);
+        REQUIRE(Bridge::convertSuitStringToInt("NT") == 0);
+      }
+    }
+  }
+  GIVEN("Invalid suit strings") {
 
+    WHEN("Converted to int") {
 
-  EXPECT_THROW(Bridge::convertSuitStringToInt("J"), std::invalid_argument);
-  EXPECT_THROW(Bridge::convertSuitIntToString(23), std::invalid_argument);
+      THEN("Exception is thrown") {
+        REQUIRE_THROWS_AS(Bridge::convertSuitStringToInt("J"),
+                          std::invalid_argument);
+        REQUIRE_THROWS_AS(Bridge::convertSuitStringToInt("u"),
+                          std::invalid_argument);
+      }
+    }
+  }
+  GIVEN("Valid suit integers") {
 
-}
+    WHEN("Converted to string") {
 
-TEST(ConverterTests, RankConverterTests) {
+      THEN("Correct output") {
+        REQUIRE(Bridge::convertSuitIntToString(0) == "NT");
+        REQUIRE(Bridge::convertSuitIntToString(1) == "C");
+        REQUIRE(Bridge::convertSuitIntToString(2) == "D");
+        REQUIRE(Bridge::convertSuitIntToString(3) == "H");
+        REQUIRE(Bridge::convertSuitIntToString(4)== "S");
+      }
+    }
+  }
+  GIVEN("Invalid suit integers") {
 
-  EXPECT_EQ(14, Bridge::convertRankStringToInt("A"));
-  EXPECT_EQ("3", Bridge::convertRankIntToString(3));
+    WHEN("Converted to string") {
 
+      THEN("Exception is thrown") {
+        REQUIRE_THROWS_AS(Bridge::convertSuitIntToString(1000),
+                          std::invalid_argument);
+        REQUIRE_THROWS_AS(Bridge::convertSuitIntToString(-1000),
+                          std::invalid_argument);
+        REQUIRE_THROWS_AS(Bridge::convertSuitIntToString(28481),
+                          std::invalid_argument);
+      }
+    }
+  }
 
-  EXPECT_THROW(Bridge::convertRankStringToInt("H"), std::invalid_argument);
-  EXPECT_THROW(Bridge::convertRankIntToString(23), std::invalid_argument);
+  GIVEN("Things to eb converted") {
+    WHEN("Converted") {
+      THEN("correct") {
 
-}
+        REQUIRE(Bridge::convertRankStringToInt("A") == 14);
+        REQUIRE(Bridge::convertRankIntToString(3) == "3");
 
-TEST(ConverterTests, DirConverterTests) {
+        REQUIRE_THROWS_AS(Bridge::convertRankStringToInt("H"),
+                          std::invalid_argument);
+        REQUIRE_THROWS_AS(Bridge::convertRankIntToString(23),
+                          std::invalid_argument);
 
-  EXPECT_EQ(2, Bridge::convertDirStringToInt("S"));
-  EXPECT_EQ("E", Bridge::convertDirIntToString(1));
+        REQUIRE(Bridge::convertDirStringToInt("S") == 2);
+        REQUIRE(Bridge::convertDirIntToString(1) == "E");
 
+        REQUIRE_THROWS_AS(Bridge::convertDirStringToInt("J"),
+                          std::invalid_argument);
+        REQUIRE_THROWS_AS(Bridge::convertDirIntToString(23),
+                          std::invalid_argument);
 
-  EXPECT_THROW(Bridge::convertDirStringToInt("J"), std::invalid_argument);
-  EXPECT_THROW(Bridge::convertDirIntToString(23), std::invalid_argument);
+        REQUIRE(Bridge::convertContractString("6S") == std::make_tuple(4, 12));
+        REQUIRE(Bridge::convertContractString("3NT") == std::make_tuple(0, 9));
 
-}
-
-
-
-TEST(ConverterTests, ContractConverterTests) {
-
-    EXPECT_EQ(std::make_tuple(4,12), Bridge::convertContractString("6S"));
-    EXPECT_EQ(std::make_tuple(0,9), Bridge::convertContractString("3NT"));
-
-    EXPECT_THROW(Bridge::convertContractString("TS"), std::invalid_argument);
-    EXPECT_THROW(Bridge::convertContractString("5Y"), std::invalid_argument);
-    EXPECT_THROW(Bridge::convertContractString("5NTT"), std::invalid_argument);
-    
+        REQUIRE_THROWS_AS(Bridge::convertContractString("TS"),
+                     std::invalid_argument);
+        REQUIRE_THROWS_AS(Bridge::convertContractString("5Y"),
+                     std::invalid_argument);
+        REQUIRE_THROWS_AS(Bridge::convertContractString("5NTT"),
+                     std::invalid_argument);
+      }
+    }
+  }
 }

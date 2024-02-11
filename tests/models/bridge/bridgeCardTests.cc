@@ -1,54 +1,46 @@
-#include <gtest/gtest.h>
 #include "models/bridge/bridgeCard.hpp"
 
+#include <catch2/catch_test_macros.hpp>
 
+namespace Bridge {
 
-TEST(BridgeCardTests, ConstructorTests) {
-
-    EXPECT_THROW(Bridge::BridgeCard testCard("S", "0"), std::invalid_argument);
-    EXPECT_THROW(Bridge::BridgeCard testCard("T", "4"), std::invalid_argument);
-
-
-    EXPECT_THROW(Bridge::BridgeCard testCard("NT", "4"), std::invalid_argument);
-
+TEST_CASE("BridgeCardTests --  ConstructorTests") {
+  REQUIRE_THROWS_AS(BridgeCard("S", "0"), std::invalid_argument);
+  REQUIRE_THROWS_AS(BridgeCard("T", "4"), std::invalid_argument);
+  REQUIRE_THROWS_AS(BridgeCard("NT", "4"), std::invalid_argument);
 }
 
+TEST_CASE("BridgeCardTests -- ComparisonTests") {
 
+  BridgeCard fourSpade("S", "4");
+  BridgeCard fiveDiamond("D", "5");
+  BridgeCard queenDiamond("D", "Q");
 
-TEST(BridgeCardTests, ComparisonTests) {
-   
-    Bridge::BridgeCard fourSpade("S", "4"); 
-    Bridge::BridgeCard fiveDiamond("D", "5"); 
-    Bridge::BridgeCard queenDiamond("D", "Q"); 
+  REQUIRE(fourSpade > queenDiamond);
+  REQUIRE(queenDiamond > fiveDiamond);
 
+  REQUIRE(fiveDiamond < queenDiamond);
+  REQUIRE(queenDiamond < fourSpade);
 
-    EXPECT_TRUE(fourSpade > queenDiamond);
-    EXPECT_TRUE(queenDiamond > fiveDiamond);
+  BridgeCard fourSpade2("S", "4");
 
-    EXPECT_TRUE(fiveDiamond < queenDiamond);
-    EXPECT_TRUE(queenDiamond < fourSpade);
-
-
-    Bridge::BridgeCard fourSpade2("S", "4"); 
-    
-    EXPECT_TRUE(fourSpade == fourSpade2);
+  REQUIRE(fourSpade == fourSpade2);
 }
 
+TEST_CASE("BridgeCardTests --  getterTests") {
 
-TEST(BridgeCardTests, getterTests) {
+  BridgeCard fourSpade("S", "4");
+  BridgeCard fiveDiamond("D", "5");
+  BridgeCard queenDiamond("D", "Q");
 
-    Bridge::BridgeCard fourSpade("S", "4"); 
-    Bridge::BridgeCard fiveDiamond("D", "5"); 
-    Bridge::BridgeCard queenDiamond("D", "Q"); 
+  REQUIRE(fourSpade.getSuit() == "S");
+  REQUIRE(fourSpade.getRank() == "4");
 
-    EXPECT_EQ(fourSpade.getSuit(), "S");
-    EXPECT_EQ(fourSpade.getRank(), "4");
+  REQUIRE(fiveDiamond.getSuit() == "D");
+  REQUIRE(fiveDiamond.getRank() == "5");
 
-    EXPECT_EQ(fiveDiamond.getSuit(), "D");
-    EXPECT_EQ(fiveDiamond.getRank(), "5");
-
-    EXPECT_EQ(queenDiamond.getSuit(), "D");
-    EXPECT_EQ(queenDiamond.getRank(), "Q");
-
-
+  REQUIRE(queenDiamond.getSuit() == "D");
+  REQUIRE(queenDiamond.getRank() == "Q");
 }
+
+}  // namespace Bridge

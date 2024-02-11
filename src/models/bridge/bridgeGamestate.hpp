@@ -6,67 +6,56 @@
 #include <string>
 #include <vector>
 
-#include <boost/json.hpp>
-
-
-
 namespace Bridge {
 
+constexpr int TOTAL_TURNS = 13;
+
 class BridgeGamestate {
-    
 
-    public:
+ public:
+  BridgeGamestate(std::vector<std::vector<BridgeCard>> board,
+                  std::string declarerHand, std::string currentLeadHand,
+                  std::string trumpSuit, int contractLevel, int currentTrick,
+                  int declarerTricksMade);
 
-        BridgeGamestate(boost::json::object& conf);
+  std::string getWinner();
 
-        std::string getWinner(); 
+  //Required for controller (MCTS) functions
+  std::string makeMoveMCTS(int validMoveNumber);
+  //Requried for view functions
+  std::string makeMove(const std::string suit, const std::string rank);
 
-        //Required for controller (MCTS) functions
-        std::string makeMoveMCTS(int validMoveNumber); 
-        //Requried for view functions
-        std::string makeMove(const std::string suit, const std::string rank);
-        
-        int getValidMoveCnt() const {return currentValidMoves.size();};
+  int getValidMoveCnt() const { return d_currentValidMoves.size(); };
 
-        boost::json::object getGamestateJson() const;
+  //        boost::json::object getGamestateJson() const;
 
+ private:
+  std::vector<std::vector<BridgeCard>> d_board;
 
-    private:
+  int d_declarerHand;
+  int d_currentLeadHand;
+  int d_currentHand;
 
-        static const int totalTurns = 13;
+  int d_trumpSuit;
+  int d_declarerTricksRequired;
 
-        std::vector<std::vector<BridgeCard>> board;
+  int d_currentTrick;
+  int d_declarerTricksMade;
 
-        int declarerHand;
-        int currentLeadHand;
-        int currentHand;
+  std::vector<BridgeCard> d_currentTrickRecord;
 
-        int trumpSuit;
-        int declarerTricksRequired;
+  bool moveIsValid(const BridgeCard& proposedMove) const;
+  bool currentHandDoesNotHaveCard(const BridgeCard& proposedMove) const;
+  bool moveShouldFollowSuitButDoesnt(const BridgeCard& proposedMove) const;
 
-        int currentTrick;
-        int declarerTricksMade;
+  void updateCurrentValidMoves();
+  std::vector<BridgeCard> d_currentValidMoves;
 
-        std::vector<BridgeCard> currentTrickRecord;
+  int getTricksRequired(int contractLevel) const { return contractLevel + 6; };
+  //       std::vector<std::vector<BridgeCard>> readBoardFromJson(boost::json::object& conf);
 
-        bool moveIsValid(const BridgeCard& proposedMove) const;
-        bool currentHandDoesNotHaveCard(const BridgeCard& proposedMove) const; 
-        bool moveShouldFollowSuitButDoesnt(const BridgeCard& proposedMove) const; 
-
-        void updateCurrentValidMoves();
-        std::vector<BridgeCard> currentValidMoves;
-
-
-        int getTricksRequired(int contractLevel) const {return contractLevel + 6;};
-        std::vector<std::vector<BridgeCard>> readBoardFromJson(boost::json::object& conf);
-
-
-        int getTrickWinner() const;
-
-
+  int getTrickWinner() const;
 };
 
-
-
-}
+}  // namespace Bridge
 #endif
