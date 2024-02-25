@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include <includes/json.hpp>
+#include <includes/json/json.hpp>
 
 using json = nlohmann::json;
 
@@ -27,10 +27,13 @@ std::vector<std::vector<BridgeCard>> getBoard(json boardData) {
 
   std::vector<std::vector<BridgeCard>> board;
 
-  for (json::iterator boardIter = boardData.begin();
-       boardIter != boardData.end(); ++boardIter) {
+  std::vector<std::string> hands = {"N_hand", "E_hand", "S_hand", "W_hand"};
+
+  for (auto& handStr : hands) {
     std::vector<BridgeCard>& hand = board.emplace_back();
-    for (json::iterator it = boardIter->begin(); it != boardIter->end(); ++it) {
+
+    for (json::iterator it = boardData[handStr].begin();
+         it != boardData[handStr].end(); ++it) {
       std::string suit = (*it)[0];
       std::string rank = (*it)[1];
       hand.emplace_back(BridgeCard{suit, rank});

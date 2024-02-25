@@ -1,8 +1,11 @@
 #include "bridgeGamestate.hpp"
 #include "bridgeCard.hpp"
+#include "includes/tl/expected.hpp"
 #include "utils/bridgeUtils.hpp"
 
 #include <algorithm>
+#include <iostream>
+#include <sstream>
 #include <stack>
 #include <stdexcept>
 #include <string>
@@ -57,9 +60,8 @@ std::string BridgeGamestate::makeMove(const std::string suit,
 
   BridgeCard move(suit, rank);
 
-  if (!moveIsValid(move)) {
-    throw std::invalid_argument(
-        "nope");  //boost::json::serialize(getGamestateJson())); //"This is an invalid move");
+  if (auto isValid = moveIsValid(move); !isValid) {
+    throw std::invalid_argument(isValid.error());
   }
 
   auto iterToErase = std::find(d_board[d_currentHand].begin(),
@@ -126,35 +128,36 @@ void BridgeGamestate::updateCurrentValidMoves() {
   }
 }
 
-bool BridgeGamestate::moveIsValid(const BridgeCard& proposedMove) const {
-
-  if (currentHandDoesNotHaveCard(proposedMove) ||
-      moveShouldFollowSuitButDoesnt(proposedMove)) {
-    return false;
+BridgeExpected<void> BridgeGamestate::moveIsValid(
+    const BridgeCard& proposedMove) const {
+  if (auto ret = currentHandHasCard(proposedMove); !ret) {
+    return ret;
   }
-
-  return true;
+  if (auto ret = moveFollowsSuitCorrectly(proposedMove); !ret) {
+    return ret;
+  }
+  return {};
 }
 
-bool BridgeGamestate::currentHandDoesNotHaveCard(
+BridgeExpected<void> BridgeGamestate::currentHandHasCard(
     const BridgeCard& proposedMove) const {
 
   auto currentCards = d_board[d_currentHand];
 
   if (find(currentCards.begin(), currentCards.end(), proposedMove) ==
       currentCards.end()) {
-    return true;
-  } else {
-    return false;
+    return tl::make_unexpected("Current hand does not have the card {}");
   }
+
+  return {};
 }
 
-bool BridgeGamestate::moveShouldFollowSuitButDoesnt(
+BridgeExpected<void> BridgeGamestate::moveFollowsSuitCorrectly(
     const BridgeCard& proposedMove) const {
 
   //First card of a trick can be any suit
   if (d_currentTrickRecord.size() == 0) {
-    return false;
+    return {};
   }
 
   auto currentCards = d_board[d_currentHand];
@@ -162,18 +165,61 @@ bool BridgeGamestate::moveShouldFollowSuitButDoesnt(
   const std::string leadSuit = d_currentTrickRecord[0].getSuit();
 
   if (proposedMove.getSuit() == leadSuit) {
-    return false;
+    return {};
   }
 
   for (auto card : currentCards) {
 
     if (card.getSuit() == leadSuit) {
-      return true;
+      return tl::make_unexpected("Move does not follow suit");
     }
   }
 
-  return false;
+  return {};
 }
+bool operator==(const BridgeGamestate& lhs, const BridgeGamestate& rhs) {
+  return lhs.d_board == rhs.d_board &&
+         lhs.d_declarerHand == rhs.d_declarerHand &&
+         lhs.d_currentLeadHand == rhs.d_currentLeadHand &&
+         lhs.d_trumpSuit == rhs.d_trumpSuit &&
+         lhs.d_declarerTricksRequired == rhs.d_declarerTricksRequired &&
+         lhs.d_currentTrick == rhs.d_currentTrick &&
+         lhs.d_declarerTricksMade == rhs.d_declarerTricksMade &&
+         lhs.d_currentTrickRecord == rhs.d_currentTrickRecord;
+}
+
+const std::vector<std::vector<BridgeCard>>& BridgeGamestate::board() const {
+  return d_board;
+}
+
+int BridgeGamestate::declarerHand() const {
+  return d_declarerHand;
+}
+int BridgeGamestate::currentLeadHand() const {
+  return d_currentLeadHand;
+}
+int BridgeGamestate::currentHand() const {
+  return d_currentHand;
+}
+
+int BridgeGamestate::trumpSuit() const {
+  return d_trumpSuit;
+}
+int BridgeGamestate::declarerTricksRequired() const {
+  return d_declarerTricksRequired;
+}
+
+int BridgeGamestate::currentTrick() const {
+  return d_currentTrick;
+}
+int BridgeGamestate::declarerTricksMade() const {
+  return d_declarerTricksMade;
+}
+
+std::vector<BridgeCard> BridgeGamestate::currentTrickRecord() const {
+  return d_currentTrickRecord;
+}
+
 //std::vector<std::vector<BridgeCard>> BridgeGamestate::readBoardFromJson(boost::json::object& conf) {
 //
 //    auto boardJson = conf["board"].as_object();

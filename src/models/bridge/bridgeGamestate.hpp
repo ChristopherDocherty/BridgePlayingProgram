@@ -3,10 +3,14 @@
 
 #include "bridgeCard.hpp"
 
+#include <includes/tl/expected.hpp>
 #include <string>
 #include <vector>
 
 namespace Bridge {
+
+template <typename T>
+using BridgeExpected = tl::expected<T, std::string>;
 
 constexpr int TOTAL_TURNS = 13;
 
@@ -29,6 +33,23 @@ class BridgeGamestate {
 
   //        boost::json::object getGamestateJson() const;
 
+  friend bool operator==(const BridgeGamestate& lhs,
+                         const BridgeGamestate& rhs);
+
+  const std::vector<std::vector<BridgeCard>>& board() const;
+
+  int declarerHand() const;
+  int currentLeadHand() const;
+  int currentHand() const;
+
+  int trumpSuit() const;
+  int declarerTricksRequired() const;
+
+  int currentTrick() const;
+  int declarerTricksMade() const;
+
+  std::vector<BridgeCard> currentTrickRecord() const;
+
  private:
   std::vector<std::vector<BridgeCard>> d_board;
 
@@ -44,9 +65,11 @@ class BridgeGamestate {
 
   std::vector<BridgeCard> d_currentTrickRecord;
 
-  bool moveIsValid(const BridgeCard& proposedMove) const;
-  bool currentHandDoesNotHaveCard(const BridgeCard& proposedMove) const;
-  bool moveShouldFollowSuitButDoesnt(const BridgeCard& proposedMove) const;
+  BridgeExpected<void> moveIsValid(const BridgeCard& proposedMove) const;
+  BridgeExpected<void> currentHandHasCard(
+      const BridgeCard& proposedMove) const;
+  BridgeExpected<void> moveFollowsSuitCorrectly(
+      const BridgeCard& proposedMove) const;
 
   void updateCurrentValidMoves();
   std::vector<BridgeCard> d_currentValidMoves;

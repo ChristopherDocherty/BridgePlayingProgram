@@ -2,11 +2,25 @@
 #include "models/bridge/bridgeGamestateLoader.hpp"
 
 #include <fstream>
+#include <iostream>
 #include <sstream>
 
 #include <catch2/catch_test_macros.hpp>
 
 namespace Bridge {
+
+void compareBridgeGamestateMembers(const BridgeGamestate& lhs,
+                                   const BridgeGamestate& rhs) {
+
+  REQUIRE(lhs.board() == rhs.board());
+  REQUIRE(lhs.declarerHand() == rhs.declarerHand());
+  REQUIRE(lhs.currentLeadHand() == rhs.currentLeadHand());
+  REQUIRE(lhs.trumpSuit() == rhs.trumpSuit());
+  REQUIRE(lhs.declarerTricksRequired() == rhs.declarerTricksRequired());
+  REQUIRE(lhs.currentTrick() == rhs.currentTrick());
+  REQUIRE(lhs.declarerTricksMade() == rhs.declarerTricksMade());
+  //REQUIRE(lhs.currentTrickRecord() == rhs.currentTrickRecord());
+}
 
 const std::string TEST_BOARD_CONFIG_FILE = "testBoards.json";
 
@@ -33,7 +47,7 @@ TEST_CASE("BridgeGamestateTest -- MakeMoveTests") {
   BridgeGamestate defaultAfterMove =
       loadGamestate(TEST_BOARD_CONFIG_FILE, "default_board_config_after_move");
 
-  //TODO: make way to compare gamestates
+  compareBridgeGamestateMembers(defaultBG, defaultAfterMove);
 }
 
 TEST_CASE("BridgeGamestateTest -- FollowSuitTests") {
@@ -60,7 +74,7 @@ TEST_CASE("BridgeGamestateTest -- DeclarerLosesTrick") {
   BridgeGamestate defaultAfterLostTrick = loadGamestate(
       TEST_BOARD_CONFIG_FILE, "default_board_config_after_lost_trick");
 
-  //TODO: make way to compare gamestates
+  compareBridgeGamestateMembers(defaultBG, defaultAfterLostTrick);
 }
 
 TEST_CASE("BridgeGamestateTest -- DeclarerWinsTrick") {
@@ -76,7 +90,7 @@ TEST_CASE("BridgeGamestateTest -- DeclarerWinsTrick") {
   BridgeGamestate defaultAfterWonTrick = loadGamestate(
       TEST_BOARD_CONFIG_FILE, "default_board_config_after_won_trick");
 
-  //TODO: make way to compare gamestates
+  compareBridgeGamestateMembers(defaultBG, defaultAfterWonTrick);
 }
 
 TEST_CASE("BridgeGamestateTest -- TrickWonByRuffing") {
@@ -92,7 +106,7 @@ TEST_CASE("BridgeGamestateTest -- TrickWonByRuffing") {
   BridgeGamestate defaultJsonAfterRuff =
       loadGamestate(TEST_BOARD_CONFIG_FILE, "test_board_config_after_ruff");
 
-  //TODO: make way to compare gamestates
+  compareBridgeGamestateMembers(testBG, defaultJsonAfterRuff);
 }
 
 TEST_CASE("BridgeGamestateTest -- DeclarerLostGameTest") {
