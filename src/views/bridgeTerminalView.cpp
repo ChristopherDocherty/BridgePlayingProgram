@@ -1,4 +1,5 @@
 #include "bridgeTerminalView.hpp"
+#include <range/v3/view/zip.hpp>
 #include <views/viewUtils.hpp>
 #include "models/bridge/utils/bridgeUtils.hpp"
 
@@ -8,6 +9,17 @@
 #include <vector>
 
 namespace Bridge {
+
+namespace {
+std::unordered_map<std::string, std::string> getSuitStringsForHand(
+    const std::vector<BridgeCard>& hand) {
+  std::vector<std::string> suits = viewUtils::getSuits();
+
+  auto t = ranges::views::zip(suits, hand);
+  (void)t;
+  return {};
+}
+}  // namespace
 
 void BridgeTerminalView::update(const BridgeGamestate& bg) {
   std::cout << getGamestateString(bg) << std::endl;

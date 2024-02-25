@@ -8,6 +8,8 @@ target_link_libraries(
     bridgeTerminalView
     PUBLIC
     bridgeGamestate
+    PRIVATE
+    range-v3
 )
 
 target_include_directories(

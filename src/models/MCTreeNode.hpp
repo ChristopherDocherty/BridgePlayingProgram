@@ -2,12 +2,12 @@
 #define MCTreeNode_h
 
 #include <functional>
-#include <includes/range-v3/range/v3/all.hpp>
+#include <range/v3/all.hpp>
 
 #include <memory>
 #include <string>
 #include <vector>
-#include "range/v3/view/transform.hpp"
+#include <range/v3/view/transform.hpp>
 
 template <typename MCTS_GAME>
 class MCTreeNode {

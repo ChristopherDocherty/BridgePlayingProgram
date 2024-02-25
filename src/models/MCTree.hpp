@@ -5,7 +5,7 @@
 #include "range/v3/view/sample.hpp"
 #include "range/v3/view/transform.hpp"
 
-#include <includes/range-v3/range/v3/all.hpp>
+#include <range/v3/all.hpp>
 
 #include <algorithm>
 #include <iterator>

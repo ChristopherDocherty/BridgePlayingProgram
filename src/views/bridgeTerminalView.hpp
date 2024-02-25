@@ -23,6 +23,10 @@ class BridgeTerminalView {
   static std::string getNSHand(const BridgeGamestate& gamestate,
                                const std::string& dir);
 
+
+  static std::string getEWHand(const BridgeGamestate& gamestate,
+                               const std::string& dir);
+
   static std::string getCardsOfSuitString(
       const std::vector<std::vector<BridgeCard>>& board, const std::string& dir,
       const std::string& suit);
