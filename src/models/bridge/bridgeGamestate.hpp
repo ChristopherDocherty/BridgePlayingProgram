@@ -50,6 +50,8 @@ class BridgeGamestate {
 
   std::vector<BridgeCard> currentTrickRecord() const;
 
+  int contractLevel() const;
+
  private:
   std::vector<std::vector<BridgeCard>> d_board;
 
@@ -65,9 +67,10 @@ class BridgeGamestate {
 
   std::vector<BridgeCard> d_currentTrickRecord;
 
+  int d_contractLevel;
+
   BridgeExpected<void> moveIsValid(const BridgeCard& proposedMove) const;
-  BridgeExpected<void> currentHandHasCard(
-      const BridgeCard& proposedMove) const;
+  BridgeExpected<void> currentHandHasCard(const BridgeCard& proposedMove) const;
   BridgeExpected<void> moveFollowsSuitCorrectly(
       const BridgeCard& proposedMove) const;
 

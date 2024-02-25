@@ -1,7 +1,6 @@
 #include "bridgeTerminalView.hpp"
-#include "viewUtils.hpp"
-
-#include <boost/json.hpp>
+#include <views/viewUtils.hpp>
+#include "models/bridge/utils/bridgeUtils.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -10,47 +9,37 @@
 
 namespace Bridge {
 
-void BridgeTerminalView::update(const std::string& gamestate) const {
-
-  boost::json::object gamestateObject =
-      (boost::json::parse(gamestate)).as_object();
-
-  printToScreen(gamestateObject);
+void BridgeTerminalView::update(const BridgeGamestate& bg) {
+  std::cout << getGamestateString(bg) << std::endl;
 }
 
-void BridgeTerminalView::printToScreen(
-    boost::json::object gamestateObject) const {
+std::string BridgeTerminalView::getGamestateString(const BridgeGamestate& bg) {
 
   std::stringstream ss;
 
-  ss << getContractAndTurnInfo(gamestateObject);
-  ss << getNSHand(gamestateObject, "N");
-  ss << getNSHand(gamestateObject, "S");
-
-  std::cout << ss.str();
-}
-
-std::string BridgeTerminalView::getContractAndTurnInfo(
-    boost::json::object gamestate) const {
-
-  std::stringstream ss;
-
-  ss << viewUtils::convertJsonToStr(gamestate["contract_level"]);
-  ss << viewUtils::convertJsonToStr(gamestate["trumpSuit"]);
-  ss << "by" << viewUtils::convertJsonToStr(gamestate["declarer_dir"]);
-
-  ss << "\n"
-     << viewUtils::convertJsonToStr(gamestate["current_lead_hand"])
-     << " leads this trick\n";
+  ss << getContractAndTurnInfo(bg) << getNSHand(bg, "N") << "\n\n\n\n"
+     << getNSHand(bg, "S");
 
   return ss.str();
 }
 
-std::string BridgeTerminalView::getNSHand(boost::json::object gamestate,
-                                          const std::string& dir) const {
+std::string BridgeTerminalView::getContractAndTurnInfo(
+    const BridgeGamestate& bg) {
+  std::stringstream ss;
 
-  boost::json::object board = gamestate["board"].as_object();
-  const std::string hand = dir + "_hand";
+  ss << std::to_string(bg.contractLevel())
+     << convertSuitIntToString(bg.trumpSuit()) << " by "
+     << convertDirIntToString(bg.declarerHand()) << "\n"
+     << convertDirIntToString(bg.currentLeadHand()) << " leads this trick\n";
+
+  return ss.str();
+}
+
+std::string BridgeTerminalView::getNSHand(const BridgeGamestate& bg,
+                                          const std::string& dir) {
+
+  std::vector<std::vector<BridgeCard>> board = bg.board();
+  const std::string hand = dir;
 
   const std::string westWhitespaceFill(westWhitespaceFillLength, ' ');
 
@@ -66,16 +55,17 @@ std::string BridgeTerminalView::getNSHand(boost::json::object gamestate,
 }
 
 std::string BridgeTerminalView::getCardsOfSuitString(
-    boost::json::object board, const std::string& dir,
-    const std::string& suit) const {
+    const std::vector<std::vector<BridgeCard>>& board, const std::string& dir,
+    const std::string& suit) {
 
-  boost::json::array hand = board[dir].as_array();
+  int dirInt = convertDirStringToInt(dir);
+  const std::vector<BridgeCard> hand = board[dirInt];
 
   const std::vector<std::string> ranks = extractAllRanksOfSuit(hand, suit);
 
   std::stringstream ss;
 
-  ss << suit << " ";
+  ss << " ";
 
   for (auto rank : ranks) {
     ss << " " << rank;
@@ -85,16 +75,13 @@ std::string BridgeTerminalView::getCardsOfSuitString(
 }
 
 std::vector<std::string> BridgeTerminalView::extractAllRanksOfSuit(
-    boost::json::array& hand, const std::string& suit) const {
+    const std::vector<BridgeCard>& hand, const std::string& suit) {
 
   std::vector<std::string> ranks;
 
   for (auto card : hand) {
-
-    boost::json::array cardArr = card.as_array();
-
-    if (viewUtils::convertJsonToStr(cardArr[0]) == suit) {
-      ranks.push_back(viewUtils::convertJsonToStr(cardArr[1]));
+    if (card.getSuit() == suit) {
+      ranks.push_back(card.getRank());
     }
   }
 

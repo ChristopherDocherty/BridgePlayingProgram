@@ -1,23 +1,27 @@
 add_subdirectory(bridge)
 
-#add_library(MCTreeNode
-#    MCTreeNode.cpp
-#    MCTreeNode.hpp
-#)
-#
-#
-#target_link_libraries(
-#    MCTreeNode
-#    PUBLIC
-#    observerInterface
-#)
-#
-#target_include_directories(
-#    MCTreeNode
-#    PUBLIC 
-#    ${CMAKE_SOURCE_DIR}/src
-#)
-#
+add_library(MCTree
+    MCTree.hpp
+    MCTree.cpp
+    MCTreeNode.cpp
+    MCTreeNode.hpp
+)
+
+
+target_link_libraries(
+    MCTree
+    PUBLIC
+    observerInterface
+    PRIVATE
+    range-v3
+)
+
+target_include_directories(
+    MCTree
+    PUBLIC 
+    ${CMAKE_SOURCE_DIR}/src
+)
+
 
 
 #Used to insert default config filepaths

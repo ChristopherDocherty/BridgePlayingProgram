@@ -1,27 +1,19 @@
-add_library(viewUtils
-    viewUtils.hpp
-    viewUtils.cpp
-)
-
 add_library(bridgeTerminalView
-    bridgeTerminalView.hpp
     bridgeTerminalView.cpp
+    viewUtils.cpp
 )
 
 
 target_link_libraries(
     bridgeTerminalView
     PUBLIC
-    viewUtils
-    observerInterface
-    Boost::json
+    bridgeGamestate
 )
 
 target_include_directories(
     bridgeTerminalView
     PUBLIC 
     ${CMAKE_SOURCE_DIR}/src
-    ${Boost_INCLUDE_DIRS}
 )
 
 

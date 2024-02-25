@@ -1,19 +1,4 @@
-add_executable( viewUtilsTests 
-    viewUtilsTests.cc
-)
-
-target_link_libraries(
-    viewUtilsTests 
-    GTest::gtest_main
-    viewUtils
-)
-
-target_include_directories(
-    viewUtilsTests 
-    PUBLIC
-    ${CMAKE_BINARY_DIR}/src
-) 
-
+configure_file(../models/bridge/testBoards.json .)
 
 add_executable( bridgeTerminalViewTests 
     bridgeTerminalViewTests.cc
@@ -21,16 +6,17 @@ add_executable( bridgeTerminalViewTests
 
 target_link_libraries(
     bridgeTerminalViewTests 
-    GTest::gtest_main
     bridgeTerminalView
+    Catch2::Catch2WithMain
+    bridgeGamestate
 )
 
 target_include_directories(
     bridgeTerminalViewTests 
     PUBLIC
-    ${CMAKE_BINARY_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src
 ) 
 
-include(GoogleTest)
-gtest_discover_tests(viewUtilsTests)
-gtest_discover_tests(bridgeTerminalViewTests)
+include(CTest)
+include(Catch)
+catch_discover_tests(bridgeTerminalViewTests)

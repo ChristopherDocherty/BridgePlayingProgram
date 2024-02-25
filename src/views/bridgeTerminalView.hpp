@@ -1,37 +1,34 @@
 #ifndef BRIDGE_TERM_VIEW_h
 #define BRIDGE_TERM_VIEW_h
 
-#include "interfaces/IObserver.hpp"
-
-#include <boost/json.hpp>
+#include <models/bridge/bridgeGamestate.hpp>
 
 #include <string>
 #include <vector>
 
 namespace Bridge {
 
-class BridgeTerminalView : IObserver {
+class BridgeTerminalView {
 
  public:
-  void update(const std::string& gamestate) const override;
+  static void update(const BridgeGamestate& gamestate);
+
+  static std::string getGamestateString(const BridgeGamestate& gamestate);
 
  private:
   constexpr static int westWhitespaceFillLength = 18;
 
-  boost::json::object getGamestateJson(const std::string& gamestateStr) const;
+  static std::string getContractAndTurnInfo(const BridgeGamestate& gamestate);
 
-  void printToScreen(boost::json::object gamestate) const;
+  static std::string getNSHand(const BridgeGamestate& gamestate,
+                               const std::string& dir);
 
-  std::string getContractAndTurnInfo(boost::json::object gamestate) const;
+  static std::string getCardsOfSuitString(
+      const std::vector<std::vector<BridgeCard>>& board, const std::string& dir,
+      const std::string& suit);
 
-  std::string getNSHand(boost::json::object gamestate,
-                        const std::string& dir) const;
-
-  std::string getCardsOfSuitString(boost::json::object board,
-                                   const std::string& dir,
-                                   const std::string& suit) const;
-  std::vector<std::string> extractAllRanksOfSuit(boost::json::array& hand,
-                                                 const std::string& suit) const;
+  static std::vector<std::string> extractAllRanksOfSuit(
+      const std::vector<BridgeCard>& hand, const std::string& suit);
 };
 
 }  // namespace Bridge
