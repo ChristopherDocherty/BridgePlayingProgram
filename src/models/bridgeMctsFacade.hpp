@@ -5,7 +5,11 @@
 
 namespace Bridge {
 
+class BridgeMctsFacade {
 
+ private:
+  BridgeGamestate gamestate;
+};
 
 }  // namespace Bridge
 #endif

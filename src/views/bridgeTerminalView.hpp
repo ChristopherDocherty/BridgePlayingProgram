@@ -6,14 +6,12 @@
 #include <string>
 #include <vector>
 
-#include <range/v3/all.hpp>
-
 namespace Bridge {
 
 class BridgeTerminalView {
 
  public:
-  static void update(const BridgeGamestate& gamestate);
+  void update(const BridgeGamestate& gamestate);
 
   static std::string getGamestateString(const BridgeGamestate& gamestate);
 
