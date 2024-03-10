@@ -6,9 +6,12 @@ add_executable( bridgeTerminalViewTests
 
 target_link_libraries(
     bridgeTerminalViewTests 
+    PUBLIC
     bridgeTerminalView
     Catch2::Catch2WithMain
     bridgeGamestate
+    PRIVATE
+    range-v3
 )
 
 target_include_directories(

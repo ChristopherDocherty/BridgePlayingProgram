@@ -11,5 +11,8 @@ target_include_directories(main PRIVATE)
 target_link_libraries(main
     PRIVATE
         bridgeGamestate
+        bridgeTerminalView
+        range-v3
     )
 
+configure_file(../tests/models/bridge/testBoards.json .)

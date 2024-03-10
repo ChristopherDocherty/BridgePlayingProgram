@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+#include <range/v3/all.hpp>
+
 namespace Bridge {
 
 class BridgeTerminalView {
@@ -20,19 +22,18 @@ class BridgeTerminalView {
 
   static std::string getContractAndTurnInfo(const BridgeGamestate& gamestate);
 
-  static std::string getNSHand(const BridgeGamestate& gamestate,
-                               const std::string& dir);
+  static std::string getEWHand(const std::vector<std::string>& eHand,
+                               const std::vector<std::string>& wHand,
+                               const BridgeGamestate& bg);
 
-
-  static std::string getEWHand(const BridgeGamestate& gamestate,
-                               const std::string& dir);
-
-  static std::string getCardsOfSuitString(
+  static std::vector<std::string> getCardsOfSuitString(
       const std::vector<std::vector<BridgeCard>>& board, const std::string& dir,
       const std::string& suit);
 
-  static std::vector<std::string> extractAllRanksOfSuit(
-      const std::vector<BridgeCard>& hand, const std::string& suit);
+  static std::unordered_map<std::string, std::vector<std::string>>
+  getHandStrings(BridgeGamestate bg);
+  static std::string getNSHand(
+      const std::vector<std::string>& northHandStrings);
 };
 
 }  // namespace Bridge

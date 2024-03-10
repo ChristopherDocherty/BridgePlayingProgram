@@ -20,11 +20,10 @@ template <typename MCTS_GAME>
 class MCTree {
 
  public:
-
-  int findBestMove(MCTS_GAME game);
+  MCTree(MCTS_GAME game);
+  int findBestMove();
 
  private:
-
   MCTreeNode<MCTS_GAME>* selectNode();
   void expandNode(MCTreeNode<MCTS_GAME>* node);
   int simulate(MCTreeNode<MCTS_GAME>* node);
@@ -32,6 +31,39 @@ class MCTree {
 
   std::unique_ptr<MCTreeNode<MCTS_GAME>> d_rootNode;
 };
+
+template <typename MCTS_GAME>
+MCTree<MCTS_GAME>::MCTree(MCTS_GAME game)
+    : d_rootNode(std::make_unique(game)) {}
+
+template <typename MCTS_GAME>
+int MCTree<MCTS_GAME>::findBestMove() {
+  int i = 0;
+  while (i != 100) {
+    auto selectedNode = selectNode();
+    expandNode(selectedNode);
+
+    MCTreeNode<MCTS_GAME>* childNode = ranges::views::sample(
+        selectedNode.children(), 1, std::mt19937{std::random_device{}()});
+
+    int result = simulate(childNode);
+
+    bool computerWonSimulation = result == 0;
+    backpropagateResult(childNode, computerWonSimulation);
+
+    ++i;
+  }
+
+  auto bestChild = ranges::max_element(
+      d_rootNode->children(),
+      [](const MCTreeNode<MCTS_GAME>* lhs, const MCTreeNode<MCTS_GAME>* rhs) {
+        //TODO check this
+        return lhs->getComparisonNumber() < rhs->getComparisonNumber();
+      });
+
+  return ranges::distance(ranges::begin(
+      d_rootNode->children(), ranges::find(bestChild, d_rootNode->children())));
+}
 
 template <typename MCTS_GAME>
 MCTreeNode<MCTS_GAME>* MCTree<MCTS_GAME>::selectNode() {
