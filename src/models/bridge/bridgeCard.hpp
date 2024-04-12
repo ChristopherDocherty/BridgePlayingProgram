@@ -2,6 +2,7 @@
 #define bridgeCard_h
 
 #include <string>
+#include <ostream>
 
 namespace Bridge {
 
@@ -11,6 +12,7 @@ class BridgeCard {
   BridgeCard(const std::string suit, const std::string rank);
 
   friend bool operator==(const BridgeCard& lhs, const BridgeCard& rhs);
+  friend std::ostream& operator<<(std::ostream& os, const BridgeCard& bc);
   bool operator>(const BridgeCard& other);
   bool operator<(const BridgeCard& other);
 

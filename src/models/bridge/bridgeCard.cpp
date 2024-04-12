@@ -15,6 +15,11 @@ bool operator==(const BridgeCard& lhs, const BridgeCard& rhs) {
   return (lhs.mSuit == rhs.mSuit) && (lhs.mRank == rhs.mRank);
 }
 
+std::ostream& operator<<(std::ostream& os, const BridgeCard& bc) {
+  os << "BridgeCard{" << bc.getRank() << bc.getSuit() << "}";
+  return os;
+}
+
 bool BridgeCard::operator>(const BridgeCard& other) {
 
   if ((mSuit > other.mSuit) ||

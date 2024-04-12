@@ -45,6 +45,11 @@ std::string BridgeGamestate::getWinner() {
 }
 
 std::string BridgeGamestate::makeMoveMCTS(int validMoveNumber) {
+
+  if (static_cast<size_t>(validMoveNumber) >= d_currentValidMoves.size()) {
+    throw std::invalid_argument("Invalid MCTS move=" +
+                                std::to_string(validMoveNumber));
+  }
   BridgeCard cardPlayed = d_currentValidMoves[validMoveNumber];
   return makeMove(cardPlayed.getSuit(), cardPlayed.getRank());
 }
@@ -71,6 +76,8 @@ std::string BridgeGamestate::makeMove(const std::string suit,
 
   d_currentTrickRecord.push_back(move);
 
+  //std::cout << "currHand before=" << convertDirIntToString(d_currentHand)
+  //           << std::endl;
   if (d_currentTrickRecord.size() == 4) {
 
     ++d_currentTrick;
@@ -84,12 +91,21 @@ std::string BridgeGamestate::makeMove(const std::string suit,
     if (trickWinnerDir % 2 == d_declarerHand % 2) {
       ++d_declarerTricksMade;
     }
+    d_currentTrickRecord.clear();
 
   } else {
     d_currentHand = (d_currentHand + 1) % 4;
   }
+  //std::cout << "currHand after=" << convertDirIntToString(d_currentHand)
+  //          << std::endl;
 
   updateCurrentValidMoves();
+
+  //std::cout << "Valid moves are:";
+  //for (const auto& move : d_currentValidMoves) {
+  //std::cout << move << "|";
+  //}
+  //std::cout << "\n";
 
   return getWinner();
 }
@@ -118,15 +134,16 @@ int BridgeGamestate::getTrickWinner() const {
 
 void BridgeGamestate::updateCurrentValidMoves() {
 
-  d_currentValidMoves.clear();
-
   auto currentCards = d_board[d_currentHand];
 
+  d_currentValidMoves.clear();
   for (auto card : currentCards) {
     if (moveIsValid(card)) {
+      //     std::cout << card << " is considered valid,";
       d_currentValidMoves.push_back(card);
     }
   }
+  //  std::cout << "\n";
 }
 
 BridgeExpected<void> BridgeGamestate::moveIsValid(
@@ -147,7 +164,10 @@ BridgeExpected<void> BridgeGamestate::currentHandHasCard(
 
   if (find(currentCards.begin(), currentCards.end(), proposedMove) ==
       currentCards.end()) {
-    return tl::make_unexpected("Current hand does not have the card {}");
+    std::stringstream ss;
+    ss << "Current hand " << convertDirIntToString(d_currentHand)
+       << " does not have the card " << proposedMove;
+    return tl::make_unexpected(ss.str());
   }
 
   return {};

@@ -135,4 +135,33 @@ TEST_CASE("BridgeGamestateTest -- DeclarerWonGameTest") {
   REQUIRE(wonTestBG.makeMove("S", "4") == "Declarer");
 }
 
+
+TEST_CASE("BridgeGamestateTest -- GameToCompletion") {
+
+  BridgeGamestate wonTestBG =
+      loadGamestate(TEST_BOARD_CONFIG_FILE, "default_board_config");
+
+  REQUIRE_NOTHROW(wonTestBG.makeMove("S", "A"));
+  REQUIRE_NOTHROW(wonTestBG.makeMove("C", "A"));
+  REQUIRE_NOTHROW(wonTestBG.makeMove("S", "K"));
+  REQUIRE_NOTHROW(wonTestBG.makeMove("S", "J"));
+
+  REQUIRE_NOTHROW(wonTestBG.makeMove("S", "Q"));
+  REQUIRE_NOTHROW(wonTestBG.makeMove("H", "Q"));
+  REQUIRE_NOTHROW(wonTestBG.makeMove("S", "9"));
+  REQUIRE_NOTHROW(wonTestBG.makeMove("S", "10"));
+
+  REQUIRE_NOTHROW(wonTestBG.makeMove("S", "7"));
+  REQUIRE_NOTHROW(wonTestBG.makeMove("H", "10"));
+  REQUIRE_NOTHROW(wonTestBG.makeMove("S", "4"));
+  REQUIRE_NOTHROW(wonTestBG.makeMove("S", "8"));
+  
+  REQUIRE_NOTHROW(wonTestBG.makeMove("S", "6"));
+  REQUIRE_NOTHROW(wonTestBG.makeMove("D", "J"));
+  REQUIRE_NOTHROW(wonTestBG.makeMove("S", "3"));
+  REQUIRE_NOTHROW(wonTestBG.makeMove("C", "J"));
+
+//  REQUIRE(wonTestBG.makeMove("S", "4") == "Declarer");
+}
+
 }  // namespace Bridge

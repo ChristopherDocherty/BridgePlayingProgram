@@ -1,6 +1,7 @@
 #ifndef MCTREE_H
 #define MCTREE_H
 
+#include <chrono>
 #include <models/MCTreeNode.hpp>
 
 #include <range/v3/algorithm/find.hpp>
@@ -10,10 +11,11 @@
 #include <range/v3/view/sample.hpp>
 
 #include <algorithm>
+#include <iostream>
 #include <iterator>
 #include <memory>
 #include <random>
-#include <iostream>
+#include <stdexcept>
 
 namespace details {
 float getComparisonNumber(int parentSimCnt, int childVisitCnt, int childWinCnt);
@@ -48,12 +50,15 @@ MCTree<MCTS_GAME>::MCTree(MCTS_GAME game)
 template <typename MCTS_GAME>
 int MCTree<MCTS_GAME>::findBestMove() {
   int i = 0;
-  while (i != 1) {
+
+  auto startTime = std::chrono::steady_clock::now();
+  auto endTime = startTime + std::chrono::seconds(60);
+  while (std::chrono::steady_clock::now() < endTime) {
     auto selectedNode = selectNode();
     expandNode(selectedNode);
 
     std::uniform_int_distribution<> dist{
-        0, static_cast<int>(selectedNode->children().size())};
+        0, static_cast<int>(selectedNode->children().size() - 1)};
     size_t selectedChildIndex = dist(s_rngEngine);
 
     MCTreeNode<MCTS_GAME>* childNode =
@@ -65,10 +70,22 @@ int MCTree<MCTS_GAME>::findBestMove() {
     backpropagateResult(childNode, computerWonSimulation);
 
     ++i;
+    if (i % 1000 == 0) {
+      std::cout << i << " simulations done \n";
+    }
   }
 
   std::vector<MCTreeNode<MCTS_GAME>*> children = d_rootNode->children();
 
+  int parentSimCnt = d_rootNode->visitCnt();
+  std::cout << " parentSimCnt=" << parentSimCnt << "\n";
+
+  for (const auto& child : children) {
+    std::cout << " chilSimCnt=" << child->visitCnt() << "\n";
+    std::cout << " chilWinCnt=" << child->winCnt() << "\n";
+    std::cout << " comparison num=" << child->getComparisonNum(parentSimCnt)
+              << "\n";
+  }
   auto bestChild = ranges::max_element(
       children.begin(), children.end(),
       [parentSimCnt = d_rootNode->visitCnt()](
@@ -92,7 +109,7 @@ MCTreeNode<MCTS_GAME>* MCTree<MCTS_GAME>::selectNode() {
 
   MCTreeNode<MCTS_GAME>* currNode = d_rootNode.get();
 
-  while (currNode->children().empty()) {
+  while (!currNode->children().empty()) {
     std::vector<MCTreeNode<MCTS_GAME>*> children = currNode->children();
 
     //find any unexplored children
@@ -153,10 +170,9 @@ int MCTree<MCTS_GAME>::simulate(MCTreeNode<MCTS_GAME>* node) {
     std::vector<int> availableMoves = game.getAvailableMoves();
 
     std::uniform_int_distribution<> dist{
-        0, static_cast<int>(availableMoves.size())};
+        0, static_cast<int>(availableMoves.size() - 1)};
     size_t selectedChildIndex = dist(s_rngEngine);
     size_t chosenMove = availableMoves[selectedChildIndex];
-
     game.makeMove(chosenMove);
   }
 
@@ -166,7 +182,7 @@ int MCTree<MCTS_GAME>::simulate(MCTreeNode<MCTS_GAME>* node) {
 template <typename MCTS_GAME>
 void MCTree<MCTS_GAME>::backpropagateResult(MCTreeNode<MCTS_GAME>* node,
                                             bool winningSimulation) {
-  while (node != d_rootNode.get()) {
+  while (node != nullptr) {
     if (winningSimulation) {
       node->addWin();
     }

@@ -1,19 +1,21 @@
 #include <BridgeController.hpp>
 #include <iostream>
+#include <stdexcept>
 #include "models/MCTree.hpp"
 #include "models/bridge/bridgeGamestate.hpp"
 #include "models/bridge/bridgeGamestateLoader.hpp"
 #include "models/bridgeMctsFacade.hpp"
-#include "views/bridgeTerminalView.hpp"
+#include "views/bridge/bridgeTerminalView.hpp"
 
 namespace Bridge {
 
 void BridgeController::playGame() {
 
   BridgeGamestate bg =
-      Bridge::loadGamestate("testBoards.json", "default_board_config");
-
+      Bridge::loadGamestate("testBoards.json", "won_test_config");
   BridgeTerminalView view;
+
+  std::string playerTeam = bg.declarerHand()%2 == bg.currentLeadHand()%2 ? "Declarer" : "Defense";
 
   int turnCnt = 0;
 
@@ -34,18 +36,25 @@ void BridgeController::playGame() {
       if (input.size() == 2) {
         std::string rank = input.substr(0, 1);
         std::string suit = input.substr(1, 1);
-        auto t = bg.makeMove(suit, rank);
-        std::cout << t << std::endl;
+        try {
+
+          auto t = bg.makeMove(suit, rank);
+          std::cout << t << std::endl;
+          ++turnCnt;
+
+        } catch (std::invalid_argument& e) {
+          std::cout << "Invalid move: " << e.what();
+        }
       }
     } else {
 
-      MCTree<BridgeMctsFacade> bridgeMcTree{BridgeMctsFacade{bg}};
+      MCTree<BridgeMctsFacade> bridgeMcTree{BridgeMctsFacade{bg, playerTeam}};
 
       int bestMove = bridgeMcTree.findBestMove();
 
       bg.makeMoveMCTS(bestMove);
+      ++turnCnt;
     }
-    ++turnCnt;
   }
 }
 

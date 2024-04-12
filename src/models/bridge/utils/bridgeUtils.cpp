@@ -69,7 +69,7 @@ int convertRankStringToInt(const std::string& rank) {
     }; 
 
     if (rankMap.find(rank) == rankMap.end()) {
-        throw std::invalid_argument("Invalid rank string entered");
+        throw std::invalid_argument("Invalid rank string entered=\"" + rank + "\"");
     }; 
 
     return rankMap.at(rank);
@@ -97,7 +97,7 @@ const std::string convertRankIntToString(const int rankInt) {
     }; 
 
     if (rankMap.find(rankInt) == rankMap.end()) {
-        throw std::invalid_argument("Invalid rank string entered");
+        throw std::invalid_argument("Invalid rank int entered=" + std::to_string(rankInt));
     }; 
 
     return rankMap.at(rankInt);

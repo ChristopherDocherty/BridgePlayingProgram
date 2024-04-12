@@ -1,6 +1,6 @@
 #include "bridgeTerminalView.hpp"
 
-#include <views/viewUtils.hpp>
+#include <views/bridge/viewUtils.hpp>
 #include "models/bridge/bridgeCard.hpp"
 #include "models/bridge/bridgeGamestate.hpp"
 #include "models/bridge/utils/bridgeUtils.hpp"

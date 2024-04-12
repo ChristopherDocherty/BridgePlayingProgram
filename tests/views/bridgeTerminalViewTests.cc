@@ -1,4 +1,4 @@
-#include "views/bridgeTerminalView.hpp"
+#include "views/bridge/bridgeTerminalView.hpp"
 
 #include "models/bridge/bridgeGamestateLoader.hpp"
 
