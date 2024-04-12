@@ -1,11 +1,16 @@
-#include "range/v3/all.hpp"
 #include "views/bridgeTerminalView.hpp"
 
 #include "models/bridge/bridgeGamestateLoader.hpp"
 
-#include <catch2/catch_test_macros.hpp>
-
 #include <iostream>
+
+#include <range/v3/algorithm/for_each.hpp>
+#include <range/v3/range/conversion.hpp>
+#include <range/v3/view/split.hpp>
+#include <range/v3/view/transform.hpp>
+#include <range/v3/view/zip.hpp>
+
+#include <catch2/catch_test_macros.hpp>
 
 namespace Bridge {
 auto getRowView(std::string gamestateStr) {

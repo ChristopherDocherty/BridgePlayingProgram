@@ -3,13 +3,21 @@ add_subdirectory(includes)
 add_subdirectory(views)
 
 add_library(BridgeController
-BridgeController.cpp
+  BridgeController.cpp
 )
 
 target_link_libraries(BridgeController 
-        bridgeGamestate
-        bridgeTerminalView
+  bridgeGamestate
+  bridgeTerminalView
+  MCTree
 )
+
+target_include_directories(BridgeController
+    PUBLIC 
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+
 add_executable(main main.cpp)
 
 target_include_directories(main PRIVATE .) 

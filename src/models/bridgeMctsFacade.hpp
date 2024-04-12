@@ -7,8 +7,18 @@ namespace Bridge {
 
 class BridgeMctsFacade {
 
+ public:
+  BridgeMctsFacade(BridgeGamestate bg);
+
+  std::vector<int> getAvailableMoves();
+
+  std::string makeMove(int validMoveNumber);
+  bool gameIsComplete();
+
+  int winner();
+
  private:
-  BridgeGamestate gamestate;
+  BridgeGamestate d_gamestate;
 };
 
 }  // namespace Bridge

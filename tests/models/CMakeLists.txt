@@ -1,20 +1,15 @@
 add_subdirectory(bridge)
 
+add_executable( MCTreeNodeTests
+    MCTreeNodeTests.cc
+)
 
+target_link_libraries( MCTreeNodeTests
+    Catch2::Catch2WithMain
+    MCTree
+)
 
-#add_executable(
-#    bridgeMCTreeNodeTests 
-#    bridgeMCTreeNodeTests.cc
-#)
-#
-#target_link_libraries(
-#    bridgeMCTreeNodeTests 
-#    GTest::gtest_main
-#    bridgeMCTreeNode
-#)
-#
-#target_include_directories(
-#    bridgeMCTreeNodeTests
-#    PUBLIC
-#    ${CMAKE_BINARY_DIR}/src
-#) 
+target_include_directories(MCTreeNodeTests
+    PUBLIC
+    ${CMAKE_BINARY_DIR}/src
+) 

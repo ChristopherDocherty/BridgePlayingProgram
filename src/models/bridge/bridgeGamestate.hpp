@@ -22,6 +22,8 @@ class BridgeGamestate {
                   std::string trumpSuit, int contractLevel, int currentTrick,
                   int declarerTricksMade);
 
+  BridgeGamestate(const BridgeGamestate&) = default;
+
   std::string getWinner();
 
   //Required for controller (MCTS) functions

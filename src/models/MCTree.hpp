@@ -1,16 +1,19 @@
 #ifndef MCTREE_H
 #define MCTREE_H
 
-#include "models/MCTreeNode.hpp"
-#include "range/v3/view/sample.hpp"
-#include "range/v3/view/transform.hpp"
+#include <models/MCTreeNode.hpp>
 
-#include <range/v3/all.hpp>
+#include <range/v3/algorithm/find.hpp>
+#include <range/v3/algorithm/max_element.hpp>
+#include <range/v3/range/conversion.hpp>
+#include <range/v3/view/filter.hpp>
+#include <range/v3/view/sample.hpp>
 
 #include <algorithm>
 #include <iterator>
 #include <memory>
 #include <random>
+#include <iostream>
 
 namespace details {
 float getComparisonNumber(int parentSimCnt, int childVisitCnt, int childWinCnt);
@@ -29,22 +32,32 @@ class MCTree {
   int simulate(MCTreeNode<MCTS_GAME>* node);
   void backpropagateResult(MCTreeNode<MCTS_GAME>* node, bool winningSimulation);
 
+  static std::mt19937 s_rngEngine;
+
   std::unique_ptr<MCTreeNode<MCTS_GAME>> d_rootNode;
 };
 
 template <typename MCTS_GAME>
+std::mt19937 MCTree<MCTS_GAME>::s_rngEngine{std::random_device{}()};
+
+template <typename MCTS_GAME>
 MCTree<MCTS_GAME>::MCTree(MCTS_GAME game)
-    : d_rootNode(std::make_unique(game)) {}
+    : d_rootNode(
+          std::make_unique<MCTreeNode<MCTS_GAME>>(std::move(game), nullptr)) {}
 
 template <typename MCTS_GAME>
 int MCTree<MCTS_GAME>::findBestMove() {
   int i = 0;
-  while (i != 100) {
+  while (i != 1) {
     auto selectedNode = selectNode();
     expandNode(selectedNode);
 
-    MCTreeNode<MCTS_GAME>* childNode = ranges::views::sample(
-        selectedNode.children(), 1, std::mt19937{std::random_device{}()});
+    std::uniform_int_distribution<> dist{
+        0, static_cast<int>(selectedNode->children().size())};
+    size_t selectedChildIndex = dist(s_rngEngine);
+
+    MCTreeNode<MCTS_GAME>* childNode =
+        selectedNode->children()[selectedChildIndex];
 
     int result = simulate(childNode);
 
@@ -54,15 +67,24 @@ int MCTree<MCTS_GAME>::findBestMove() {
     ++i;
   }
 
+  std::vector<MCTreeNode<MCTS_GAME>*> children = d_rootNode->children();
+
   auto bestChild = ranges::max_element(
-      d_rootNode->children(),
-      [](const MCTreeNode<MCTS_GAME>* lhs, const MCTreeNode<MCTS_GAME>* rhs) {
+      children.begin(), children.end(),
+      [parentSimCnt = d_rootNode->visitCnt()](
+          const MCTreeNode<MCTS_GAME>* lhs, const MCTreeNode<MCTS_GAME>* rhs) {
         //TODO check this
-        return lhs->getComparisonNumber() < rhs->getComparisonNumber();
+        return lhs->getComparisonNum(parentSimCnt) <
+               rhs->getComparisonNum(parentSimCnt);
       });
 
-  return ranges::distance(ranges::begin(
-      d_rootNode->children(), ranges::find(bestChild, d_rootNode->children())));
+  auto findBestChild =
+      std::find_if(children.begin(), children.end(),
+                   [bestChild](const MCTreeNode<MCTS_GAME>* node) {
+                     return node == *bestChild;
+                   });
+
+  return findBestChild - children.begin();
 }
 
 template <typename MCTS_GAME>
@@ -81,15 +103,17 @@ MCTreeNode<MCTS_GAME>* MCTree<MCTS_GAME>::selectNode() {
         ranges::to<std::vector>;
 
     if (!unexploredChildren.empty()) {
-      return unexploredChildren.first();
+      return unexploredChildren.front();
     }
 
     //If all explored, choose a next child
-    auto nextChild = ranges::max_element(
-        children,
-        [](const MCTreeNode<MCTS_GAME>* lhs, const MCTreeNode<MCTS_GAME>* rhs) {
+    auto nextChild =
+        ranges::max_element(children, [parentSimCnt = currNode->visitCnt()](
+                                          const MCTreeNode<MCTS_GAME>* lhs,
+                                          const MCTreeNode<MCTS_GAME>* rhs) {
           //TODO check this
-          return lhs->getComparisonNumber() < rhs->getComparisonNumber();
+          return lhs->getComparisonNum(parentSimCnt) <
+                 rhs->getComparisonNum(parentSimCnt);
         });
 
     currNode = *nextChild;
@@ -111,7 +135,7 @@ void MCTree<MCTS_GAME>::expandNode(MCTreeNode<MCTS_GAME>* node) {
     childGame.makeMove(move);
 
     std::unique_ptr<MCTreeNode<MCTS_GAME>> childNode =
-        std::make_unique(node, childGame);
+        std::make_unique<MCTreeNode<MCTS_GAME>>(childGame, node);
 
     node->addChildNode(std::move(childNode));
   }
@@ -123,16 +147,17 @@ int MCTree<MCTS_GAME>::simulate(MCTreeNode<MCTS_GAME>* node) {
 
   MCTS_GAME game = node->game();
 
-  while (!game.over()) {
+  while (!game.gameIsComplete()) {
 
     //TODO: think about type of move
-    std::vector<int> nextMove{};
-    //TODO: probably inefficient to do this
-    ranges::views::sample(game.getAvailableMoves(),
-                          std::back_inserter(nextMove), 1,
-                          std::mt19937{std::random_device{}()});
+    std::vector<int> availableMoves = game.getAvailableMoves();
 
-    game.makeMove(nextMove.front());
+    std::uniform_int_distribution<> dist{
+        0, static_cast<int>(availableMoves.size())};
+    size_t selectedChildIndex = dist(s_rngEngine);
+    size_t chosenMove = availableMoves[selectedChildIndex];
+
+    game.makeMove(chosenMove);
   }
 
   return game.winner();
@@ -141,7 +166,7 @@ int MCTree<MCTS_GAME>::simulate(MCTreeNode<MCTS_GAME>* node) {
 template <typename MCTS_GAME>
 void MCTree<MCTS_GAME>::backpropagateResult(MCTreeNode<MCTS_GAME>* node,
                                             bool winningSimulation) {
-  while (node != d_rootNode) {
+  while (node != d_rootNode.get()) {
     if (winningSimulation) {
       node->addWin();
     }

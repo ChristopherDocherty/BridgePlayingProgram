@@ -2,22 +2,23 @@
 #define MCTreeNode_h
 
 #include <functional>
-#include <range/v3/all.hpp>
 
+#include <cmath>
 #include <memory>
 #include <string>
 #include <vector>
-#include <range/v3/view/transform.hpp>
+
+constexpr static float EXPLORE_PARAM = 1.41;
 
 template <typename MCTS_GAME>
 class MCTreeNode {
 
  public:
-  MCTreeNode(MCTreeNode* parent, MCTS_GAME game);
+  MCTreeNode(MCTS_GAME game, MCTreeNode* parent);
 
   void addChildNode(std::unique_ptr<MCTreeNode> childNode);
   void recordSimulationResult(bool wonSim);
-  float getComparisonNum(float parentSimCnt);
+  float getComparisonNum(float parentSimCnt) const;
 
   MCTS_GAME game() const;
 
@@ -42,8 +43,8 @@ class MCTreeNode {
 };
 
 template <typename MCTS_GAME>
-MCTreeNode<MCTS_GAME>::MCTreeNode(MCTreeNode* parent, MCTS_GAME game)
-    : d_parent(parent), d_game(game) {}
+MCTreeNode<MCTS_GAME>::MCTreeNode(MCTS_GAME game, MCTreeNode* parent)
+    : d_game(game), d_parent(parent) {}
 
 template <typename MCTS_GAME>
 MCTS_GAME MCTreeNode<MCTS_GAME>::game() const {
@@ -55,7 +56,7 @@ std::vector<MCTreeNode<MCTS_GAME>*> MCTreeNode<MCTS_GAME>::children() {
   std::vector<MCTreeNode<MCTS_GAME>*> ret;
 
   for (auto& child : d_children) {
-    ret.pushback(child.get());
+    ret.push_back(child.get());
   }
 
   return ret;
@@ -83,7 +84,7 @@ void MCTreeNode<MCTS_GAME>::addWin() {
 }
 template <typename MCTS_GAME>
 void MCTreeNode<MCTS_GAME>::addLoss() {
-  d_visitCnt;
+  ++d_visitCnt;
 }
 
 template <typename MCTS_GAME>
@@ -98,6 +99,16 @@ void MCTreeNode<MCTS_GAME>::recordSimulationResult(bool wonSim) {
   if (wonSim) {
     ++d_winCnt;
   };
+}
+
+template <typename MCTS_GAME>
+float MCTreeNode<MCTS_GAME>::getComparisonNum(float parentSimCnt) const {
+
+  float winCntFloat = static_cast<float>(d_winCnt);
+  float visitCntFloat = static_cast<float>(d_visitCnt);
+
+  return winCntFloat / visitCntFloat +
+         EXPLORE_PARAM * std::sqrt(std::log(parentSimCnt) / visitCntFloat);
 }
 
 #endif

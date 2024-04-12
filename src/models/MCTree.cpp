@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-constexpr static float EXPLORE_PARAM = 1.41;
+//constexpr static float EXPLORE_PARAM = 1.41;
 
 float details::getComparisonNumber(int parentSimCnt, int childVisitCnt,
                                    int childWinCnt) {

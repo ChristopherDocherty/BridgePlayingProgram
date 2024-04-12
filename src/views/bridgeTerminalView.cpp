@@ -5,9 +5,9 @@
 #include "models/bridge/bridgeGamestate.hpp"
 #include "models/bridge/utils/bridgeUtils.hpp"
 
-#include "range/v3/iterator/operations.hpp"
-#include "range/v3/view/cartesian_product.hpp"
-#include "range/v3/view/for_each.hpp"
+#include <range/v3/iterator/operations.hpp>
+#include <range/v3/view/cartesian_product.hpp>
+#include <range/v3/view/for_each.hpp>
 #include <range/v3/view/enumerate.hpp>
 #include <range/v3/view/zip.hpp>
 #include <range/v3/view/filter.hpp>
