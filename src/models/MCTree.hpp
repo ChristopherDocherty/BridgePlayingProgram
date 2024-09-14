@@ -2,20 +2,27 @@
 #define MCTREE_H
 
 #include <chrono>
+#include <ios>
 #include <models/MCTreeNode.hpp>
 
 #include <range/v3/algorithm/find.hpp>
 #include <range/v3/algorithm/max_element.hpp>
 #include <range/v3/range/conversion.hpp>
+#include <range/v3/view/enumerate.hpp>
 #include <range/v3/view/filter.hpp>
+#include <range/v3/view/join.hpp>
 #include <range/v3/view/sample.hpp>
+#include <range/v3/view/transform.hpp>
 
 #include <algorithm>
+#include <fstream>
 #include <iostream>
 #include <iterator>
 #include <memory>
 #include <random>
+#include <sstream>
 #include <stdexcept>
+#include <tuple>
 
 namespace details {
 float getComparisonNumber(int parentSimCnt, int childVisitCnt, int childWinCnt);
@@ -34,6 +41,8 @@ class MCTree {
   int simulate(MCTreeNode<MCTS_GAME>* node);
   void backpropagateResult(MCTreeNode<MCTS_GAME>* node, bool winningSimulation);
 
+  void dumpCurrentState(int iterations);
+
   static std::mt19937 s_rngEngine;
 
   std::unique_ptr<MCTreeNode<MCTS_GAME>> d_rootNode;
@@ -50,12 +59,17 @@ MCTree<MCTS_GAME>::MCTree(MCTS_GAME game)
 template <typename MCTS_GAME>
 int MCTree<MCTS_GAME>::findBestMove() {
   int i = 0;
+  std::cout << "root node childrens=" <<d_rootNode->children().size();
 
   auto startTime = std::chrono::steady_clock::now();
-  auto endTime = startTime + std::chrono::seconds(60);
+  auto endTime = startTime + std::chrono::seconds(10);
   while (std::chrono::steady_clock::now() < endTime) {
     auto selectedNode = selectNode();
     expandNode(selectedNode);
+    //Catch for when there is only one child so we don't simulate
+    if (d_rootNode->children().size() == 1) {
+      return i;
+    }
 
     std::uniform_int_distribution<> dist{
         0, static_cast<int>(selectedNode->children().size() - 1)};
@@ -69,6 +83,7 @@ int MCTree<MCTS_GAME>::findBestMove() {
     bool computerWonSimulation = result == 0;
     backpropagateResult(childNode, computerWonSimulation);
 
+    dumpCurrentState(i);
     ++i;
     if (i % 1000 == 0) {
       std::cout << i << " simulations done \n";
@@ -77,22 +92,19 @@ int MCTree<MCTS_GAME>::findBestMove() {
 
   std::vector<MCTreeNode<MCTS_GAME>*> children = d_rootNode->children();
 
-  int parentSimCnt = d_rootNode->visitCnt();
-  std::cout << " parentSimCnt=" << parentSimCnt << "\n";
-
-  for (const auto& child : children) {
-    std::cout << " chilSimCnt=" << child->visitCnt() << "\n";
-    std::cout << " chilWinCnt=" << child->winCnt() << "\n";
-    std::cout << " comparison num=" << child->getComparisonNum(parentSimCnt)
-              << "\n";
-  }
+  //  int parentSimCnt = d_rootNode->visitCnt();
+  //  std::cout << " parentSimCnt=" << parentSimCnt << "\n";
+  //
+  //  for (const auto& child : children) {
+  //    std::cout << " chilSimCnt=" << child->visitCnt() << "\n";
+  //    std::cout << " chilWinCnt=" << child->winCnt() << "\n";
+  //    std::cout << " comparison num=" << child->getComparisonNum(parentSimCnt)
+  //              << "\n";
+  //  }
   auto bestChild = ranges::max_element(
       children.begin(), children.end(),
-      [parentSimCnt = d_rootNode->visitCnt()](
-          const MCTreeNode<MCTS_GAME>* lhs, const MCTreeNode<MCTS_GAME>* rhs) {
-        //TODO check this
-        return lhs->getComparisonNum(parentSimCnt) <
-               rhs->getComparisonNum(parentSimCnt);
+      [](const MCTreeNode<MCTS_GAME>* lhs, const MCTreeNode<MCTS_GAME>* rhs) {
+        return lhs->visitCnt() < rhs->visitCnt();
       });
 
   auto findBestChild =
@@ -128,7 +140,6 @@ MCTreeNode<MCTS_GAME>* MCTree<MCTS_GAME>::selectNode() {
         ranges::max_element(children, [parentSimCnt = currNode->visitCnt()](
                                           const MCTreeNode<MCTS_GAME>* lhs,
                                           const MCTreeNode<MCTS_GAME>* rhs) {
-          //TODO check this
           return lhs->getComparisonNum(parentSimCnt) <
                  rhs->getComparisonNum(parentSimCnt);
         });
@@ -190,6 +201,33 @@ void MCTree<MCTS_GAME>::backpropagateResult(MCTreeNode<MCTS_GAME>* node,
 
     node = node->parent();
   }
+}
+
+struct nodeDumpData {
+  int visitCnt;
+  int winCnt;
+  float comparisonNum;
+};
+
+template <typename MCTS_GAME>
+void MCTree<MCTS_GAME>::dumpCurrentState(int iterations) {
+  auto children = d_rootNode->children();
+  std::string output =
+      children | ranges::views::enumerate |
+      ranges::views::transform(
+          [iterations, parentSimCnt = d_rootNode->visitCnt()](
+              std::tuple<int, MCTreeNode<MCTS_GAME>*> enumChildNode) {
+            auto& [childId, childNode] = enumChildNode;
+            std::stringstream ss;
+            ss << iterations << "|" << childId << "|" << childNode->visitCnt()
+               << "|" << childNode->winCnt() << "|"
+               << childNode->getComparisonNum(parentSimCnt) << "\n";
+            return ss.str();
+          }) |
+      ranges::views::join | ranges::to<std::string>;
+
+  std::fstream fout("data_dump.csv", std::ios_base::app);
+  fout << output;
 }
 
 #endif
