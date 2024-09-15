@@ -8,6 +8,7 @@
 #include <range/v3/algorithm/find.hpp>
 #include <range/v3/algorithm/max_element.hpp>
 #include <range/v3/range/conversion.hpp>
+#include <range/v3/algorithm/all_of.hpp>
 #include <range/v3/view/enumerate.hpp>
 #include <range/v3/view/filter.hpp>
 #include <range/v3/view/join.hpp>
@@ -59,12 +60,16 @@ MCTree<MCTS_GAME>::MCTree(MCTS_GAME game)
 template <typename MCTS_GAME>
 int MCTree<MCTS_GAME>::findBestMove() {
   int i = 0;
-  std::cout << "root node childrens=" <<d_rootNode->children().size();
 
   auto startTime = std::chrono::steady_clock::now();
-  auto endTime = startTime + std::chrono::seconds(10);
+  auto endTime = startTime + std::chrono::seconds(1);
   while (std::chrono::steady_clock::now() < endTime) {
+    //  while (i < 100) {
     auto selectedNode = selectNode();
+    //Don't attempt to expand if the selectedNode is already a end game scenario
+    if(!selectedNode){
+      continue;
+    }
     expandNode(selectedNode);
     //Catch for when there is only one child so we don't simulate
     if (d_rootNode->children().size() == 1) {
@@ -92,15 +97,6 @@ int MCTree<MCTS_GAME>::findBestMove() {
 
   std::vector<MCTreeNode<MCTS_GAME>*> children = d_rootNode->children();
 
-  //  int parentSimCnt = d_rootNode->visitCnt();
-  //  std::cout << " parentSimCnt=" << parentSimCnt << "\n";
-  //
-  //  for (const auto& child : children) {
-  //    std::cout << " chilSimCnt=" << child->visitCnt() << "\n";
-  //    std::cout << " chilWinCnt=" << child->winCnt() << "\n";
-  //    std::cout << " comparison num=" << child->getComparisonNum(parentSimCnt)
-  //              << "\n";
-  //  }
   auto bestChild = ranges::max_element(
       children.begin(), children.end(),
       [](const MCTreeNode<MCTS_GAME>* lhs, const MCTreeNode<MCTS_GAME>* rhs) {
@@ -133,6 +129,13 @@ MCTreeNode<MCTS_GAME>* MCTree<MCTS_GAME>::selectNode() {
 
     if (!unexploredChildren.empty()) {
       return unexploredChildren.front();
+    }
+
+    if (ranges::all_of(currNode->children(),
+                           [](MCTreeNode<MCTS_GAME>* childNode) {
+                             return childNode->game().winner() != -1;
+                           })) {
+      return nullptr;
     }
 
     //If all explored, choose a next child
@@ -192,22 +195,17 @@ int MCTree<MCTS_GAME>::simulate(MCTreeNode<MCTS_GAME>* node) {
 
 template <typename MCTS_GAME>
 void MCTree<MCTS_GAME>::backpropagateResult(MCTreeNode<MCTS_GAME>* node,
-                                            bool winningSimulation) {
+                                            bool computerWon) {
   while (node != nullptr) {
-    if (winningSimulation) {
+    if ((computerWon && node->isComputer()) ||
+        (!computerWon && !node->isComputer())) {
       node->addWin();
+    } else {
+      node->addLoss();
     }
-    node->addLoss();
-
     node = node->parent();
   }
 }
-
-struct nodeDumpData {
-  int visitCnt;
-  int winCnt;
-  float comparisonNum;
-};
 
 template <typename MCTS_GAME>
 void MCTree<MCTS_GAME>::dumpCurrentState(int iterations) {

@@ -27,10 +27,10 @@ std::string BridgeMctsFacade::makeMove(int validMoveNumber) {
 
 bool BridgeMctsFacade::gameIsComplete() {
   return !d_gamestate.getWinner().empty();
-  ;
 }
 
 int BridgeMctsFacade::winner() {
+  //contract is that 0 is computer win
   std::string winner = d_gamestate.getWinner();
   if (winner == "") {
     return -1;

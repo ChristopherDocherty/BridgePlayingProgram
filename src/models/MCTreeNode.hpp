@@ -21,6 +21,7 @@ class MCTreeNode {
   float getComparisonNum(float parentSimCnt) const;
 
   MCTS_GAME game() const;
+  bool isComputer() const;
 
   int visitCnt() const;
   int winCnt() const;
@@ -39,16 +40,26 @@ class MCTreeNode {
   int d_winCnt = 0;
 
   MCTreeNode* d_parent;
+  bool d_isComputer;
   std::vector<std::unique_ptr<MCTreeNode>> d_children;
 };
 
 template <typename MCTS_GAME>
 MCTreeNode<MCTS_GAME>::MCTreeNode(MCTS_GAME game, MCTreeNode* parent)
-    : d_game(game), d_parent(parent) {}
+    : d_game(game), d_parent(parent) {
+  if (d_parent) {
+    d_isComputer = !d_parent->isComputer();
+  }
+}
 
 template <typename MCTS_GAME>
 MCTS_GAME MCTreeNode<MCTS_GAME>::game() const {
   return d_game;
+}
+
+template <typename MCTS_GAME>
+bool MCTreeNode<MCTS_GAME>::isComputer() const {
+  return d_isComputer;
 }
 
 template <typename MCTS_GAME>
