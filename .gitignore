@@ -1,11 +1,2 @@
-bridge_MCTS.exe
-Example hands
-pg57_record
-pg88_record
-/Hands
-/hide
-/Notes
-.vscode
 /build
-/new_temp
 *.swp
