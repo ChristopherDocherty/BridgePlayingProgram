@@ -7,11 +7,11 @@
 
 #include <range/v3/iterator/operations.hpp>
 #include <range/v3/view/cartesian_product.hpp>
-#include <range/v3/view/for_each.hpp>
-#include <range/v3/view/enumerate.hpp>
-#include <range/v3/view/zip.hpp>
-#include <range/v3/view/filter.hpp>
 #include <range/v3/view/chunk.hpp>
+#include <range/v3/view/enumerate.hpp>
+#include <range/v3/view/filter.hpp>
+#include <range/v3/view/for_each.hpp>
+#include <range/v3/view/zip.hpp>
 
 #include <iostream>
 #include <optional>
@@ -92,7 +92,7 @@ std::string BridgeTerminalView::getGamestateString(const BridgeGamestate& bg) {
 
   std::stringstream ss;
   ss << getContractAndTurnInfo(bg) << getNSHand(handStr["N"]) << "\n"
-     << getEWHand(handStr["E"], handStr["W"], bg) << "\n"
+     << getEWHand(std::move(handStr["E"]), std::move(handStr["W"]), bg) << "\n"
      << getNSHand(handStr["S"]);
 
   return ss.str();
@@ -121,16 +121,19 @@ std::string BridgeTerminalView::getNSHand(
   return ss.str();
 }
 
-std::string BridgeTerminalView::getEWHand(const std::vector<std::string>& eHand,
-                                          const std::vector<std::string>& wHand,
+std::string BridgeTerminalView::getEWHand(std::vector<std::string>&& eHand,
+                                          std::vector<std::string>&& wHand,
                                           const BridgeGamestate& bg) {
 
   std::vector<BridgeCard> currPlayedCards = bg.currentTrickRecord();
   std::vector<std::string> playedCards = getPlayedCards(bg);
 
+  const auto [eHandPadded, wHandPadded] = detail::padVectorsToBeSameLength(
+      std::move(eHand), std::move(wHand), std::string{});
+
   std::stringstream ss;
   for (auto [i, cards] :
-       ranges::views::enumerate(ranges::views::zip(eHand, wHand))) {
+       ranges::views::enumerate(ranges::views::zip(eHandPadded, wHandPadded))) {
     const auto& [eCards, wCards] = cards;
     auto playedCard =
         i < playedCards.size() ? playedCards[i] : std::string(12, ' ');
