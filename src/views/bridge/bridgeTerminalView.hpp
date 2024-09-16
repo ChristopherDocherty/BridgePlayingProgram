@@ -8,6 +8,25 @@
 
 namespace Bridge {
 
+namespace detail {
+
+template <typename T>
+std::pair<std::vector<T>, std::vector<T>> padVectorsToBeSameLength(
+    std::vector<T>&& leftHand, std::vector<T>&& rightHand, const T& valueToPadWith) {
+  size_t lSize = leftHand.size();
+  size_t rSize = rightHand.size();
+
+  if (lSize > rSize) {
+    rightHand.resize(lSize, valueToPadWith);
+  }
+
+  if (lSize < rSize) {
+    leftHand.resize(rSize, valueToPadWith);
+  }
+  return std::pair{leftHand, rightHand};
+}
+}  // namespace Detail
+
 class BridgeTerminalView {
 
  public:
@@ -20,8 +39,8 @@ class BridgeTerminalView {
 
   static std::string getContractAndTurnInfo(const BridgeGamestate& gamestate);
 
-  static std::string getEWHand(const std::vector<std::string>& eHand,
-                               const std::vector<std::string>& wHand,
+  static std::string getEWHand(std::vector<std::string>&& eHand,
+                               std::vector<std::string>&& wHand,
                                const BridgeGamestate& bg);
 
   static std::vector<std::string> getCardsOfSuitString(
