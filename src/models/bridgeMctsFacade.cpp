@@ -22,7 +22,13 @@ std::vector<int> BridgeMctsFacade::getAvailableMoves() {
 }
 
 std::string BridgeMctsFacade::makeMove(int validMoveNumber) {
-  return d_gamestate.makeMoveMCTS(validMoveNumber);
+  return d_gamestate.makeMoveMCTS(validMoveNumber)
+      .map_error([&validMoveNumber](std::string&& err) {
+        throw std::invalid_argument(
+            "Invalid MCTS move attempted=" + std::to_string(validMoveNumber) +
+            " - failing with error=" + err);
+      })
+      .value();
 }
 
 bool BridgeMctsFacade::gameIsComplete() {

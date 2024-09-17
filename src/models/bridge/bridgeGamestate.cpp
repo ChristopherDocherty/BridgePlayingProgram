@@ -44,30 +44,33 @@ std::string BridgeGamestate::getWinner() {
   //just do simple check of if there is only one valid card to play - no reason to go through the last obvious move
 }
 
-std::string BridgeGamestate::makeMoveMCTS(int validMoveNumber) {
+BridgeExpected<std::string> BridgeGamestate::makeMoveMCTS(int validMoveNumber) {
 
   if (static_cast<size_t>(validMoveNumber) >= d_currentValidMoves.size()) {
-    throw std::invalid_argument("Invalid MCTS move=" +
-                                std::to_string(validMoveNumber));
+    std::stringstream ss;
+    ss << "Invalid MCTS move number given - there are only"
+       << d_currentValidMoves.size() << " many moves";
+    return tl::make_unexpected(ss.str());
   }
   BridgeCard cardPlayed = d_currentValidMoves[validMoveNumber];
   return makeMove(cardPlayed.getSuit(), cardPlayed.getRank());
 }
 
-std::string BridgeGamestate::makeMove(const std::string suit,
-                                      const std::string rank) {
+BridgeExpected<std::string> BridgeGamestate::makeMove(const std::string suit,
+                                                      const std::string rank) {
 
   if (getWinner() != "") {
     //probably cahnge this to return something else
     //basically jsut want a catch so you can't keep changing the gamestate once the gme is done
     //but this logic may end up in the controller
+    //TODO: think about returning an unexpected state
     return getWinner();
   }
 
   BridgeCard move(suit, rank);
 
   if (auto isValid = moveIsValid(move); !isValid) {
-    throw std::invalid_argument(isValid.error());
+    return tl::make_unexpected(isValid.error());
   }
 
   auto iterToErase = std::find(d_board[d_currentHand].begin(),
@@ -76,8 +79,6 @@ std::string BridgeGamestate::makeMove(const std::string suit,
 
   d_currentTrickRecord.push_back(move);
 
-  //std::cout << "currHand before=" << convertDirIntToString(d_currentHand)
-  //           << std::endl;
   if (d_currentTrickRecord.size() == 4) {
 
     ++d_currentTrick;
@@ -96,16 +97,8 @@ std::string BridgeGamestate::makeMove(const std::string suit,
   } else {
     d_currentHand = (d_currentHand + 1) % 4;
   }
-  //std::cout << "currHand after=" << convertDirIntToString(d_currentHand)
-  //          << std::endl;
 
   updateCurrentValidMoves();
-
-  //std::cout << "Valid moves are:";
-  //for (const auto& move : d_currentValidMoves) {
-  //std::cout << move << "|";
-  //}
-  //std::cout << "\n";
 
   return getWinner();
 }

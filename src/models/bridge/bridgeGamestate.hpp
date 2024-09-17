@@ -27,13 +27,12 @@ class BridgeGamestate {
   std::string getWinner();
 
   //Required for controller (MCTS) functions
-  std::string makeMoveMCTS(int validMoveNumber);
+  BridgeExpected<std::string> makeMoveMCTS(int validMoveNumber);
   //Requried for view functions
-  std::string makeMove(const std::string suit, const std::string rank);
+  BridgeExpected<std::string> makeMove(const std::string suit,
+                                       const std::string rank);
 
   int getValidMoveCnt() const { return d_currentValidMoves.size(); };
-
-  //        boost::json::object getGamestateJson() const;
 
   friend bool operator==(const BridgeGamestate& lhs,
                          const BridgeGamestate& rhs);
