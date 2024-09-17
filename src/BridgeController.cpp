@@ -19,8 +19,7 @@ const std::set<std::string> VALID_DESIRED_DIRS{"N", "E"};
 
 void BridgeController::playGame() {
 
-  BridgeGamestate bg =
-      Bridge::loadGamestate("testBoards.json", "squeeze");
+  BridgeGamestate bg = Bridge::loadGamestate("testBoards.json", "squeeze");
   BridgeTerminalView view;
 
   std::string desiredDir{};
@@ -32,8 +31,6 @@ void BridgeController::playGame() {
   int desiredDirInt = convertDirStringToInt(desiredDir);
   std::string playerTeam =
       bg.declarerHand() % 2 == desiredDirInt ? "Declarer" : "Defence";
-
-  int turnCnt = 0;
 
   while (bg.getWinner() == "") {
 
@@ -52,17 +49,20 @@ void BridgeController::playGame() {
       if (input.size() == 2) {
         std::string rank = input.substr(0, 1);
         std::string suit = input.substr(1, 1);
-        try {
-          //TODO: change to tlexpected
 
-          auto t = bg.makeMove(suit, rank);
-          std::cout << t << std::endl;
-          ++turnCnt;
+        bg.makeMove(suit, rank).map_error([](std::string&& err) {
+          std::cout << "Invalid move entered: " << err << std::endl;
+        });
+      } else if (input.size() == 3) {
 
-        } catch (std::invalid_argument& e) {
-          std::cout << "Invalid move: " << e.what();
-        }
+        std::string rank = input.substr(0, 1);
+        std::string suit = input.substr(1, 1);
+
+        bg.makeMove(suit, rank).map_error([](std::string&& err) {
+          std::cout << "Invalid move entered: " << err << std::endl;
+        });
       }
+
     } else {
 
       MCTree<BridgeMctsFacade> bridgeMcTree{BridgeMctsFacade{bg, playerTeam}};
@@ -70,10 +70,8 @@ void BridgeController::playGame() {
       int bestMove = bridgeMcTree.findBestMove();
 
       bg.makeMoveMCTS(bestMove);
-      ++turnCnt;
     }
   }
-
 
   std::cout << "Winner is: " << bg.getWinner();
 }
