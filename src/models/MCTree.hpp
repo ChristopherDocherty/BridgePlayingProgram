@@ -5,10 +5,10 @@
 #include <ios>
 #include <models/MCTreeNode.hpp>
 
+#include <range/v3/algorithm/all_of.hpp>
 #include <range/v3/algorithm/find.hpp>
 #include <range/v3/algorithm/max_element.hpp>
 #include <range/v3/range/conversion.hpp>
-#include <range/v3/algorithm/all_of.hpp>
 #include <range/v3/view/enumerate.hpp>
 #include <range/v3/view/filter.hpp>
 #include <range/v3/view/join.hpp>
@@ -67,7 +67,7 @@ int MCTree<MCTS_GAME>::findBestMove() {
     //  while (i < 100) {
     auto selectedNode = selectNode();
     //Don't attempt to expand if the selectedNode is already a end game scenario
-    if(!selectedNode){
+    if (!selectedNode) {
       continue;
     }
     expandNode(selectedNode);
@@ -132,9 +132,9 @@ MCTreeNode<MCTS_GAME>* MCTree<MCTS_GAME>::selectNode() {
     }
 
     if (ranges::all_of(currNode->children(),
-                           [](MCTreeNode<MCTS_GAME>* childNode) {
-                             return childNode->game().winner() != -1;
-                           })) {
+                       [](MCTreeNode<MCTS_GAME>* childNode) {
+                         return childNode->game().winner() != -1;
+                       })) {
       return nullptr;
     }
 
