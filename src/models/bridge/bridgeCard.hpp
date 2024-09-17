@@ -1,8 +1,8 @@
 #ifndef bridgeCard_h
 #define bridgeCard_h
 
-#include <string>
 #include <ostream>
+#include <string>
 
 namespace Bridge {
 

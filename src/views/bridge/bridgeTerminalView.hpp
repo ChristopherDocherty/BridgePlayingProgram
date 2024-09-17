@@ -12,7 +12,8 @@ namespace detail {
 
 template <typename T>
 std::pair<std::vector<T>, std::vector<T>> padVectorsToBeSameLength(
-    std::vector<T>&& leftHand, std::vector<T>&& rightHand, const T& valueToPadWith) {
+    std::vector<T>&& leftHand, std::vector<T>&& rightHand,
+    const T& valueToPadWith) {
   size_t lSize = leftHand.size();
   size_t rSize = rightHand.size();
 
@@ -25,7 +26,7 @@ std::pair<std::vector<T>, std::vector<T>> padVectorsToBeSameLength(
   }
   return std::pair{leftHand, rightHand};
 }
-}  // namespace Detail
+}  // namespace detail
 
 class BridgeTerminalView {
 
