@@ -12,6 +12,7 @@ target_link_libraries(
     bridgeTests 
     Catch2::Catch2WithMain
     bridgeGamestate
+    tl::expected
 )
 
 target_include_directories(

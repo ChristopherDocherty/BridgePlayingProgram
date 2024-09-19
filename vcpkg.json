@@ -1,0 +1,9 @@
+{
+  "dependencies": [
+    "fmt",
+    "nlohmann-json",
+    "range-v3",
+    "tl-expected",
+    "catch2"
+  ]
+}
