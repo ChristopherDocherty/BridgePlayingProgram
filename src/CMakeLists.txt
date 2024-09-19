@@ -1,5 +1,4 @@
 add_subdirectory(models)
-add_subdirectory(includes)
 add_subdirectory(views)
 
 add_library(BridgeController

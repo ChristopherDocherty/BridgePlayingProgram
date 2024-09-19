@@ -1,6 +1,6 @@
 add_subdirectory(bridge)
 
-add_executable( MCTreeNodeTests
+add_executable(MCTreeNodeTests
     MCTreeNodeTests.cc
 )
 

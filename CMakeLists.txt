@@ -15,6 +15,11 @@ else()
   add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 endif()
 
+find_package(fmt CONFIG REQUIRED)
+find_package(range-v3 CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
+find_package(tl-expected CONFIG REQUIRED)
+find_package(Catch2 CONFIG REQUIRED)
 
 #Saving the dir of config files for later substition
 #set(CONFIG_BINARY_DIR "${CMAKE_BINARY_DIR}/config")
