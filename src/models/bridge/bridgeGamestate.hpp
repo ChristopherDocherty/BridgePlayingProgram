@@ -3,14 +3,11 @@
 
 #include "bridgeCard.hpp"
 
-#include <tl/expected.hpp>
 #include <string>
 #include <vector>
 
 namespace Bridge {
 
-template <typename T>
-using BridgeExpected = tl::expected<T, std::string>;
 
 constexpr int TOTAL_TURNS = 13;
 

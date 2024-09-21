@@ -5,16 +5,16 @@
 namespace Bridge {
 
 TEST_CASE("BridgeCardTests --  ConstructorTests") {
-  REQUIRE_THROWS_AS(BridgeCard("S", "0"), std::invalid_argument);
-  REQUIRE_THROWS_AS(BridgeCard("T", "4"), std::invalid_argument);
-  REQUIRE_THROWS_AS(BridgeCard("NT", "4"), std::invalid_argument);
+  REQUIRE_FALSE(BridgeCard::create("S", "0"));
+  REQUIRE_FALSE(BridgeCard::create("T", "4"));
+  REQUIRE_FALSE(BridgeCard::create("NT", "4"));
 }
 
 TEST_CASE("BridgeCardTests -- ComparisonTests") {
 
-  BridgeCard fourSpade("S", "4");
-  BridgeCard fiveDiamond("D", "5");
-  BridgeCard queenDiamond("D", "Q");
+  BridgeCard fourSpade = *BridgeCard::create("S", "4");
+  BridgeCard fiveDiamond = *BridgeCard::create("D", "5");
+  BridgeCard queenDiamond = *BridgeCard::create("D", "Q");
 
   REQUIRE(fourSpade > queenDiamond);
   REQUIRE(queenDiamond > fiveDiamond);
@@ -22,16 +22,16 @@ TEST_CASE("BridgeCardTests -- ComparisonTests") {
   REQUIRE(fiveDiamond < queenDiamond);
   REQUIRE(queenDiamond < fourSpade);
 
-  BridgeCard fourSpade2("S", "4");
+  BridgeCard fourSpade2 = *BridgeCard::create("S", "4");
 
   REQUIRE(fourSpade == fourSpade2);
 }
 
 TEST_CASE("BridgeCardTests --  getterTests") {
 
-  BridgeCard fourSpade("S", "4");
-  BridgeCard fiveDiamond("D", "5");
-  BridgeCard queenDiamond("D", "Q");
+  BridgeCard fourSpade = *BridgeCard::create("S", "4");
+  BridgeCard fiveDiamond = *BridgeCard::create("D", "5");
+  BridgeCard queenDiamond = *BridgeCard::create("D", "Q");
 
   REQUIRE(fourSpade.getSuit() == "S");
   REQUIRE(fourSpade.getRank() == "4");

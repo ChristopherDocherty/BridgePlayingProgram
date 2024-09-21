@@ -4,17 +4,18 @@
 #include <map>
 #include <sstream>
 #include <string>
+#include <tl/expected.hpp>
 #include <tuple>
+#include "models/bridge/utils/bridgeExpected.hpp"
 
 namespace Bridge {
 
-int convertSuitStringToInt(const std::string& suit) {
-
+BridgeExpected<int> convertSuitStringToInt(const std::string& suit) {
   const static std::map<std::string, int> suitMap = {
       {"NT", 0}, {"C", 1}, {"D", 2}, {"H", 3}, {"S", 4}};
 
   if (suitMap.find(suit) == suitMap.end()) {
-    throw std::invalid_argument("Invalid suit string entered");
+    return tl::make_unexpected("Invalid suit string entered");
   };
 
   return suitMap.at(suit);
@@ -32,7 +33,7 @@ const std::string convertSuitIntToString(const int suitInt) {
   return suitMap.at(suitInt);
 }
 
-int convertRankStringToInt(const std::string& rank) {
+BridgeExpected<int> convertRankStringToInt(const std::string& rank) {
 
   const static std::map<std::string, int> rankMap = {
       {"1", 1},  {"2", 2},  {"3", 3},  {"4", 4}, {"5", 5},
@@ -40,7 +41,7 @@ int convertRankStringToInt(const std::string& rank) {
       {"J", 11}, {"Q", 12}, {"K", 13}, {"A", 14}};
 
   if (rankMap.find(rank) == rankMap.end()) {
-    throw std::invalid_argument("Invalid rank string entered=\"" + rank + "\"");
+    return tl::make_unexpected("Invalid rank string entered=\"" + rank + "\"");
   };
 
   return rankMap.at(rank);
@@ -85,7 +86,7 @@ const std::string convertDirIntToString(const int dirInt) {
   return dirMap.at(dirInt);
 }
 
-const std::tuple<int, int> convertContractString(
+BridgeExpected<std::tuple<int, int>> convertContractString(
     const std::string& contractString) {
 
   std::stringstream contractStream(contractString);
@@ -96,16 +97,17 @@ const std::tuple<int, int> convertContractString(
   contractStream >> contractNumber >> contractSuit;
 
   if (contractStream.fail()) {
-    throw std::invalid_argument(
+    return tl::make_unexpected(
         "Invalid contract string entered: first char must be an valid "
         "integer.");
   }
 
   int tricksRequired = contractNumber + 6;
 
-  int trumpSuitInt = convertSuitStringToInt(contractSuit);
-
-  return std::make_tuple(trumpSuitInt, tricksRequired);
+  return convertSuitStringToInt(contractSuit)
+      .map([&tricksRequired](int trumpSuitInt) {
+        return std::make_tuple(trumpSuitInt, tricksRequired);
+      });
 }
 
 }  // namespace Bridge

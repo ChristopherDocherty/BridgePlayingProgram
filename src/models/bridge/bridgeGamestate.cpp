@@ -1,4 +1,5 @@
 #include "bridgeGamestate.hpp"
+
 #include "bridgeCard.hpp"
 #include "utils/bridgeUtils.hpp"
 
@@ -21,7 +22,8 @@ BridgeGamestate::BridgeGamestate(std::vector<std::vector<BridgeCard>> board,
       d_declarerHand(convertDirStringToInt(declarerHand)),
       d_currentLeadHand(convertDirStringToInt(currentLeadHand)),
       d_currentHand(convertDirStringToInt(currentLeadHand)),
-      d_trumpSuit(convertSuitStringToInt(trumpSuit)),
+      //TODO: fix this vvv
+      d_trumpSuit(*convertSuitStringToInt(trumpSuit)),
       d_declarerTricksRequired(getTricksRequired(contractLevel)),
       d_currentTrick(currentTrick),
       d_declarerTricksMade(declarerTricksMade),
@@ -57,49 +59,48 @@ BridgeExpected<std::string> BridgeGamestate::makeMoveMCTS(int validMoveNumber) {
 
 BridgeExpected<std::string> BridgeGamestate::makeMove(const std::string suit,
                                                       const std::string rank) {
-
+  //TODO: mabe needs to be a more distinct return type
   if (getWinner() != "") {
-    //probably cahnge this to return something else
-    //basically jsut want a catch so you can't keep changing the gamestate once the gme is done
-    //but this logic may end up in the controller
-    //TODO: think about returning an unexpected state
-    return getWinner();
+    return tl::make_unexpected("The game is over! The winner is: " + getWinner());
   }
 
-  BridgeCard move(suit, rank);
+  return BridgeCard::create(suit, rank)
+      .and_then([this](BridgeCard&& move) -> BridgeExpected<BridgeCard> {
+        if (auto isValid = moveIsValid(move); !isValid) {
+          return tl::make_unexpected(isValid.error());
+        }
+        return move;
+      })
+      .map([this](BridgeCard&& move) {
+        auto iterToErase = std::find(d_board[d_currentHand].begin(),
+                                     d_board[d_currentHand].end(), move);
+        d_board[d_currentHand].erase(iterToErase);
 
-  if (auto isValid = moveIsValid(move); !isValid) {
-    return tl::make_unexpected(isValid.error());
-  }
+        d_currentTrickRecord.push_back(move);
 
-  auto iterToErase = std::find(d_board[d_currentHand].begin(),
-                               d_board[d_currentHand].end(), move);
-  d_board[d_currentHand].erase(iterToErase);
+        if (d_currentTrickRecord.size() == 4) {
 
-  d_currentTrickRecord.push_back(move);
+          ++d_currentTrick;
 
-  if (d_currentTrickRecord.size() == 4) {
+          const int trickWinnerDir = getTrickWinner();
 
-    ++d_currentTrick;
+          d_currentHand = trickWinnerDir;
+          d_currentLeadHand = trickWinnerDir;
 
-    const int trickWinnerDir = getTrickWinner();
+          //Declarer wins trick if they or the dummy wins, hence %2
+          if (trickWinnerDir % 2 == d_declarerHand % 2) {
+            ++d_declarerTricksMade;
+          }
+          d_currentTrickRecord.clear();
 
-    d_currentHand = trickWinnerDir;
-    d_currentLeadHand = trickWinnerDir;
+        } else {
+          d_currentHand = (d_currentHand + 1) % 4;
+        }
 
-    //Declarer wins trick if they or the dummy wins, hence %2
-    if (trickWinnerDir % 2 == d_declarerHand % 2) {
-      ++d_declarerTricksMade;
-    }
-    d_currentTrickRecord.clear();
+        updateCurrentValidMoves();
 
-  } else {
-    d_currentHand = (d_currentHand + 1) % 4;
-  }
-
-  updateCurrentValidMoves();
-
-  return getWinner();
+        return getWinner();
+      });
 }
 
 int BridgeGamestate::getTrickWinner() const {

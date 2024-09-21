@@ -15,11 +15,9 @@ namespace Bridge {
 
 namespace {
 const std::set<std::string> VALID_DESIRED_DIRS{"N", "E"};
-}
 
-void BridgeController::playGame() {
+void playGameImpl(BridgeGamestate&& bg) {
 
-  BridgeGamestate bg = Bridge::loadGamestate("testBoards.json", "squeeze");
   BridgeTerminalView view;
 
   std::string desiredDir{};
@@ -74,6 +72,11 @@ void BridgeController::playGame() {
   }
 
   std::cout << "Winner is: " << bg.getWinner();
+}
+}  // namespace
+
+void BridgeController::playGame() {
+  Bridge::loadGamestate("testBoards.json", "squeeze").map(playGameImpl);
 }
 
 }  // namespace Bridge

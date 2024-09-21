@@ -1,6 +1,8 @@
 #ifndef bridgeCard_h
 #define bridgeCard_h
 
+#include "utils/bridgeExpected.hpp"
+
 #include <ostream>
 #include <string>
 
@@ -9,21 +11,22 @@ namespace Bridge {
 class BridgeCard {
 
  public:
-  BridgeCard(const std::string suit, const std::string rank);
 
   friend bool operator==(const BridgeCard& lhs, const BridgeCard& rhs);
   friend std::ostream& operator<<(std::ostream& os, const BridgeCard& bc);
-  bool operator>(const BridgeCard& other);
-  bool operator<(const BridgeCard& other);
+  bool operator>(const BridgeCard& other) const;
+  bool operator<(const BridgeCard& other) const;
 
   const std::string getSuit() const;
   const std::string getRank() const;
+
+  static BridgeExpected<BridgeCard> create(const std::string suit, const std::string rank);
 
  private:
   int mSuit;
   int mRank;
 
-  int convertToValidCardSuit(const std::string suit);
+  BridgeCard(int suit, int rank);
 };
 
 }  // namespace Bridge
