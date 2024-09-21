@@ -159,9 +159,10 @@ BridgeExpected<void> BridgeGamestate::currentHandHasCard(
 
   if (find(currentCards.begin(), currentCards.end(), proposedMove) ==
       currentCards.end()) {
-    return tl::make_unexpected(
-        fmt::format("Current hand {} does not have the card {}",
-                    convertDirIntToString(d_currentHand), proposedMove));
+    std::stringstream ss;
+    ss << "Current hand " << convertDirIntToString(d_currentHand)
+       << " does not have the card " << proposedMove;
+    return tl::make_unexpected(ss.str());
   }
 
   return {};
