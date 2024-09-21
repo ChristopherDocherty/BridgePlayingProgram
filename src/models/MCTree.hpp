@@ -15,6 +15,8 @@
 #include <range/v3/view/sample.hpp>
 #include <range/v3/view/transform.hpp>
 
+#include <fmt/format.h>
+
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -221,11 +223,9 @@ void MCTree<MCTS_GAME>::dumpCurrentState(int iterations) {
           [iterations, parentSimCnt = d_rootNode->visitCnt()](
               std::tuple<int, MCTreeNode<MCTS_GAME>*> enumChildNode) {
             auto& [childId, childNode] = enumChildNode;
-            std::stringstream ss;
-            ss << iterations << "|" << childId << "|" << childNode->visitCnt()
-               << "|" << childNode->winCnt() << "|"
-               << childNode->getComparisonNum(parentSimCnt) << "\n";
-            return ss.str();
+            return fmt::format("{}|{}|{}|{}|{}\n", iterations, childId,
+                               childNode->visitCnt(), childNode->winCnt(),
+                               childNode->getComparisonNum(parentSimCnt));
           }) |
       ranges::views::join | ranges::to<std::string>;
 

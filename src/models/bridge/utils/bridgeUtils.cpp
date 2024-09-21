@@ -1,12 +1,15 @@
 #include "bridgeUtils.hpp"
 
+#include "models/bridge/utils/bridgeExpected.hpp"
+
 #include <exception>
 #include <map>
 #include <sstream>
 #include <string>
-#include <tl/expected.hpp>
 #include <tuple>
-#include "models/bridge/utils/bridgeExpected.hpp"
+
+#include <fmt/format.h>
+#include <tl/expected.hpp>
 
 namespace Bridge {
 
@@ -41,7 +44,8 @@ BridgeExpected<int> convertRankStringToInt(const std::string& rank) {
       {"J", 11}, {"Q", 12}, {"K", 13}, {"A", 14}};
 
   if (rankMap.find(rank) == rankMap.end()) {
-    return tl::make_unexpected("Invalid rank string entered=\"" + rank + "\"");
+    return tl::make_unexpected(
+        fmt::format("Invalid rank string entered=\"{}\"", rank));
   };
 
   return rankMap.at(rank);
@@ -55,8 +59,8 @@ const std::string convertRankIntToString(const int rankInt) {
       {11, "J"}, {12, "Q"}, {13, "K"}, {14, "A"}};
 
   if (rankMap.find(rankInt) == rankMap.end()) {
-    throw std::invalid_argument("Invalid rank int entered=" +
-                                std::to_string(rankInt));
+    throw std::invalid_argument(
+        fmt::format("Invalid rank int entered={}", rankInt));
   };
 
   return rankMap.at(rankInt);
@@ -97,9 +101,10 @@ BridgeExpected<std::tuple<int, int>> convertContractString(
   contractStream >> contractNumber >> contractSuit;
 
   if (contractStream.fail()) {
-    return tl::make_unexpected(
-        "Invalid contract string entered: first char must be an valid "
-        "integer.");
+    return tl::make_unexpected(fmt::format(
+        "Invalid contract string \"{}\" entered: first char must be an valid "
+        "integer.",
+        contractString));
   }
 
   int tricksRequired = contractNumber + 6;

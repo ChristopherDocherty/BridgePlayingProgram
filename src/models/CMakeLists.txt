@@ -10,8 +10,8 @@ add_library(MCTree
 target_link_libraries(MCTree
     PUBLIC
     range-v3
+    fmt::fmt
 )
-
 target_include_directories(MCTree
     PUBLIC 
     ${CMAKE_SOURCE_DIR}/src
