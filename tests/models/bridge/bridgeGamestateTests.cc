@@ -3,16 +3,32 @@
 
 #include <fstream>
 #include <iostream>
+#include <set>
 #include <sstream>
+
+#include <range/v3/range/conversion.hpp>
+#include <range/v3/view/transform.hpp>
 
 #include <catch2/catch_test_macros.hpp>
 
 namespace Bridge {
 
+namespace {
+
+std::set<std::set<BridgeCard>> convertBoardToSet(
+    std::vector<std::vector<BridgeCard>> board) {
+  return board | ranges::views::transform([](std::vector<BridgeCard> hand) {
+           return hand | ranges::to<std::set>;
+         }) |
+         ranges::to<std::set>;
+}
+
+}  // namespace
+
 void compareBridgeGamestateMembers(const BridgeGamestate& lhs,
                                    const BridgeGamestate& rhs) {
 
-  REQUIRE(lhs.board() == rhs.board());
+  REQUIRE(convertBoardToSet(lhs.board()) == convertBoardToSet(rhs.board()));
   REQUIRE(lhs.declarerHand() == rhs.declarerHand());
   REQUIRE(lhs.currentLeadHand() == rhs.currentLeadHand());
   REQUIRE(lhs.trumpSuit() == rhs.trumpSuit());
@@ -26,142 +42,166 @@ const std::string TEST_BOARD_CONFIG_FILE = "testBoards.json";
 
 TEST_CASE("BridgeGamestateTest -- MCTSInterfaceTests") {
 
-  BridgeGamestate defaultBG =
+  auto expDefaultBG =
       loadGamestate(TEST_BOARD_CONFIG_FILE, "default_board_config");
+  REQUIRE(expDefaultBG);
+  BridgeGamestate defaultBG = *expDefaultBG;
 
   REQUIRE(defaultBG.getValidMoveCnt() == 13);
 
-  REQUIRE_NOTHROW(defaultBG.makeMoveMCTS(3));
+  REQUIRE(defaultBG.makeMoveMCTS(3));
 }
 
 TEST_CASE("BridgeGamestateTest -- MakeMoveTests") {
 
-  BridgeGamestate defaultBG =
+  auto expDefaultBG =
       loadGamestate(TEST_BOARD_CONFIG_FILE, "default_board_config");
+  REQUIRE(expDefaultBG);
+  BridgeGamestate defaultBG = *expDefaultBG;
 
-  REQUIRE_THROWS_AS(defaultBG.makeMove("D", "2"), std::invalid_argument);
-  REQUIRE_THROWS_AS(defaultBG.makeMove("C", "2"), std::invalid_argument);
+  REQUIRE_FALSE(defaultBG.makeMove("D", "2"));
+  REQUIRE_FALSE(defaultBG.makeMove("C", "2"));
 
-  REQUIRE_NOTHROW(defaultBG.makeMove("S", "A"));
+  REQUIRE(defaultBG.makeMove("S", "A"));
 
-  BridgeGamestate defaultAfterMove =
+  auto expDefaultAfterMoveBG =
       loadGamestate(TEST_BOARD_CONFIG_FILE, "default_board_config_after_move");
+  REQUIRE(expDefaultAfterMoveBG);
+  BridgeGamestate defaultAfterMove = *expDefaultAfterMoveBG;
 
   compareBridgeGamestateMembers(defaultBG, defaultAfterMove);
 }
 
 TEST_CASE("BridgeGamestateTest -- FollowSuitTests") {
 
-  BridgeGamestate defaultBG =
+  auto expDefaultBG =
       loadGamestate(TEST_BOARD_CONFIG_FILE, "default_board_config");
+  REQUIRE(expDefaultBG);
+  BridgeGamestate defaultBG = *expDefaultBG;
 
-  REQUIRE_NOTHROW(defaultBG.makeMove("C", "K"));
-  REQUIRE_THROWS_AS(defaultBG.makeMove("D", "5"), std::invalid_argument);
-  REQUIRE_NOTHROW(defaultBG.makeMove("C", "A"));
-  REQUIRE_NOTHROW(defaultBG.makeMove("C", "Q"));
+  REQUIRE(defaultBG.makeMove("C", "K"));
+  REQUIRE_FALSE(defaultBG.makeMove("D", "5"));
+  REQUIRE(defaultBG.makeMove("C", "A"));
+  REQUIRE(defaultBG.makeMove("C", "Q"));
 }
 
 TEST_CASE("BridgeGamestateTest -- DeclarerLosesTrick") {
 
-  BridgeGamestate defaultBG =
+  auto expDefaultBG =
       loadGamestate(TEST_BOARD_CONFIG_FILE, "default_board_config");
+  REQUIRE(expDefaultBG);
+  BridgeGamestate defaultBG = *expDefaultBG;
 
-  REQUIRE_NOTHROW(defaultBG.makeMove("C", "K"));
-  REQUIRE_NOTHROW(defaultBG.makeMove("C", "A"));
-  REQUIRE_NOTHROW(defaultBG.makeMove("C", "Q"));
-  REQUIRE_NOTHROW(defaultBG.makeMove("C", "J"));
+  REQUIRE(defaultBG.makeMove("C", "K"));
+  REQUIRE(defaultBG.makeMove("C", "A"));
+  REQUIRE(defaultBG.makeMove("C", "Q"));
+  REQUIRE(defaultBG.makeMove("C", "J"));
 
-  BridgeGamestate defaultAfterLostTrick = loadGamestate(
+  auto expDefaultAfterLostTrick = loadGamestate(
       TEST_BOARD_CONFIG_FILE, "default_board_config_after_lost_trick");
+  REQUIRE(expDefaultBG);
+  BridgeGamestate defaultAfterLostTrick = *expDefaultAfterLostTrick;
 
   compareBridgeGamestateMembers(defaultBG, defaultAfterLostTrick);
 }
 
 TEST_CASE("BridgeGamestateTest -- DeclarerWinsTrick") {
 
-  BridgeGamestate defaultBG =
+  auto expDefaultBG =
       loadGamestate(TEST_BOARD_CONFIG_FILE, "default_board_config");
+  REQUIRE(expDefaultBG);
+  BridgeGamestate defaultBG = *expDefaultBG;
 
-  REQUIRE_NOTHROW(defaultBG.makeMove("S", "A"));
-  REQUIRE_NOTHROW(defaultBG.makeMove("C", "A"));
-  REQUIRE_NOTHROW(defaultBG.makeMove("S", "3"));
-  REQUIRE_NOTHROW(defaultBG.makeMove("S", "J"));
+  REQUIRE(defaultBG.makeMove("S", "A"));
+  REQUIRE(defaultBG.makeMove("C", "A"));
+  REQUIRE(defaultBG.makeMove("S", "3"));
+  REQUIRE(defaultBG.makeMove("S", "J"));
 
-  BridgeGamestate defaultAfterWonTrick = loadGamestate(
+  auto expDefaultAfterWonTrick = loadGamestate(
       TEST_BOARD_CONFIG_FILE, "default_board_config_after_won_trick");
+  REQUIRE(expDefaultBG);
+  BridgeGamestate defaultAfterWonTrick = *expDefaultAfterWonTrick;
 
   compareBridgeGamestateMembers(defaultBG, defaultAfterWonTrick);
 }
 
 TEST_CASE("BridgeGamestateTest -- TrickWonByRuffing") {
+  auto expTestBG = loadGamestate(TEST_BOARD_CONFIG_FILE, "test_board_config");
+  REQUIRE(expTestBG);
+  BridgeGamestate testBG = *expTestBG;
 
-  BridgeGamestate testBG =
-      loadGamestate(TEST_BOARD_CONFIG_FILE, "test_board_config");
+  REQUIRE(testBG.makeMove("S", "A"));
+  REQUIRE(testBG.makeMove("D", "5"));
+  REQUIRE(testBG.makeMove("S", "3"));
+  REQUIRE(testBG.makeMove("S", "J"));
 
-  REQUIRE_NOTHROW(testBG.makeMove("S", "A"));
-  REQUIRE_NOTHROW(testBG.makeMove("D", "5"));
-  REQUIRE_NOTHROW(testBG.makeMove("S", "3"));
-  REQUIRE_NOTHROW(testBG.makeMove("S", "J"));
-
-  BridgeGamestate defaultJsonAfterRuff =
+  auto expDefaultJsonAfterRuff =
       loadGamestate(TEST_BOARD_CONFIG_FILE, "test_board_config_after_ruff");
+  REQUIRE(expDefaultJsonAfterRuff);
+  BridgeGamestate defaultJsonAfterRuff = *expDefaultJsonAfterRuff;
 
   compareBridgeGamestateMembers(testBG, defaultJsonAfterRuff);
 }
 
 TEST_CASE("BridgeGamestateTest -- DeclarerLostGameTest") {
 
-  BridgeGamestate testBG =
-      loadGamestate(TEST_BOARD_CONFIG_FILE, "test_board_config");
+  auto expTestBG = loadGamestate(TEST_BOARD_CONFIG_FILE, "test_board_config");
+  REQUIRE(expTestBG);
+  BridgeGamestate testBG = *expTestBG;
 
-  REQUIRE_NOTHROW(testBG.makeMove("S", "A"));
-  REQUIRE_NOTHROW(testBG.makeMove("D", "5"));
-  REQUIRE_NOTHROW(testBG.makeMove("S", "3"));
-  REQUIRE_NOTHROW(testBG.makeMove("S", "J"));
+  REQUIRE(testBG.makeMove("S", "A"));
+  REQUIRE(testBG.makeMove("D", "5"));
+  REQUIRE(testBG.makeMove("S", "3"));
+  auto finalMove = testBG.makeMove("S", "J");
+  REQUIRE(finalMove);
+  REQUIRE(*finalMove == "Defence");
 
-  REQUIRE(testBG.makeMove("S", "4") == "Defence");
+  auto invalidMove = testBG.makeMove("S", "4");
+  REQUIRE_FALSE(invalidMove);
+  REQUIRE(invalidMove.error() == "The game is over! The winner is: Defence");
 }
 
 TEST_CASE("BridgeGamestateTest -- DeclarerWonGameTest") {
 
-  BridgeGamestate wonTestBG =
-      loadGamestate(TEST_BOARD_CONFIG_FILE, "won_test_config");
+  auto expWonTestBG = loadGamestate(TEST_BOARD_CONFIG_FILE, "won_test_config");
+  REQUIRE(expWonTestBG);
+  BridgeGamestate wonTestBG = *expWonTestBG;
 
-  REQUIRE_NOTHROW(wonTestBG.makeMove("S", "A"));
-  REQUIRE_NOTHROW(wonTestBG.makeMove("D", "J"));
-  REQUIRE_NOTHROW(wonTestBG.makeMove("H", "3"));
-  REQUIRE_NOTHROW(wonTestBG.makeMove("C", "J"));
+  REQUIRE(wonTestBG.makeMove("S", "A"));
+  REQUIRE(wonTestBG.makeMove("D", "J"));
+  REQUIRE(wonTestBG.makeMove("H", "3"));
+  auto finalMove = wonTestBG.makeMove("C", "J");
+  REQUIRE(finalMove);
+  REQUIRE(*finalMove == "Declarer");
 
-  REQUIRE(wonTestBG.makeMove("S", "4") == "Declarer");
+  auto invalidMove = wonTestBG.makeMove("S", "4");
+  REQUIRE_FALSE(invalidMove);
+  REQUIRE(invalidMove.error() == "The game is over! The winner is: Declarer");
 }
-
 
 TEST_CASE("BridgeGamestateTest -- GameToCompletion") {
 
-  BridgeGamestate wonTestBG =
+  auto expWonTestBG =
       loadGamestate(TEST_BOARD_CONFIG_FILE, "default_board_config");
+  REQUIRE(expWonTestBG);
+  BridgeGamestate wonTestBG = *expWonTestBG;
 
-  REQUIRE_NOTHROW(wonTestBG.makeMove("S", "A"));
-  REQUIRE_NOTHROW(wonTestBG.makeMove("C", "A"));
-  REQUIRE_NOTHROW(wonTestBG.makeMove("S", "K"));
-  REQUIRE_NOTHROW(wonTestBG.makeMove("S", "J"));
+  REQUIRE(wonTestBG.makeMove("S", "A"));
+  REQUIRE(wonTestBG.makeMove("C", "A"));
+  REQUIRE(wonTestBG.makeMove("S", "K"));
+  REQUIRE(wonTestBG.makeMove("S", "J"));
 
-  REQUIRE_NOTHROW(wonTestBG.makeMove("S", "Q"));
-  REQUIRE_NOTHROW(wonTestBG.makeMove("H", "Q"));
-  REQUIRE_NOTHROW(wonTestBG.makeMove("S", "9"));
-  REQUIRE_NOTHROW(wonTestBG.makeMove("S", "10"));
+  REQUIRE(wonTestBG.makeMove("S", "Q"));
+  REQUIRE(wonTestBG.makeMove("H", "Q"));
+  REQUIRE(wonTestBG.makeMove("S", "9"));
+  REQUIRE(wonTestBG.makeMove("S", "10"));
 
-  REQUIRE_NOTHROW(wonTestBG.makeMove("S", "7"));
-  REQUIRE_NOTHROW(wonTestBG.makeMove("H", "10"));
-  REQUIRE_NOTHROW(wonTestBG.makeMove("S", "4"));
-  REQUIRE_NOTHROW(wonTestBG.makeMove("S", "8"));
-  
-  REQUIRE_NOTHROW(wonTestBG.makeMove("S", "6"));
-  REQUIRE_NOTHROW(wonTestBG.makeMove("D", "J"));
-  REQUIRE_NOTHROW(wonTestBG.makeMove("S", "3"));
-  REQUIRE_NOTHROW(wonTestBG.makeMove("C", "J"));
+  REQUIRE(wonTestBG.makeMove("S", "7"));
+  REQUIRE(wonTestBG.makeMove("H", "10"));
+  REQUIRE(wonTestBG.makeMove("S", "4"));
+  REQUIRE(wonTestBG.makeMove("S", "8"));
 
-//  REQUIRE(wonTestBG.makeMove("S", "4") == "Declarer");
+  //TODO: finish
 }
 
 }  // namespace Bridge

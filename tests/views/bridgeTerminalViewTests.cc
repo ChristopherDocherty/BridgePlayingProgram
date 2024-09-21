@@ -23,8 +23,9 @@ auto getRowView(std::string gamestateStr) {
 
 TEST_CASE("Gamestate is displayed correctly") {
 
-  BridgeGamestate gamestate =
-      loadGamestate("testBoards.json", "default_board_config");
+  auto expGamestate = loadGamestate("testBoards.json", "default_board_config");
+  REQUIRE(expGamestate);
+  BridgeGamestate gamestate = *expGamestate;
 
   std::vector<std::string> expectedView = {
       {"6S by S"},
@@ -57,12 +58,13 @@ TEST_CASE("Gamestate is displayed correctly") {
 
 TEST_CASE("Gamestate with played cards is displayed correctly") {
 
-  BridgeGamestate gamestate =
-      loadGamestate("testBoards.json", "default_board_config");
+  auto expGamestate = loadGamestate("testBoards.json", "default_board_config");
+  REQUIRE(expGamestate);
+  BridgeGamestate gamestate = *expGamestate;
 
-  REQUIRE_NOTHROW(gamestate.makeMove("S", "A"));
-  REQUIRE_NOTHROW(gamestate.makeMove("H", "Q"));
-  REQUIRE_NOTHROW(gamestate.makeMove("S", "9"));
+  REQUIRE(gamestate.makeMove("S", "A"));
+  REQUIRE(gamestate.makeMove("H", "Q"));
+  REQUIRE(gamestate.makeMove("S", "9"));
 
   std::vector<std::string> expectedView = {
       {"6S by S"},

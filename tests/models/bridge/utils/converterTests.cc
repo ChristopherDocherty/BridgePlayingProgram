@@ -9,23 +9,20 @@ SCENARIO("Converters work as expected") {
     WHEN("Converted to int") {
 
       THEN("The correct int is found") {
-        REQUIRE(Bridge::convertSuitStringToInt("C") == 1);
-        REQUIRE(Bridge::convertSuitStringToInt("D") == 2);
-        REQUIRE(Bridge::convertSuitStringToInt("H") == 3);
-        REQUIRE(Bridge::convertSuitStringToInt("S") == 4);
-        REQUIRE(Bridge::convertSuitStringToInt("NT") == 0);
+        //TODO: expected checks
+        REQUIRE(*Bridge::convertSuitStringToInt("C") == 1);
+        REQUIRE(*Bridge::convertSuitStringToInt("D") == 2);
+        REQUIRE(*Bridge::convertSuitStringToInt("H") == 3);
+        REQUIRE(*Bridge::convertSuitStringToInt("S") == 4);
+        REQUIRE(*Bridge::convertSuitStringToInt("NT") == 0);
       }
     }
   }
   GIVEN("Invalid suit strings") {
-
     WHEN("Converted to int") {
-
-      THEN("Exception is thrown") {
-        REQUIRE_THROWS_AS(Bridge::convertSuitStringToInt("J"),
-                          std::invalid_argument);
-        REQUIRE_THROWS_AS(Bridge::convertSuitStringToInt("u"),
-                          std::invalid_argument);
+      THEN("Unexpected returned") {
+        REQUIRE_FALSE(Bridge::convertSuitStringToInt("J"));
+        REQUIRE_FALSE(Bridge::convertSuitStringToInt("u"));
       }
     }
   }
@@ -38,7 +35,7 @@ SCENARIO("Converters work as expected") {
         REQUIRE(Bridge::convertSuitIntToString(1) == "C");
         REQUIRE(Bridge::convertSuitIntToString(2) == "D");
         REQUIRE(Bridge::convertSuitIntToString(3) == "H");
-        REQUIRE(Bridge::convertSuitIntToString(4)== "S");
+        REQUIRE(Bridge::convertSuitIntToString(4) == "S");
       }
     }
   }
@@ -57,15 +54,16 @@ SCENARIO("Converters work as expected") {
     }
   }
 
-  GIVEN("Things to eb converted") {
+  GIVEN("Things to be converted") {
     WHEN("Converted") {
       THEN("correct") {
 
-        REQUIRE(Bridge::convertRankStringToInt("A") == 14);
+        auto expRankInt = Bridge::convertRankStringToInt("A");
+        REQUIRE(expRankInt);
+        REQUIRE(*expRankInt == 14);
         REQUIRE(Bridge::convertRankIntToString(3) == "3");
 
-        REQUIRE_THROWS_AS(Bridge::convertRankStringToInt("H"),
-                          std::invalid_argument);
+        REQUIRE_FALSE(Bridge::convertRankStringToInt("H"));
         REQUIRE_THROWS_AS(Bridge::convertRankIntToString(23),
                           std::invalid_argument);
 
@@ -77,15 +75,12 @@ SCENARIO("Converters work as expected") {
         REQUIRE_THROWS_AS(Bridge::convertDirIntToString(23),
                           std::invalid_argument);
 
-        REQUIRE(Bridge::convertContractString("6S") == std::make_tuple(4, 12));
-        REQUIRE(Bridge::convertContractString("3NT") == std::make_tuple(0, 9));
+        REQUIRE(*Bridge::convertContractString("6S") == std::make_tuple(4, 12));
+        REQUIRE(*Bridge::convertContractString("3NT") == std::make_tuple(0, 9));
 
-        REQUIRE_THROWS_AS(Bridge::convertContractString("TS"),
-                     std::invalid_argument);
-        REQUIRE_THROWS_AS(Bridge::convertContractString("5Y"),
-                     std::invalid_argument);
-        REQUIRE_THROWS_AS(Bridge::convertContractString("5NTT"),
-                     std::invalid_argument);
+        REQUIRE_FALSE(Bridge::convertContractString("TS"));
+        REQUIRE_FALSE(Bridge::convertContractString("5Y"));
+        REQUIRE_FALSE(Bridge::convertContractString("5NTT"));
       }
     }
   }

@@ -10,10 +10,9 @@
 namespace Bridge {
 
 TEST_CASE("bridgGamestateLoader loads correctly") {
-
-  BridgeGamestate gamestate =
-      loadGamestate("testBoards.json", "default_board_config");
-
+  auto expGamestate = loadGamestate("testBoards.json", "default_board_config");
+  BridgeGamestate gamestate = *expGamestate;
   REQUIRE(gamestate.getWinner() == "");
 }
+
 }  // namespace Bridge

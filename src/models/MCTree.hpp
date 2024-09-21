@@ -120,9 +120,21 @@ MCTreeNode<MCTS_GAME>* MCTree<MCTS_GAME>::selectNode() {
   while (!currNode->children().empty()) {
     std::vector<MCTreeNode<MCTS_GAME>*> children = currNode->children();
 
+    auto uncompletedChildren =
+        children | ranges::views::filter([](MCTreeNode<MCTS_GAME>* childNode) {
+          return !childNode->game().gameIsComplete();
+        }) |
+        ranges::to<std::vector>;
+
+    //TODO: Not correct
+    if (uncompletedChildren.empty()) {
+      return nullptr;
+    }
+
     //find any unexplored children
     auto unexploredChildren =
-        children | ranges::views::filter([](const MCTreeNode<MCTS_GAME>* node) {
+        uncompletedChildren |
+        ranges::views::filter([](const MCTreeNode<MCTS_GAME>* node) {
           return node->visitCnt() == 0;
         }) |
         ranges::to<std::vector>;
@@ -131,18 +143,11 @@ MCTreeNode<MCTS_GAME>* MCTree<MCTS_GAME>::selectNode() {
       return unexploredChildren.front();
     }
 
-    if (ranges::all_of(currNode->children(),
-                       [](MCTreeNode<MCTS_GAME>* childNode) {
-                         return childNode->game().winner() != -1;
-                       })) {
-      return nullptr;
-    }
-
     //If all explored, choose a next child
-    auto nextChild =
-        ranges::max_element(children, [parentSimCnt = currNode->visitCnt()](
-                                          const MCTreeNode<MCTS_GAME>* lhs,
-                                          const MCTreeNode<MCTS_GAME>* rhs) {
+    auto nextChild = ranges::max_element(
+        uncompletedChildren, [parentSimCnt = currNode->visitCnt()](
+                                 const MCTreeNode<MCTS_GAME>* lhs,
+                                 const MCTreeNode<MCTS_GAME>* rhs) {
           return lhs->getComparisonNum(parentSimCnt) <
                  rhs->getComparisonNum(parentSimCnt);
         });

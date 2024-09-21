@@ -3,6 +3,8 @@
 
 namespace Bridge {
 
+class BridgeGamestate;
+
 class BridgeController {
 
  public:
