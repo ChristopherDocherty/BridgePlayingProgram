@@ -11,6 +11,8 @@
 #include <string>
 #include <vector>
 
+#include <fmt/format.h>
+
 namespace Bridge {
 
 BridgeGamestate::BridgeGamestate(std::vector<std::vector<BridgeCard>> board,
@@ -48,10 +50,9 @@ std::string BridgeGamestate::getWinner() {
 BridgeExpected<std::string> BridgeGamestate::makeMoveMCTS(int validMoveNumber) {
 
   if (static_cast<size_t>(validMoveNumber) >= d_currentValidMoves.size()) {
-    std::stringstream ss;
-    ss << "Invalid MCTS move number given - there are only"
-       << d_currentValidMoves.size() << " many moves";
-    return tl::make_unexpected(ss.str());
+    return tl::make_unexpected(fmt::format(
+        "Invalid MCTS move number given - there are only {} many moves",
+        d_currentValidMoves.size()));
   }
   BridgeCard cardPlayed = d_currentValidMoves[validMoveNumber];
   return makeMove(cardPlayed.getSuit(), cardPlayed.getRank());
@@ -61,7 +62,8 @@ BridgeExpected<std::string> BridgeGamestate::makeMove(const std::string suit,
                                                       const std::string rank) {
   //TODO: mabe needs to be a more distinct return type
   if (getWinner() != "") {
-    return tl::make_unexpected("The game is over! The winner is: " + getWinner());
+    return tl::make_unexpected(
+        fmt::format("The game is over! The winner is: {}", getWinner()));
   }
 
   return BridgeCard::create(suit, rank)

@@ -11,8 +11,9 @@ add_library(bridgeGamestate
 
 target_link_libraries(bridgeGamestate 
     PRIVATE
-        tl::expected
-        nlohmann_json::nlohmann_json
+      tl::expected
+      nlohmann_json::nlohmann_json
+      fmt::fmt
     )
 
 target_include_directories(bridgeGamestate
