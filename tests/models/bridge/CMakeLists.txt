@@ -1,4 +1,5 @@
 configure_file(testBoards.json .)
+configure_file(data/test_1.json .)
 
 add_executable(
     bridgeTests 
@@ -6,6 +7,7 @@ add_executable(
     bridgeCardTests.cc
     bridgeGamestateTests.cc
     bridgeGamestateLoaderTests.cc
+    bridgeGamestateLoaderTests_new.cc
 )
 
 target_link_libraries(

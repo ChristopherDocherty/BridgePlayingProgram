@@ -224,4 +224,10 @@ std::vector<BridgeCard> BridgeGamestate::currentTrickRecord() const {
 
 int BridgeGamestate::contractLevel() const { return d_contract.level; }
 
+ContractInfo BridgeGamestate::contractInfo() const { return d_contract; }
+
+CurrentTrickInfo BridgeGamestate::currentTrickInfo() const {
+  return d_currentTrick;
+}
+
 } // namespace Bridge

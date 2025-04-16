@@ -69,6 +69,9 @@ public:
 
   int contractLevel() const;
 
+  ContractInfo contractInfo() const;
+  CurrentTrickInfo currentTrickInfo() const;
+
 private:
   std::vector<std::vector<BridgeCard>> d_board;
 

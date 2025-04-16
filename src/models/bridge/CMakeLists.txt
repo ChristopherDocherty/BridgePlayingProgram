@@ -7,6 +7,8 @@ add_library(bridgeGamestate
     bridgeGamestate.cpp
     bridgeGamestateLoader.hpp
     bridgeGamestateLoader.cpp
+    bridgeGamestateLoader_new.hpp
+    bridgeGamestateLoader_new.cpp
 )
 
 target_link_libraries(bridgeGamestate 
