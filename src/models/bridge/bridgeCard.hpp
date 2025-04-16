@@ -10,25 +10,25 @@ namespace Bridge {
 
 class BridgeCard {
 
- public:
-
-  friend bool operator==(const BridgeCard& lhs, const BridgeCard& rhs);
-  friend std::ostream& operator<<(std::ostream& os, const BridgeCard& bc);
-  bool operator>(const BridgeCard& other) const;
-  bool operator<(const BridgeCard& other) const;
+public:
+  friend bool operator==(const BridgeCard &lhs, const BridgeCard &rhs);
+  friend std::ostream &operator<<(std::ostream &os, const BridgeCard &bc);
+  bool operator>(const BridgeCard &other) const;
+  bool operator<(const BridgeCard &other) const;
 
   const std::string getSuit() const;
   const std::string getRank() const;
 
-  static BridgeExpected<BridgeCard> create(const std::string suit, const std::string rank);
+  static BridgeExpected<BridgeCard> create(const std::string suit,
+                                           const std::string rank);
 
- private:
+private:
   int mSuit;
   int mRank;
 
   BridgeCard(int suit, int rank);
 };
 
-}  // namespace Bridge
+} // namespace Bridge
 
 #endif

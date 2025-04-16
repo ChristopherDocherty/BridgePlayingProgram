@@ -4,6 +4,4 @@
 
 class MockMctsGame {};
 
-SCENARIO("MCtreenode with mock mctsgame") {
-  REQUIRE(true);
-}
+SCENARIO("MCtreenode with mock mctsgame") { REQUIRE(true); }

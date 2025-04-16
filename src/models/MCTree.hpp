@@ -29,20 +29,19 @@
 
 namespace details {
 float getComparisonNumber(int parentSimCnt, int childVisitCnt, int childWinCnt);
-}  // namespace details
+} // namespace details
 
-template <typename MCTS_GAME>
-class MCTree {
+template <typename MCTS_GAME> class MCTree {
 
- public:
+public:
   MCTree(MCTS_GAME game);
   int findBestMove();
 
- private:
-  MCTreeNode<MCTS_GAME>* selectNode();
-  void expandNode(MCTreeNode<MCTS_GAME>* node);
-  int simulate(MCTreeNode<MCTS_GAME>* node);
-  void backpropagateResult(MCTreeNode<MCTS_GAME>* node, bool winningSimulation);
+private:
+  MCTreeNode<MCTS_GAME> *selectNode();
+  void expandNode(MCTreeNode<MCTS_GAME> *node);
+  int simulate(MCTreeNode<MCTS_GAME> *node);
+  void backpropagateResult(MCTreeNode<MCTS_GAME> *node, bool winningSimulation);
 
   void dumpCurrentState(int iterations);
 
@@ -59,8 +58,7 @@ MCTree<MCTS_GAME>::MCTree(MCTS_GAME game)
     : d_rootNode(
           std::make_unique<MCTreeNode<MCTS_GAME>>(std::move(game), nullptr)) {}
 
-template <typename MCTS_GAME>
-int MCTree<MCTS_GAME>::findBestMove() {
+template <typename MCTS_GAME> int MCTree<MCTS_GAME>::findBestMove() {
   int i = 0;
 
   auto startTime = std::chrono::steady_clock::now();
@@ -68,12 +66,13 @@ int MCTree<MCTS_GAME>::findBestMove() {
   while (std::chrono::steady_clock::now() < endTime) {
     //  while (i < 100) {
     auto selectedNode = selectNode();
-    //Don't attempt to expand if the selectedNode is already a end game scenario
+    // Don't attempt to expand if the selectedNode is already a end game
+    // scenario
     if (!selectedNode) {
       continue;
     }
     expandNode(selectedNode);
-    //Catch for when there is only one child so we don't simulate
+    // Catch for when there is only one child so we don't simulate
     if (d_rootNode->children().size() == 1) {
       return i;
     }
@@ -82,7 +81,7 @@ int MCTree<MCTS_GAME>::findBestMove() {
         0, static_cast<int>(selectedNode->children().size() - 1)};
     size_t selectedChildIndex = dist(s_rngEngine);
 
-    MCTreeNode<MCTS_GAME>* childNode =
+    MCTreeNode<MCTS_GAME> *childNode =
         selectedNode->children()[selectedChildIndex];
 
     int result = simulate(childNode);
@@ -97,17 +96,17 @@ int MCTree<MCTS_GAME>::findBestMove() {
     }
   }
 
-  std::vector<MCTreeNode<MCTS_GAME>*> children = d_rootNode->children();
+  std::vector<MCTreeNode<MCTS_GAME> *> children = d_rootNode->children();
 
   auto bestChild = ranges::max_element(
       children.begin(), children.end(),
-      [](const MCTreeNode<MCTS_GAME>* lhs, const MCTreeNode<MCTS_GAME>* rhs) {
+      [](const MCTreeNode<MCTS_GAME> *lhs, const MCTreeNode<MCTS_GAME> *rhs) {
         return lhs->visitCnt() < rhs->visitCnt();
       });
 
   auto findBestChild =
       std::find_if(children.begin(), children.end(),
-                   [bestChild](const MCTreeNode<MCTS_GAME>* node) {
+                   [bestChild](const MCTreeNode<MCTS_GAME> *node) {
                      return node == *bestChild;
                    });
 
@@ -115,28 +114,28 @@ int MCTree<MCTS_GAME>::findBestMove() {
 }
 
 template <typename MCTS_GAME>
-MCTreeNode<MCTS_GAME>* MCTree<MCTS_GAME>::selectNode() {
+MCTreeNode<MCTS_GAME> *MCTree<MCTS_GAME>::selectNode() {
 
-  MCTreeNode<MCTS_GAME>* currNode = d_rootNode.get();
+  MCTreeNode<MCTS_GAME> *currNode = d_rootNode.get();
 
   while (!currNode->children().empty()) {
-    std::vector<MCTreeNode<MCTS_GAME>*> children = currNode->children();
+    std::vector<MCTreeNode<MCTS_GAME> *> children = currNode->children();
 
     auto uncompletedChildren =
-        children | ranges::views::filter([](MCTreeNode<MCTS_GAME>* childNode) {
+        children | ranges::views::filter([](MCTreeNode<MCTS_GAME> *childNode) {
           return !childNode->game().gameIsComplete();
         }) |
         ranges::to<std::vector>;
 
-    //TODO: Not correct
+    // TODO: Not correct
     if (uncompletedChildren.empty()) {
       return nullptr;
     }
 
-    //find any unexplored children
+    // find any unexplored children
     auto unexploredChildren =
         uncompletedChildren |
-        ranges::views::filter([](const MCTreeNode<MCTS_GAME>* node) {
+        ranges::views::filter([](const MCTreeNode<MCTS_GAME> *node) {
           return node->visitCnt() == 0;
         }) |
         ranges::to<std::vector>;
@@ -145,11 +144,11 @@ MCTreeNode<MCTS_GAME>* MCTree<MCTS_GAME>::selectNode() {
       return unexploredChildren.front();
     }
 
-    //If all explored, choose a next child
+    // If all explored, choose a next child
     auto nextChild = ranges::max_element(
         uncompletedChildren, [parentSimCnt = currNode->visitCnt()](
-                                 const MCTreeNode<MCTS_GAME>* lhs,
-                                 const MCTreeNode<MCTS_GAME>* rhs) {
+                                 const MCTreeNode<MCTS_GAME> *lhs,
+                                 const MCTreeNode<MCTS_GAME> *rhs) {
           return lhs->getComparisonNum(parentSimCnt) <
                  rhs->getComparisonNum(parentSimCnt);
         });
@@ -161,8 +160,8 @@ MCTreeNode<MCTS_GAME>* MCTree<MCTS_GAME>::selectNode() {
 }
 
 template <typename MCTS_GAME>
-void MCTree<MCTS_GAME>::expandNode(MCTreeNode<MCTS_GAME>* node) {
-  //Add children for each possible move
+void MCTree<MCTS_GAME>::expandNode(MCTreeNode<MCTS_GAME> *node) {
+  // Add children for each possible move
 
   MCTS_GAME baseGame = node->game();
 
@@ -180,14 +179,14 @@ void MCTree<MCTS_GAME>::expandNode(MCTreeNode<MCTS_GAME>* node) {
 }
 
 template <typename MCTS_GAME>
-//TODO: THINK about type for winner
-int MCTree<MCTS_GAME>::simulate(MCTreeNode<MCTS_GAME>* node) {
+// TODO: THINK about type for winner
+int MCTree<MCTS_GAME>::simulate(MCTreeNode<MCTS_GAME> *node) {
 
   MCTS_GAME game = node->game();
 
   while (!game.gameIsComplete()) {
 
-    //TODO: think about type of move
+    // TODO: think about type of move
     std::vector<int> availableMoves = game.getAvailableMoves();
 
     std::uniform_int_distribution<> dist{
@@ -201,7 +200,7 @@ int MCTree<MCTS_GAME>::simulate(MCTreeNode<MCTS_GAME>* node) {
 }
 
 template <typename MCTS_GAME>
-void MCTree<MCTS_GAME>::backpropagateResult(MCTreeNode<MCTS_GAME>* node,
+void MCTree<MCTS_GAME>::backpropagateResult(MCTreeNode<MCTS_GAME> *node,
                                             bool computerWon) {
   while (node != nullptr) {
     if ((computerWon && node->isComputer()) ||
@@ -221,8 +220,8 @@ void MCTree<MCTS_GAME>::dumpCurrentState(int iterations) {
       children | ranges::views::enumerate |
       ranges::views::transform(
           [iterations, parentSimCnt = d_rootNode->visitCnt()](
-              std::tuple<int, MCTreeNode<MCTS_GAME>*> enumChildNode) {
-            auto& [childId, childNode] = enumChildNode;
+              std::tuple<int, MCTreeNode<MCTS_GAME> *> enumChildNode) {
+            auto &[childId, childNode] = enumChildNode;
             return fmt::format("{}|{}|{}|{}|{}\n", iterations, childId,
                                childNode->visitCnt(), childNode->winCnt(),
                                childNode->getComparisonNum(parentSimCnt));

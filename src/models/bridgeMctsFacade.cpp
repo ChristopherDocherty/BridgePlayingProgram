@@ -23,7 +23,7 @@ std::vector<int> BridgeMctsFacade::getAvailableMoves() {
 
 std::string BridgeMctsFacade::makeMove(int validMoveNumber) {
   return d_gamestate.makeMoveMCTS(validMoveNumber)
-      .map_error([&validMoveNumber](std::string&& err) {
+      .map_error([&validMoveNumber](std::string &&err) {
         throw std::invalid_argument(
             "Invalid MCTS move attempted=" + std::to_string(validMoveNumber) +
             " - failing with error=" + err);
@@ -36,7 +36,7 @@ bool BridgeMctsFacade::gameIsComplete() {
 }
 
 int BridgeMctsFacade::winner() {
-  //contract is that 0 is computer win
+  // contract is that 0 is computer win
   std::string winner = d_gamestate.getWinner();
   if (winner == "") {
     return -1;
@@ -44,4 +44,4 @@ int BridgeMctsFacade::winner() {
   return winner == d_playerTeam ? 1 : 0;
 }
 
-}  // namespace Bridge
+} // namespace Bridge

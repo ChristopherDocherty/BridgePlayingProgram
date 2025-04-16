@@ -9,4 +9,4 @@ std::vector<std::string> getSuits() {
   return suits;
 }
 
-}  // namespace viewUtils
+} // namespace viewUtils

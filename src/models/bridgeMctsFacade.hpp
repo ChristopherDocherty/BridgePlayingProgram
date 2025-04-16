@@ -7,7 +7,7 @@ namespace Bridge {
 
 class BridgeMctsFacade {
 
- public:
+public:
   BridgeMctsFacade(BridgeGamestate bg, std::string playerTeam);
 
   std::vector<int> getAvailableMoves();
@@ -17,10 +17,10 @@ class BridgeMctsFacade {
 
   int winner();
 
- private:
+private:
   BridgeGamestate d_gamestate;
   std::string d_playerTeam;
 };
 
-}  // namespace Bridge
+} // namespace Bridge
 #endif

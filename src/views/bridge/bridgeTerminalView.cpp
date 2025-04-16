@@ -1,9 +1,9 @@
 #include "bridgeTerminalView.hpp"
 
-#include <views/bridge/viewUtils.hpp>
 #include "models/bridge/bridgeCard.hpp"
 #include "models/bridge/bridgeGamestate.hpp"
 #include "models/bridge/utils/bridgeUtils.hpp"
+#include <views/bridge/viewUtils.hpp>
 
 #include <range/v3/iterator/operations.hpp>
 #include <range/v3/view/cartesian_product.hpp>
@@ -22,8 +22,9 @@
 
 namespace Bridge {
 
-std::optional<BridgeCard> getCardForDir(
-    const std::vector<BridgeCard>& currentTrickRecord, int leadDir, int dir) {
+std::optional<BridgeCard>
+getCardForDir(const std::vector<BridgeCard> &currentTrickRecord, int leadDir,
+              int dir) {
 
   size_t cardLocation = (4 - (leadDir - dir)) % 4;
 
@@ -33,7 +34,7 @@ std::optional<BridgeCard> getCardForDir(
   return currentTrickRecord[cardLocation];
 }
 
-std::string getNSPlayedCard(const std::optional<BridgeCard>& card) {
+std::string getNSPlayedCard(const std::optional<BridgeCard> &card) {
   if (card) {
     std::stringstream ss;
     ss << std::string(4, ' ') << card->getSuit() << " " << card->getRank()
@@ -43,11 +44,11 @@ std::string getNSPlayedCard(const std::optional<BridgeCard>& card) {
     return std::string(12, ' ');
   }
 }
-std::string getEWPlayedCards(const std::optional<BridgeCard>& eCard,
-                             const std::optional<BridgeCard>& wCard) {
+std::string getEWPlayedCards(const std::optional<BridgeCard> &eCard,
+                             const std::optional<BridgeCard> &wCard) {
   std::stringstream ss;
 
-  auto addCard = [&ss](const std::optional<BridgeCard>& card) {
+  auto addCard = [&ss](const std::optional<BridgeCard> &card) {
     if (card) {
       ss << card->getSuit() << " " << card->getRank() << " ";
     } else {
@@ -62,7 +63,7 @@ std::string getEWPlayedCards(const std::optional<BridgeCard>& eCard,
   return ss.str();
 }
 
-std::vector<std::string> getPlayedCards(const BridgeGamestate& bg) {
+std::vector<std::string> getPlayedCards(const BridgeGamestate &bg) {
   std::vector<BridgeCard> currentTrickRecord = bg.currentTrickRecord();
   int leadDir = bg.currentLeadHand();
   std::vector<std::string> playedCards;
@@ -82,11 +83,11 @@ std::vector<std::string> getPlayedCards(const BridgeGamestate& bg) {
   return playedCards;
 }
 
-void BridgeTerminalView::update(const BridgeGamestate& bg) {
+void BridgeTerminalView::update(const BridgeGamestate &bg) {
   std::cout << getGamestateString(bg) << std::endl;
 }
 
-std::string BridgeTerminalView::getGamestateString(const BridgeGamestate& bg) {
+std::string BridgeTerminalView::getGamestateString(const BridgeGamestate &bg) {
 
   auto handStr = getHandStrings(bg);
 
@@ -98,8 +99,8 @@ std::string BridgeTerminalView::getGamestateString(const BridgeGamestate& bg) {
   return ss.str();
 }
 
-std::string BridgeTerminalView::getContractAndTurnInfo(
-    const BridgeGamestate& bg) {
+std::string
+BridgeTerminalView::getContractAndTurnInfo(const BridgeGamestate &bg) {
   std::stringstream ss;
 
   ss << std::to_string(bg.contractLevel())
@@ -110,20 +111,20 @@ std::string BridgeTerminalView::getContractAndTurnInfo(
   return ss.str();
 }
 
-std::string BridgeTerminalView::getNSHand(
-    const std::vector<std::string>& handStrings) {
+std::string
+BridgeTerminalView::getNSHand(const std::vector<std::string> &handStrings) {
   const std::string westWhitespaceFill(westWhitespaceFillLength, ' ');
 
   std::stringstream ss;
-  for (const auto& suitStr : handStrings) {
+  for (const auto &suitStr : handStrings) {
     ss << westWhitespaceFill << suitStr << "\n";
   }
   return ss.str();
 }
 
-std::string BridgeTerminalView::getEWHand(std::vector<std::string>&& eHand,
-                                          std::vector<std::string>&& wHand,
-                                          const BridgeGamestate& bg) {
+std::string BridgeTerminalView::getEWHand(std::vector<std::string> &&eHand,
+                                          std::vector<std::string> &&wHand,
+                                          const BridgeGamestate &bg) {
 
   std::vector<BridgeCard> currPlayedCards = bg.currentTrickRecord();
   std::vector<std::string> playedCards = getPlayedCards(bg);
@@ -134,7 +135,7 @@ std::string BridgeTerminalView::getEWHand(std::vector<std::string>&& eHand,
   std::stringstream ss;
   for (auto [i, cards] :
        ranges::views::enumerate(ranges::views::zip(eHandPadded, wHandPadded))) {
-    const auto& [eCards, wCards] = cards;
+    const auto &[eCards, wCards] = cards;
     auto playedCard =
         i < playedCards.size() ? playedCards[i] : std::string(12, ' ');
 
@@ -149,14 +150,14 @@ std::string BridgeTerminalView::getEWHand(std::vector<std::string>&& eHand,
 }
 
 std::vector<std::string> BridgeTerminalView::getCardsOfSuitString(
-    const std::vector<std::vector<BridgeCard>>& board, const std::string& dir,
-    const std::string& suit) {
+    const std::vector<std::vector<BridgeCard>> &board, const std::string &dir,
+    const std::string &suit) {
 
   int dirInt = convertDirStringToInt(dir);
   const std::vector<BridgeCard> hand = board[dirInt];
 
   auto extractAllRanksOfSuit = [](auto hand, std::string suit) {
-    return hand | ranges::views::filter([&suit](const BridgeCard& card) {
+    return hand | ranges::views::filter([&suit](const BridgeCard &card) {
              return card.getSuit() == suit;
            }) |
            ranges::views::transform(&BridgeCard::getRank);
@@ -199,4 +200,4 @@ BridgeTerminalView::getHandStrings(BridgeGamestate bg) {
          ranges::to<std::unordered_map>;
 }
 
-}  // namespace Bridge
+} // namespace Bridge

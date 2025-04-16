@@ -43,4 +43,4 @@ TEST_CASE("BridgeCardTests --  getterTests") {
   REQUIRE(queenDiamond.getRank() == "Q");
 }
 
-}  // namespace Bridge
+} // namespace Bridge

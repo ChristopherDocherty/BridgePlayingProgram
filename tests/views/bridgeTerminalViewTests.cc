@@ -51,7 +51,7 @@ TEST_CASE("Gamestate is displayed correctly") {
   std::vector<std::string> rowView = getRowView(gamestateStr);
 
   ranges::for_each(ranges::views::zip(rowView, expectedView), [](auto views) {
-    const auto& [generatedRow, expectedRow] = views;
+    const auto &[generatedRow, expectedRow] = views;
     CHECK(generatedRow == expectedRow);
   });
 }
@@ -90,9 +90,9 @@ TEST_CASE("Gamestate with played cards is displayed correctly") {
   std::vector<std::string> rowView = getRowView(gamestateStr);
 
   ranges::for_each(ranges::views::zip(rowView, expectedView), [](auto views) {
-    const auto& [generatedRow, expectedRow] = views;
+    const auto &[generatedRow, expectedRow] = views;
     CHECK(generatedRow == expectedRow);
   });
 }
 
-}  // namespace Bridge
+} // namespace Bridge

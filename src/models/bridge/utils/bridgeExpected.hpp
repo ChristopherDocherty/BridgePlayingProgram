@@ -5,7 +5,6 @@
 
 #include <tl/expected.hpp>
 
-template <typename T>
-using BridgeExpected = tl::expected<T, std::string>;
+template <typename T> using BridgeExpected = tl::expected<T, std::string>;
 
 #endif

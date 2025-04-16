@@ -16,7 +16,7 @@ namespace Bridge {
 namespace {
 const std::set<std::string> VALID_DESIRED_DIRS{"N", "E"};
 
-void playGameImpl(BridgeGamestate&& bg) {
+void playGameImpl(BridgeGamestate &&bg) {
 
   BridgeTerminalView view;
 
@@ -48,7 +48,7 @@ void playGameImpl(BridgeGamestate&& bg) {
         std::string rank = input.substr(0, 1);
         std::string suit = input.substr(1, 1);
 
-        bg.makeMove(suit, rank).map_error([](std::string&& err) {
+        bg.makeMove(suit, rank).map_error([](std::string &&err) {
           std::cout << "Invalid move entered: " << err << std::endl;
         });
       } else if (input.size() == 3) {
@@ -56,7 +56,7 @@ void playGameImpl(BridgeGamestate&& bg) {
         std::string rank = input.substr(0, 1);
         std::string suit = input.substr(1, 1);
 
-        bg.makeMove(suit, rank).map_error([](std::string&& err) {
+        bg.makeMove(suit, rank).map_error([](std::string &&err) {
           std::cout << "Invalid move entered: " << err << std::endl;
         });
       }
@@ -73,10 +73,10 @@ void playGameImpl(BridgeGamestate&& bg) {
 
   std::cout << "Winner is: " << bg.getWinner();
 }
-}  // namespace
+} // namespace
 
 void BridgeController::playGame() {
   Bridge::loadGamestate("testBoards.json", "squeeze").map(playGameImpl);
 }
 
-}  // namespace Bridge
+} // namespace Bridge

@@ -15,18 +15,18 @@ namespace Bridge {
 
 namespace {
 
-std::set<std::set<BridgeCard>> convertBoardToSet(
-    std::vector<std::vector<BridgeCard>> board) {
+std::set<std::set<BridgeCard>>
+convertBoardToSet(std::vector<std::vector<BridgeCard>> board) {
   return board | ranges::views::transform([](std::vector<BridgeCard> hand) {
            return hand | ranges::to<std::set>;
          }) |
          ranges::to<std::set>;
 }
 
-}  // namespace
+} // namespace
 
-void compareBridgeGamestateMembers(const BridgeGamestate& lhs,
-                                   const BridgeGamestate& rhs) {
+void compareBridgeGamestateMembers(const BridgeGamestate &lhs,
+                                   const BridgeGamestate &rhs) {
 
   REQUIRE(convertBoardToSet(lhs.board()) == convertBoardToSet(rhs.board()));
   REQUIRE(lhs.declarerHand() == rhs.declarerHand());
@@ -35,7 +35,7 @@ void compareBridgeGamestateMembers(const BridgeGamestate& lhs,
   REQUIRE(lhs.declarerTricksRequired() == rhs.declarerTricksRequired());
   REQUIRE(lhs.currentTrick() == rhs.currentTrick());
   REQUIRE(lhs.declarerTricksMade() == rhs.declarerTricksMade());
-  //REQUIRE(lhs.currentTrickRecord() == rhs.currentTrickRecord());
+  // REQUIRE(lhs.currentTrickRecord() == rhs.currentTrickRecord());
 }
 
 const std::string TEST_BOARD_CONFIG_FILE = "testBoards.json";
@@ -201,7 +201,7 @@ TEST_CASE("BridgeGamestateTest -- GameToCompletion") {
   REQUIRE(wonTestBG.makeMove("S", "4"));
   REQUIRE(wonTestBG.makeMove("S", "8"));
 
-  //TODO: finish
+  // TODO: finish
 }
 
-}  // namespace Bridge
+} // namespace Bridge

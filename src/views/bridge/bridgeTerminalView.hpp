@@ -11,9 +11,9 @@ namespace Bridge {
 namespace detail {
 
 template <typename T>
-std::pair<std::vector<T>, std::vector<T>> padVectorsToBeSameLength(
-    std::vector<T>&& leftHand, std::vector<T>&& rightHand,
-    const T& valueToPadWith) {
+std::pair<std::vector<T>, std::vector<T>>
+padVectorsToBeSameLength(std::vector<T> &&leftHand, std::vector<T> &&rightHand,
+                         const T &valueToPadWith) {
   size_t lSize = leftHand.size();
   size_t rSize = rightHand.size();
 
@@ -26,33 +26,33 @@ std::pair<std::vector<T>, std::vector<T>> padVectorsToBeSameLength(
   }
   return std::pair{leftHand, rightHand};
 }
-}  // namespace detail
+} // namespace detail
 
 class BridgeTerminalView {
 
- public:
-  void update(const BridgeGamestate& gamestate);
+public:
+  void update(const BridgeGamestate &gamestate);
 
-  static std::string getGamestateString(const BridgeGamestate& gamestate);
+  static std::string getGamestateString(const BridgeGamestate &gamestate);
 
- private:
+private:
   constexpr static int westWhitespaceFillLength = 18;
 
-  static std::string getContractAndTurnInfo(const BridgeGamestate& gamestate);
+  static std::string getContractAndTurnInfo(const BridgeGamestate &gamestate);
 
-  static std::string getEWHand(std::vector<std::string>&& eHand,
-                               std::vector<std::string>&& wHand,
-                               const BridgeGamestate& bg);
+  static std::string getEWHand(std::vector<std::string> &&eHand,
+                               std::vector<std::string> &&wHand,
+                               const BridgeGamestate &bg);
 
-  static std::vector<std::string> getCardsOfSuitString(
-      const std::vector<std::vector<BridgeCard>>& board, const std::string& dir,
-      const std::string& suit);
+  static std::vector<std::string>
+  getCardsOfSuitString(const std::vector<std::vector<BridgeCard>> &board,
+                       const std::string &dir, const std::string &suit);
 
   static std::unordered_map<std::string, std::vector<std::string>>
   getHandStrings(BridgeGamestate bg);
-  static std::string getNSHand(
-      const std::vector<std::string>& northHandStrings);
+  static std::string
+  getNSHand(const std::vector<std::string> &northHandStrings);
 };
 
-}  // namespace Bridge
+} // namespace Bridge
 #endif

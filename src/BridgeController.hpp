@@ -7,9 +7,9 @@ class BridgeGamestate;
 
 class BridgeController {
 
- public:
+public:
   void playGame();
 };
 
-}  // namespace Bridge
+} // namespace Bridge
 #endif

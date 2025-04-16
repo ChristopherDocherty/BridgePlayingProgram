@@ -15,4 +15,4 @@ TEST_CASE("bridgGamestateLoader loads correctly") {
   REQUIRE(gamestate.getWinner() == "");
 }
 
-}  // namespace Bridge
+} // namespace Bridge

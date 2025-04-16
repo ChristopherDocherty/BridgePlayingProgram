@@ -16,5 +16,5 @@ BridgeExpected<BridgeGamestate> loadGamestate(std::string configFilepath,
                                               std::string key);
 BridgeExpected<std::vector<std::vector<BridgeCard>>> getBoard(json boardData);
 
-}  // namespace Bridge
+} // namespace Bridge
 #endif

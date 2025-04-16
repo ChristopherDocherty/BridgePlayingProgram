@@ -20,15 +20,13 @@ BridgeGamestate::BridgeGamestate(std::vector<std::vector<BridgeCard>> board,
                                  std::string currentLeadHand,
                                  std::string trumpSuit, int contractLevel,
                                  int currentTrick, int declarerTricksMade)
-    : d_board(board),
-      d_declarerHand(convertDirStringToInt(declarerHand)),
+    : d_board(board), d_declarerHand(convertDirStringToInt(declarerHand)),
       d_currentLeadHand(convertDirStringToInt(currentLeadHand)),
       d_currentHand(convertDirStringToInt(currentLeadHand)),
-      //TODO: fix this vvv
+      // TODO: fix this vvv
       d_trumpSuit(*convertSuitStringToInt(trumpSuit)),
       d_declarerTricksRequired(getTricksRequired(contractLevel)),
-      d_currentTrick(currentTrick),
-      d_declarerTricksMade(declarerTricksMade),
+      d_currentTrick(currentTrick), d_declarerTricksMade(declarerTricksMade),
       d_contractLevel(contractLevel) {
   updateCurrentValidMoves();
 }
@@ -43,8 +41,9 @@ std::string BridgeGamestate::getWinner() {
   } else {
     return "";
   }
-  //possibly simulate till the end
-  //just do simple check of if there is only one valid card to play - no reason to go through the last obvious move
+  // possibly simulate till the end
+  // just do simple check of if there is only one valid card to play - no reason
+  // to go through the last obvious move
 }
 
 BridgeExpected<std::string> BridgeGamestate::makeMoveMCTS(int validMoveNumber) {
@@ -60,20 +59,20 @@ BridgeExpected<std::string> BridgeGamestate::makeMoveMCTS(int validMoveNumber) {
 
 BridgeExpected<std::string> BridgeGamestate::makeMove(const std::string suit,
                                                       const std::string rank) {
-  //TODO: mabe needs to be a more distinct return type
+  // TODO: mabe needs to be a more distinct return type
   if (getWinner() != "") {
     return tl::make_unexpected(
         fmt::format("The game is over! The winner is: {}", getWinner()));
   }
 
   return BridgeCard::create(suit, rank)
-      .and_then([this](BridgeCard&& move) -> BridgeExpected<BridgeCard> {
+      .and_then([this](BridgeCard &&move) -> BridgeExpected<BridgeCard> {
         if (auto isValid = moveIsValid(move); !isValid) {
           return tl::make_unexpected(isValid.error());
         }
         return move;
       })
-      .map([this](BridgeCard&& move) {
+      .map([this](BridgeCard &&move) {
         auto iterToErase = std::find(d_board[d_currentHand].begin(),
                                      d_board[d_currentHand].end(), move);
         d_board[d_currentHand].erase(iterToErase);
@@ -89,7 +88,7 @@ BridgeExpected<std::string> BridgeGamestate::makeMove(const std::string suit,
           d_currentHand = trickWinnerDir;
           d_currentLeadHand = trickWinnerDir;
 
-          //Declarer wins trick if they or the dummy wins, hence %2
+          // Declarer wins trick if they or the dummy wins, hence %2
           if (trickWinnerDir % 2 == d_declarerHand % 2) {
             ++d_declarerTricksMade;
           }
@@ -141,8 +140,8 @@ void BridgeGamestate::updateCurrentValidMoves() {
   //  std::cout << "\n";
 }
 
-BridgeExpected<void> BridgeGamestate::moveIsValid(
-    const BridgeCard& proposedMove) const {
+BridgeExpected<void>
+BridgeGamestate::moveIsValid(const BridgeCard &proposedMove) const {
   if (auto ret = currentHandHasCard(proposedMove); !ret) {
     return ret;
   }
@@ -152,8 +151,8 @@ BridgeExpected<void> BridgeGamestate::moveIsValid(
   return {};
 }
 
-BridgeExpected<void> BridgeGamestate::currentHandHasCard(
-    const BridgeCard& proposedMove) const {
+BridgeExpected<void>
+BridgeGamestate::currentHandHasCard(const BridgeCard &proposedMove) const {
 
   auto currentCards = d_board[d_currentHand];
 
@@ -169,9 +168,9 @@ BridgeExpected<void> BridgeGamestate::currentHandHasCard(
 }
 
 BridgeExpected<void> BridgeGamestate::moveFollowsSuitCorrectly(
-    const BridgeCard& proposedMove) const {
+    const BridgeCard &proposedMove) const {
 
-  //First card of a trick can be any suit
+  // First card of a trick can be any suit
   if (d_currentTrickRecord.size() == 0) {
     return {};
   }
@@ -193,7 +192,7 @@ BridgeExpected<void> BridgeGamestate::moveFollowsSuitCorrectly(
 
   return {};
 }
-bool operator==(const BridgeGamestate& lhs, const BridgeGamestate& rhs) {
+bool operator==(const BridgeGamestate &lhs, const BridgeGamestate &rhs) {
   return lhs.d_board == rhs.d_board &&
          lhs.d_declarerHand == rhs.d_declarerHand &&
          lhs.d_currentLeadHand == rhs.d_currentLeadHand &&
@@ -204,40 +203,26 @@ bool operator==(const BridgeGamestate& lhs, const BridgeGamestate& rhs) {
          lhs.d_currentTrickRecord == rhs.d_currentTrickRecord;
 }
 
-const std::vector<std::vector<BridgeCard>>& BridgeGamestate::board() const {
+const std::vector<std::vector<BridgeCard>> &BridgeGamestate::board() const {
   return d_board;
 }
 
-int BridgeGamestate::declarerHand() const {
-  return d_declarerHand;
-}
-int BridgeGamestate::currentLeadHand() const {
-  return d_currentLeadHand;
-}
-int BridgeGamestate::currentHand() const {
-  return d_currentHand;
-}
+int BridgeGamestate::declarerHand() const { return d_declarerHand; }
+int BridgeGamestate::currentLeadHand() const { return d_currentLeadHand; }
+int BridgeGamestate::currentHand() const { return d_currentHand; }
 
-int BridgeGamestate::trumpSuit() const {
-  return d_trumpSuit;
-}
+int BridgeGamestate::trumpSuit() const { return d_trumpSuit; }
 int BridgeGamestate::declarerTricksRequired() const {
   return d_declarerTricksRequired;
 }
 
-int BridgeGamestate::currentTrick() const {
-  return d_currentTrick;
-}
-int BridgeGamestate::declarerTricksMade() const {
-  return d_declarerTricksMade;
-}
+int BridgeGamestate::currentTrick() const { return d_currentTrick; }
+int BridgeGamestate::declarerTricksMade() const { return d_declarerTricksMade; }
 
 std::vector<BridgeCard> BridgeGamestate::currentTrickRecord() const {
   return d_currentTrickRecord;
 }
 
-int BridgeGamestate::contractLevel() const {
-  return d_contractLevel;
-}
+int BridgeGamestate::contractLevel() const { return d_contractLevel; }
 
-}  // namespace Bridge
+} // namespace Bridge

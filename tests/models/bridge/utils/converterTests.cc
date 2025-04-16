@@ -9,7 +9,7 @@ SCENARIO("Converters work as expected") {
     WHEN("Converted to int") {
 
       THEN("The correct int is found") {
-        //TODO: expected checks
+        // TODO: expected checks
         REQUIRE(*Bridge::convertSuitStringToInt("C") == 1);
         REQUIRE(*Bridge::convertSuitStringToInt("D") == 2);
         REQUIRE(*Bridge::convertSuitStringToInt("H") == 3);

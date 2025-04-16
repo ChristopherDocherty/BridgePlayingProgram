@@ -13,7 +13,7 @@
 
 namespace Bridge {
 
-BridgeExpected<int> convertSuitStringToInt(const std::string& suit) {
+BridgeExpected<int> convertSuitStringToInt(const std::string &suit) {
   const static std::map<std::string, int> suitMap = {
       {"NT", 0}, {"C", 1}, {"D", 2}, {"H", 3}, {"S", 4}};
 
@@ -36,7 +36,7 @@ const std::string convertSuitIntToString(const int suitInt) {
   return suitMap.at(suitInt);
 }
 
-BridgeExpected<int> convertRankStringToInt(const std::string& rank) {
+BridgeExpected<int> convertRankStringToInt(const std::string &rank) {
 
   const static std::map<std::string, int> rankMap = {
       {"1", 1},  {"2", 2},  {"3", 3},  {"4", 4}, {"5", 5},
@@ -66,7 +66,7 @@ const std::string convertRankIntToString(const int rankInt) {
   return rankMap.at(rankInt);
 }
 
-int convertDirStringToInt(const std::string& dir) {
+int convertDirStringToInt(const std::string &dir) {
 
   const static std::map<std::string, int> dirMap = {
       {"N", 0}, {"E", 1}, {"S", 2}, {"W", 3}};
@@ -90,8 +90,8 @@ const std::string convertDirIntToString(const int dirInt) {
   return dirMap.at(dirInt);
 }
 
-BridgeExpected<std::tuple<int, int>> convertContractString(
-    const std::string& contractString) {
+BridgeExpected<std::tuple<int, int>>
+convertContractString(const std::string &contractString) {
 
   std::stringstream contractStream(contractString);
 
@@ -115,4 +115,4 @@ BridgeExpected<std::tuple<int, int>> convertContractString(
       });
 }
 
-}  // namespace Bridge
+} // namespace Bridge

@@ -8,9 +8,9 @@
 
 namespace Bridge {
 
-//ctor for root node
+// ctor for root node
 BridgeMCTreeNode::BridgeMCTreeNode(
-    const std::string& initialGamestateJsonFilepath)
+    const std::string &initialGamestateJsonFilepath)
     : MCTreeNode(nullptr) {
 
   std::string initialGamestateJson =
@@ -19,7 +19,7 @@ BridgeMCTreeNode::BridgeMCTreeNode(
   setGamestate(initialGamestateJson);
 }
 
-BridgeMCTreeNode::BridgeMCTreeNode(MCTreeNode* parent) : MCTreeNode(parent) {
+BridgeMCTreeNode::BridgeMCTreeNode(MCTreeNode *parent) : MCTreeNode(parent) {
 
   std::string inheritedGamestate = parent->getGamestate();
 
@@ -35,8 +35,8 @@ void BridgeMCTreeNode::notify() {
   }
 }
 
-std::string BridgeMCTreeNode::loadGamestateJsonFromFile(
-    const std::string& filepath) {
+std::string
+BridgeMCTreeNode::loadGamestateJsonFromFile(const std::string &filepath) {
 
   std::ifstream jsonFile(filepath);
   std::stringstream buffer;
@@ -52,4 +52,4 @@ void BridgeMCTreeNode::setGamestate(std::string gamestate) {
   pGamestate = std::make_unique<BridgeGamestate>(gamestateJson.as_object());
 }
 
-}  // namespace Bridge
+} // namespace Bridge
