@@ -5,6 +5,7 @@
 
 #include <ostream>
 #include <string>
+#include <string_view>
 
 namespace Bridge {
 
@@ -19,14 +20,14 @@ public:
   const std::string getSuit() const;
   const std::string getRank() const;
 
-  static BridgeExpected<BridgeCard> create(const std::string suit,
-                                           const std::string rank);
+  static BridgeExpected<BridgeCard> create(std::string_view suit,
+                                           std::string_view rank);
 
 private:
   int mSuit;
   int mRank;
 
-  BridgeCard(int suit, int rank);
+  BridgeCard(const int suit, const int rank);
 };
 
 } // namespace Bridge

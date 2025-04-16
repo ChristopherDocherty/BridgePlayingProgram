@@ -2,15 +2,13 @@
 
 #include "utils/bridgeUtils.hpp"
 
-#include <stdexcept>
 #include <string>
-#include <tl/expected.hpp>
 
 namespace Bridge {
 
 namespace {
 
-BridgeExpected<int> convertToValidCardSuit(const std::string suit) {
+BridgeExpected<int> convertToValidCardSuit(std::string_view suit) {
   if (suit == "NT") {
     return tl::make_unexpected("No Trump is not a valid suit for a Card");
   }
@@ -20,9 +18,8 @@ BridgeExpected<int> convertToValidCardSuit(const std::string suit) {
 
 } // namespace
 
-BridgeExpected<BridgeCard> BridgeCard::create(const std::string suit,
-                                              const std::string rank) {
-
+BridgeExpected<BridgeCard> BridgeCard::create(std::string_view suit,
+                                              std::string_view rank) {
   auto expSuit = convertToValidCardSuit(suit);
 
   if (!expSuit) {
@@ -35,7 +32,6 @@ BridgeExpected<BridgeCard> BridgeCard::create(const std::string suit,
 }
 
 bool operator==(const BridgeCard &lhs, const BridgeCard &rhs) {
-
   return (lhs.mSuit == rhs.mSuit) && (lhs.mRank == rhs.mRank);
 }
 
@@ -45,23 +41,21 @@ std::ostream &operator<<(std::ostream &os, const BridgeCard &bc) {
 }
 
 bool BridgeCard::operator>(const BridgeCard &other) const {
-
   if ((mSuit > other.mSuit) ||
       ((mSuit == other.mSuit) && (mRank > other.mRank))) {
     return true;
-  } else {
-    return false;
   }
+
+  return false;
 }
 
 bool BridgeCard::operator<(const BridgeCard &other) const {
-
   if ((mSuit < other.mSuit) ||
       ((mSuit == other.mSuit) && (mRank < other.mRank))) {
     return true;
-  } else {
-    return false;
   }
+
+  return false;
 }
 
 const std::string BridgeCard::getSuit() const {
@@ -72,6 +66,7 @@ const std::string BridgeCard::getRank() const {
   return convertRankIntToString(mRank);
 }
 
-BridgeCard::BridgeCard(int suit, int rank) : mSuit(suit), mRank(rank) {};
+BridgeCard::BridgeCard(const int suit, const int rank)
+    : mSuit(suit), mRank(rank) {};
 
 } // namespace Bridge

@@ -8,13 +8,13 @@
 
 namespace Bridge {
 
-BridgeExpected<int> convertSuitStringToInt(const std::string &suit);
+BridgeExpected<int> convertSuitStringToInt(std::string_view suit);
 const std::string convertSuitIntToString(const int suitInt);
 
-BridgeExpected<int> convertRankStringToInt(const std::string &rank);
+BridgeExpected<int> convertRankStringToInt(std::string_view rank);
 const std::string convertRankIntToString(const int rankInt);
 
-int convertDirStringToInt(const std::string &dir);
+int convertDirStringToInt(std::string_view dir);
 const std::string convertDirIntToString(const int dirInt);
 
 BridgeExpected<std::tuple<int, int>>

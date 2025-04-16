@@ -75,8 +75,6 @@ private:
   std::vector<BridgeCard> d_currentValidMoves;
 
   int getTricksRequired(int contractLevel) const { return contractLevel + 6; };
-  //       std::vector<std::vector<BridgeCard>>
-  //       readBoardFromJson(boost::json::object& conf);
 
   int getTrickWinner() const;
 };
