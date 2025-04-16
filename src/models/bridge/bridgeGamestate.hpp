@@ -10,6 +10,24 @@ namespace Bridge {
 
 constexpr int TOTAL_TURNS = 13;
 
+struct ContractInfo {
+  int trumpSuit;
+  int declarerTricksRequired;
+  int level;
+  int declarer;
+
+  auto operator<=>(const ContractInfo &) const = default;
+};
+
+struct CurrentTrickInfo {
+  int leadHand;
+  int currHand;
+  int num;
+  std::vector<BridgeCard> cardsPlayed;
+
+  auto operator<=>(const CurrentTrickInfo &) const = default;
+};
+
 class BridgeGamestate {
 
 public:
@@ -52,19 +70,10 @@ public:
 private:
   std::vector<std::vector<BridgeCard>> d_board;
 
-  int d_declarerHand;
-  int d_currentLeadHand;
-  int d_currentHand;
+  ContractInfo d_contract;
+  CurrentTrickInfo d_currentTrick;
 
-  int d_trumpSuit;
-  int d_declarerTricksRequired;
-
-  int d_currentTrick;
   int d_declarerTricksMade;
-
-  std::vector<BridgeCard> d_currentTrickRecord;
-
-  int d_contractLevel;
 
   BridgeExpected<void> moveIsValid(const BridgeCard &proposedMove) const;
   BridgeExpected<void> currentHandHasCard(const BridgeCard &proposedMove) const;
