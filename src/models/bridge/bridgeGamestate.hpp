@@ -25,6 +25,8 @@ struct CurrentTrickInfo {
   int num;
   std::vector<BridgeCard> cardsPlayed;
 
+  std::string leadSuit() const;
+
   auto operator<=>(const CurrentTrickInfo &) const = default;
 };
 
